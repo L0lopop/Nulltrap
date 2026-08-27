@@ -16,6 +16,7 @@
     <Copyright>Copyright (c) 2026 L0lopop</Copyright>
     <VersionPrefix>0.0.1</VersionPrefix>
     <RepositoryType>git</RepositoryType>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>
