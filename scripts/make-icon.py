@@ -1,8 +1,9 @@
 from collections import deque
 from pathlib import Path
 
+import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,7 +16,8 @@ ICO_SIZES = [16, 24, 32, 48, 64, 128, 256]
 BACKGROUND_TOLERANCE = 18
 CUTOUT_TOLERANCE = 45
 CUTOUT_OPENING_RADIUS = 8
-CUTOUT_EDGE_BLEED = 10
+CUTOUT_OFFSET = 8
+CUTOUT_SIMPLIFY = 0.01
 MARGIN = 0.04
 
 def border_seeds(height, width):
@@ -49,15 +51,38 @@ def flood_clear(rgba, seeds, reference, tolerance):
     rgba[visited, 3] = 0
     return int(visited.sum())
 
-def clear_centre_cutout(rgba, tolerance, radius, bleed):
-    height, width = rgba.shape[:2]
-    centre = (height // 2, width // 2)
+def polygon_area(points):
+    x, y = points[:, 0], points[:, 1]
+    return abs(0.5 * np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
 
-    similar = np.all(
-        np.abs(rgba[:, :, :3] - rgba[centre[0], centre[1], :3]) <= tolerance,
-        axis=2,
-    )
+def offset_polygon(points, distance):
+    points = np.asarray(points, dtype=float)
+    count = len(points)
 
+    def build(sign):
+        edges = []
+        for index in range(count):
+            start = points[index]
+            end = points[(index + 1) % count]
+            direction = end - start
+            length = float(np.hypot(*direction))
+            normal = np.array([direction[1], -direction[0]]) / length * sign
+            edges.append((start + normal * distance, direction))
+
+        corners = []
+        for index in range(count):
+            previous_point, previous_direction = edges[index - 1]
+            current_point, current_direction = edges[index]
+            matrix = np.column_stack([previous_direction, -current_direction])
+            steps = np.linalg.solve(matrix, current_point - previous_point)
+            corners.append(previous_point + previous_direction * steps[0])
+        return np.array(corners)
+
+    outward = build(1)
+    inward = build(-1)
+    return outward if polygon_area(outward) > polygon_area(inward) else inward
+
+def find_cutout_quad(similar, centre, radius, simplify):
     element = np.ones((2 * radius + 1, 2 * radius + 1), dtype=bool)
     eroded = ndimage.binary_erosion(similar, structure=element)
 
@@ -72,12 +97,40 @@ def clear_centre_cutout(rgba, tolerance, radius, bleed):
     core = labels == label
     region = ndimage.binary_dilation(core, structure=element) & similar
 
-    if bleed > 0:
-        halo = np.ones((2 * bleed + 1, 2 * bleed + 1), dtype=bool)
-        region = ndimage.binary_dilation(region, structure=halo)
+    contours, _ = cv2.findContours(
+        (region * 255).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+    )
+    contour = max(contours, key=cv2.contourArea)
+    approximation = cv2.approxPolyDP(
+        contour, simplify * cv2.arcLength(contour, True), True
+    ).reshape(-1, 2)
 
-    rgba[region, 3] = 0
-    return int(region.sum())
+    if len(approximation) != 4:
+        raise SystemExit(
+            f"The cutout simplified to {len(approximation)} corners, not 4. "
+            "Adjust CUTOUT_SIMPLIFY."
+        )
+
+    return approximation
+
+def clear_centre_cutout(rgba, tolerance, radius, offset, simplify):
+    height, width = rgba.shape[:2]
+    centre = (height // 2, width // 2)
+
+    similar = np.all(
+        np.abs(rgba[:, :, :3] - rgba[centre[0], centre[1], :3]) <= tolerance,
+        axis=2,
+    )
+
+    quad = find_cutout_quad(similar, centre, radius, simplify)
+    outline = offset_polygon(quad, offset)
+
+    stencil = Image.new("L", (width, height), 0)
+    ImageDraw.Draw(stencil).polygon([tuple(point) for point in outline], fill=255)
+
+    cut = np.array(stencil) > 0
+    rgba[cut, 3] = 0
+    return int(cut.sum())
 
 def prepare(image: Image.Image) -> Image.Image:
     rgba = np.array(image.convert("RGBA"), dtype=np.int16)
@@ -93,7 +146,7 @@ def prepare(image: Image.Image) -> Image.Image:
     print(f"background {cleared:>10,} px cleared")
 
     cleared = clear_centre_cutout(
-        rgba, CUTOUT_TOLERANCE, CUTOUT_OPENING_RADIUS, CUTOUT_EDGE_BLEED
+        rgba, CUTOUT_TOLERANCE, CUTOUT_OPENING_RADIUS, CUTOUT_OFFSET, CUTOUT_SIMPLIFY
     )
     print(f"cutout     {cleared:>10,} px cleared")
 
