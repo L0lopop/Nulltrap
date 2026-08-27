@@ -1,0 +1,29 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>Nulltrap</Product>
+    <Company>Nulltrap</Company>
+    <Authors>Nulltrap Contributors</Authors>
+    <Copyright>Copyright (c) Nulltrap Contributors</Copyright>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+</Project>

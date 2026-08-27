@@ -1,0 +1,24 @@
+<Application x:Class="Nulltrap.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+
+        <Color x:Key="VoidColor">#FF110D18</Color>
+        <Color x:Key="SurfaceColor">#FF1A1524</Color>
+        <Color x:Key="PurpleColor">#FF62209F</Color>
+        <Color x:Key="PurpleBrightColor">#FFB96FF0</Color>
+        <Color x:Key="GlowColor">#FFE4BAFC</Color>
+        <Color x:Key="TextColor">#FFEDE9F2</Color>
+        <Color x:Key="TextSoftColor">#FF9A93A8</Color>
+
+        <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="PurpleBrush" Color="{StaticResource PurpleColor}" />
+        <SolidColorBrush x:Key="PurpleBrightBrush" Color="{StaticResource PurpleBrightColor}" />
+        <SolidColorBrush x:Key="GlowBrush" Color="{StaticResource GlowColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
+        <SolidColorBrush x:Key="TextSoftBrush" Color="{StaticResource TextSoftColor}" />
+
+    </Application.Resources>
+</Application>

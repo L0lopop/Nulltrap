@@ -1,0 +1,50 @@
+<Window x:Class="Nulltrap.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Nulltrap"
+        Height="380" Width="520"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource VoidBrush}"
+        TextOptions.TextFormattingMode="Ideal"
+        UseLayoutRounding="True">
+
+    <Grid Margin="36,32,36,28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="Nulltrap"
+                   Foreground="{StaticResource TextBrush}"
+                   FontSize="34"
+                   FontWeight="SemiBold" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,2,0,0"
+                   Text="Alternative Roblox bootstrapper for Windows"
+                   Foreground="{StaticResource TextSoftBrush}"
+                   FontSize="13" />
+
+        <Border Grid.Row="2"
+                Margin="0,26,0,0"
+                Padding="18,14"
+                VerticalAlignment="Top"
+                Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource PurpleBrush}"
+                BorderThickness="2,0,0,0">
+            <StackPanel x:Name="DiagnosticsPanel" />
+        </Border>
+
+        <TextBlock Grid.Row="3"
+                   Text="Phase 0 — skeleton. Nothing launches Roblox yet."
+                   Foreground="{StaticResource TextSoftBrush}"
+                   FontSize="11" />
+    </Grid>
+</Window>

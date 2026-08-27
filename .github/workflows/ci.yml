@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CI: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Nulltrap.slnx
+
+      - name: Build
+        run: dotnet build Nulltrap.slnx -c Release --no-restore -warnaserror
+
+      - name: Test
+        run: dotnet test --solution Nulltrap.slnx -c Release --no-build
+
+      - name: Publish
+        run: dotnet publish src/Nulltrap.App -c Release -o publish
+
+      - name: Record artifact hashes
+        shell: pwsh
+        run: |
+          "## Build artifacts"                     | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          ""                                       | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| File | Size | SHA-256 |"              | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          "| --- | ---: | --- |"                   | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+
+          Get-ChildItem publish -File | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            $size = "{0:N0} KB" -f [math]::Ceiling($_.Length / 1KB)
+            "| ``$($_.Name)`` | $size | ``$hash`` |" |
+              Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+            "$hash  $($_.Name)" | Out-File -FilePath publish/SHA256SUMS.txt -Append -Encoding utf8
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nulltrap-win-x64
+          path: publish/
+          if-no-files-found: error
+
+  portability:
+    name: Core stays portable (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Build the portable projects
+        run: |
+          dotnet build src/Nulltrap.Core -c Release -warnaserror
+          dotnet build src/Nulltrap.Platform.Abstractions -c Release -warnaserror
+          dotnet build src/Nulltrap.Plugins.Sdk -c Release -warnaserror
+
+      - name: Test the portable projects
+        run: dotnet test --project tests/Nulltrap.Core.Tests -c Release

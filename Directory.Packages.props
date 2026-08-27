@@ -1,0 +1,13 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

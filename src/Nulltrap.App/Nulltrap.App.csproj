@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Nulltrap</AssemblyName>
+    <RootNamespace>Nulltrap.App</RootNamespace>
+    <ApplicationIcon>Nulltrap.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nulltrap.Core\Nulltrap.Core.csproj" />
+    <ProjectReference Include="..\Nulltrap.Platform.Windows\Nulltrap.Platform.Windows.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Nulltrap.ico" />
+  </ItemGroup>
+
+</Project>

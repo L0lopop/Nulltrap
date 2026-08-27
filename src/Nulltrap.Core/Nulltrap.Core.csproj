@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nulltrap.Platform.Abstractions\Nulltrap.Platform.Abstractions.csproj" />
+    <ProjectReference Include="..\Nulltrap.Plugins.Sdk\Nulltrap.Plugins.Sdk.csproj" />
+  </ItemGroup>
+
+</Project>

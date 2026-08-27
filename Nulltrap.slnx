@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Nulltrap.App/Nulltrap.App.csproj" />
+    <Project Path="src/Nulltrap.Core/Nulltrap.Core.csproj" />
+    <Project Path="src/Nulltrap.Platform.Abstractions/Nulltrap.Platform.Abstractions.csproj" />
+    <Project Path="src/Nulltrap.Platform.Windows/Nulltrap.Platform.Windows.csproj" />
+    <Project Path="src/Nulltrap.Plugins.Sdk/Nulltrap.Plugins.Sdk.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Nulltrap.Core.Tests/Nulltrap.Core.Tests.csproj" />
+    <Project Path="tests/Nulltrap.Platform.Windows.Tests/Nulltrap.Platform.Windows.Tests.csproj" />
+  </Folder>
+</Solution>
