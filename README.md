@@ -7,6 +7,8 @@
 **An alternative Roblox bootstrapper for Windows.**
 Small, auditable, and honest about what it can and cannot do.
 
+**English** · [Русский](README.ru.md)
+
 </div>
 
 > [!WARNING]
@@ -59,7 +61,7 @@ a flag will be ignored, rather than letting you believe it applied.
 | Phase | Scope | State |
 | --- | --- | --- |
 | 0 | Solution structure, architecture guard, CI | Done |
-| 1 | Deployment, package download, protocol handlers, launch | Next |
+| 1 | Deployment, package download, protocol handlers, launch | In progress |
 | 2 | Mods, FastFlags, activity tracking, Discord RPC | Planned |
 | 3 | Per-game profiles, signed releases, plugin SDK | Planned |
 | 4 | Second platform, if the groundwork holds up | Open |
