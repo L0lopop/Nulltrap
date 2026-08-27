@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 
 using Nulltrap.Core.Bootstrapping;
+using Nulltrap.Core.Installation;
 using Nulltrap.Platform.Abstractions;
 
 namespace Nulltrap.App;
@@ -22,6 +23,10 @@ public partial class App : Application
 
         switch (arguments.Action)
         {
+            case LaunchAction.Install:
+                RunInstall(arguments);
+                break;
+
             case LaunchAction.Uninstall:
                 RunUninstall(arguments);
                 break;
@@ -35,6 +40,40 @@ public partial class App : Application
                 new MainWindow().Show();
                 break;
         }
+    }
+
+    private void RunInstall(LaunchArguments arguments)
+    {
+        try
+        {
+            InstallReport report = Services.Installer.Install(
+                AppServices.CurrentExecutablePath,
+                AppServices.Version);
+
+            if (!arguments.Quiet)
+            {
+                string replaced = report.ReplacedAnotherLauncher && report.PreviousPlayerHandler is not null
+                    ? $"\n\nIt replaced:\n{report.PreviousPlayerHandler}"
+                    : string.Empty;
+
+                MessageBox.Show(
+                    $"Nulltrap is installed and now handles Roblox launches.{replaced}",
+                    "Nulltrap",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+        catch (Exception failure)
+        {
+            if (!arguments.Quiet)
+            {
+                MessageBox.Show(failure.Message, "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            Environment.ExitCode = 1;
+        }
+
+        Shutdown();
     }
 
     private void RunUninstall(LaunchArguments arguments)
