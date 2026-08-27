@@ -5,6 +5,7 @@ using System.Windows.Media;
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
 
@@ -24,23 +25,28 @@ public partial class MainWindow : Window
 
         Installer installer = App.Services.Installer;
         bool installed = installer.IsInstalled;
+        InstallState state = App.Services.StateStore.Load();
+        NulltrapSettings settings = App.Services.Settings.Load();
 
         AddRow("Nulltrap", AppServices.Version);
         AddRow("Installed", installed ? "yes" : "no");
         AddRow("Location", App.Services.Paths.Root);
+        AddRow("Channel", settings.Channel);
 
         string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
         AddRow("Roblox opens with", handler ?? "the official bootstrapper");
 
-        InstalledClient? client = App.Services.StateStore.Load().Get(BinaryType.WindowsPlayer);
-        AddRow("Roblox client", client is null ? "not downloaded yet" : $"{client.Version}");
+        InstalledClient? player = state.Get(BinaryType.WindowsPlayer);
+        InstalledClient? studio = state.Get(BinaryType.WindowsStudio64);
+
+        PlayHint.Text = player is null ? "not downloaded" : player.Version;
+        StudioHint.Text = studio is null ? "not downloaded" : studio.Version;
 
         InstallButton.Content = installed ? "Uninstall" : "Install";
 
         FooterText.Text = installed
-            ? "Nulltrap handles Roblox launches on this account. Uninstalling restores the previous handler."
-            : "Installing copies Nulltrap into your user profile and makes it handle Roblox launches. "
-              + "No administrator rights are needed.";
+            ? "Nulltrap handles Roblox launches on this account."
+            : "Not installed yet. Installing needs no administrator rights.";
     }
 
     private void AddRow(string label, string value)
@@ -72,6 +78,59 @@ public partial class MainWindow : Window
         StatusPanel.Children.Add(row);
     }
 
+    private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
+
+    private void OnLaunchStudio(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsStudio64);
+
+    private void OnSettings(object sender, RoutedEventArgs e)
+    {
+        new SettingsWindow { Owner = this }.ShowDialog();
+        Refresh();
+    }
+
+    private async Task LaunchAsync(BinaryType binaryType)
+    {
+        PlayButton.IsEnabled = false;
+        StudioButton.IsEnabled = false;
+
+        var window = new ProgressWindow { Owner = this };
+        window.Show();
+
+        try
+        {
+            NulltrapSettings settings = App.Services.Settings.Load();
+
+            BootstrapResult result = await App.Services.Bootstrapper.EnsureUpToDateAsync(
+                binaryType,
+                settings.DeploymentChannel,
+                window.Progress,
+                window.CancellationToken);
+
+            App.Services.ProcessLauncher.Start(result.ExecutablePath, string.Empty, result.VersionDirectory);
+            window.Close();
+
+            if (settings.CloseAfterLaunch)
+            {
+                Close();
+                return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            window.Close();
+        }
+        catch (Exception failure)
+        {
+            window.ShowFailure(failure.Message);
+        }
+        finally
+        {
+            PlayButton.IsEnabled = true;
+            StudioButton.IsEnabled = true;
+            Refresh();
+        }
+    }
+
     private void OnInstall(object sender, RoutedEventArgs e)
     {
         Installer installer = App.Services.Installer;
@@ -89,13 +148,20 @@ public partial class MainWindow : Window
                     return;
                 }
 
-                installer.Uninstall();
+                installer.Uninstall(App.Services.Settings.Load().KeepDownloadCache);
             }
             else
             {
+                NulltrapSettings settings = App.Services.Settings.Load();
+
                 InstallReport report = installer.Install(
                     AppServices.CurrentExecutablePath,
-                    AppServices.Version);
+                    AppServices.Version,
+                    new InstallOptions(
+                        settings.DesktopShortcut,
+                        settings.StartMenuShortcut,
+                        RegisterPlayer: true,
+                        settings.RegisterStudio));
 
                 if (report.ReplacedAnotherLauncher && report.PreviousPlayerHandler is not null)
                 {
@@ -113,37 +179,5 @@ public partial class MainWindow : Window
         }
 
         Refresh();
-    }
-
-    private async void OnLaunch(object sender, RoutedEventArgs e)
-    {
-        LaunchButton.IsEnabled = false;
-
-        var window = new ProgressWindow { Owner = this };
-        window.Show();
-
-        try
-        {
-            BootstrapResult result = await App.Services.Bootstrapper.EnsureUpToDateAsync(
-                BinaryType.WindowsPlayer,
-                cancellationToken: window.CancellationToken,
-                progress: window.Progress);
-
-            App.Services.ProcessLauncher.Start(result.ExecutablePath, string.Empty, result.VersionDirectory);
-            window.Close();
-        }
-        catch (OperationCanceledException)
-        {
-            window.Close();
-        }
-        catch (Exception failure)
-        {
-            window.ShowFailure(failure.Message);
-        }
-        finally
-        {
-            LaunchButton.IsEnabled = true;
-            Refresh();
-        }
     }
 }

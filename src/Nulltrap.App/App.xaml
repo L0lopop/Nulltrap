@@ -11,6 +11,7 @@
         <Color x:Key="GlowColor">#FFE4BAFC</Color>
         <Color x:Key="TextColor">#FFEDE9F2</Color>
         <Color x:Key="TextSoftColor">#FF9A93A8</Color>
+        <Color x:Key="RuleColor">#FF352C45</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
@@ -19,6 +20,7 @@
         <SolidColorBrush x:Key="GlowBrush" Color="{StaticResource GlowColor}" />
         <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
         <SolidColorBrush x:Key="TextSoftBrush" Color="{StaticResource TextSoftColor}" />
+        <SolidColorBrush x:Key="RuleBrush" Color="{StaticResource RuleColor}" />
 
     </Application.Resources>
 </Application>

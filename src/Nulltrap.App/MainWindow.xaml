@@ -5,48 +5,111 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Nulltrap"
-        Height="440" Width="560"
+        Height="470" Width="560"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource VoidBrush}"
         UseLayoutRounding="True">
 
     <Window.Resources>
-        <Style x:Key="Action" TargetType="Button">
-            <Setter Property="Height" Value="34" />
-            <Setter Property="MinWidth" Value="132" />
-            <Setter Property="Margin" Value="0,0,10,0" />
+        <Style x:Key="Primary" TargetType="Button">
+            <Setter Property="Height" Value="70" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource PurpleBrush}" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Face"
+                                Background="{StaticResource SurfaceBrush}"
+                                BorderBrush="{StaticResource PurpleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource PurpleBrightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Face" Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Secondary" TargetType="Button">
+            <Setter Property="Height" Value="28" />
+            <Setter Property="MinWidth" Value="110" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource RuleBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
     </Window.Resources>
 
-    <Grid Margin="34,30,34,26">
+    <Grid Margin="30,26,30,22">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="Nulltrap"
-                   Foreground="{StaticResource TextBrush}"
-                   FontSize="30"
-                   FontWeight="SemiBold" />
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Image Source="Nulltrap.ico" Width="34" Height="34" VerticalAlignment="Center" />
+            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="Nulltrap"
+                           Foreground="{StaticResource TextBrush}"
+                           FontSize="24"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="Alternative Roblox bootstrapper"
+                           Foreground="{StaticResource TextSoftBrush}"
+                           FontSize="11" />
+            </StackPanel>
+        </StackPanel>
 
-        <TextBlock Grid.Row="1"
-                   Margin="0,2,0,0"
-                   Text="Alternative Roblox bootstrapper for Windows"
-                   Foreground="{StaticResource TextSoftBrush}"
-                   FontSize="12" />
+        <Grid Grid.Row="1" Margin="0,22,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Border Grid.Row="2"
-                Margin="0,22,0,0"
+            <Button Grid.Column="0" x:Name="PlayButton" Style="{StaticResource Primary}" Click="OnLaunchPlayer">
+                <StackPanel>
+                    <TextBlock Text="Launch Roblox" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBlock x:Name="PlayHint" Text="" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
+                </StackPanel>
+            </Button>
+
+            <Button Grid.Column="2" x:Name="StudioButton" Style="{StaticResource Primary}" Click="OnLaunchStudio">
+                <StackPanel>
+                    <TextBlock Text="Launch Studio" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBlock x:Name="StudioHint" Text="" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
+                </StackPanel>
+            </Button>
+
+            <Button Grid.Column="4" x:Name="SettingsButton" Style="{StaticResource Primary}" Click="OnSettings">
+                <StackPanel>
+                    <TextBlock Text="Settings" HorizontalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBlock Text="launcher options" HorizontalAlignment="Center" Margin="0,4,0,0"
+                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Margin="0,20,0,0"
                 Padding="18,14"
                 VerticalAlignment="Top"
                 Background="{StaticResource SurfaceBrush}"
@@ -55,15 +118,17 @@
             <StackPanel x:Name="StatusPanel" />
         </Border>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,14">
-            <Button x:Name="InstallButton" Style="{StaticResource Action}" Click="OnInstall" />
-            <Button x:Name="LaunchButton" Style="{StaticResource Action}" Content="Launch Roblox" Click="OnLaunch" />
-        </StackPanel>
-
-        <TextBlock Grid.Row="4"
-                   x:Name="FooterText"
-                   Foreground="{StaticResource TextSoftBrush}"
-                   FontSize="11"
-                   TextWrapping="Wrap" />
+        <Grid Grid.Row="4">
+            <TextBlock x:Name="FooterText"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource TextSoftBrush}"
+                       FontSize="11"
+                       TextWrapping="Wrap"
+                       Margin="0,0,130,0" />
+            <Button x:Name="InstallButton"
+                    Style="{StaticResource Secondary}"
+                    HorizontalAlignment="Right"
+                    Click="OnInstall" />
+        </Grid>
     </Grid>
 </Window>

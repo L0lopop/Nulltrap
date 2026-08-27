@@ -5,6 +5,7 @@ using System.Reflection;
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Packages;
+using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
 using Nulltrap.Platform.Windows;
@@ -29,6 +30,7 @@ public sealed class AppServices : IDisposable
         ProcessLauncher = new WindowsProcessLauncher();
 
         StateStore = new InstallStateStore(Paths);
+        Settings = new SettingsStore(Paths);
         Deployment = new CoreDeploymentClient(_http);
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
@@ -56,6 +58,8 @@ public sealed class AppServices : IDisposable
     public IProcessLauncher ProcessLauncher { get; }
 
     public InstallStateStore StateStore { get; }
+
+    public SettingsStore Settings { get; }
 
     public CoreDeploymentClient Deployment { get; }
 

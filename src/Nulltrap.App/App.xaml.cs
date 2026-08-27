@@ -46,9 +46,16 @@ public partial class App : Application
     {
         try
         {
+            Core.Settings.NulltrapSettings settings = Services.Settings.Load();
+
             InstallReport report = Services.Installer.Install(
                 AppServices.CurrentExecutablePath,
-                AppServices.Version);
+                AppServices.Version,
+                new InstallOptions(
+                    settings.DesktopShortcut,
+                    settings.StartMenuShortcut,
+                    RegisterPlayer: true,
+                    settings.RegisterStudio));
 
             if (!arguments.Quiet)
             {
@@ -93,7 +100,7 @@ public partial class App : Application
             }
         }
 
-        Services.Installer.Uninstall();
+        Services.Installer.Uninstall(Services.Settings.Load().KeepDownloadCache);
 
         if (!arguments.Quiet)
         {
@@ -112,8 +119,9 @@ public partial class App : Application
         {
             BootstrapResult result = await Services.Bootstrapper.EnsureUpToDateAsync(
                 arguments.BinaryType,
-                cancellationToken: window.CancellationToken,
-                progress: window.Progress);
+                Services.Settings.Load().DeploymentChannel,
+                window.Progress,
+                window.CancellationToken);
 
             Services.ProcessLauncher.Start(
                 result.ExecutablePath,
