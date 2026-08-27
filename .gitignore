@@ -33,3 +33,7 @@ desktop.ini
 /scratch/
 
 .claude/settings.local.json
+
+# Tests are kept local, not published
+tests/
+Nulltrap.Local.slnx

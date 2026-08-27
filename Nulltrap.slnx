@@ -6,8 +6,4 @@
     <Project Path="src/Nulltrap.Platform.Windows/Nulltrap.Platform.Windows.csproj" />
     <Project Path="src/Nulltrap.Plugins.Sdk/Nulltrap.Plugins.Sdk.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/Nulltrap.Core.Tests/Nulltrap.Core.Tests.csproj" />
-    <Project Path="tests/Nulltrap.Platform.Windows.Tests/Nulltrap.Platform.Windows.Tests.csproj" />
-  </Folder>
 </Solution>

@@ -71,7 +71,6 @@ version is pinned in `global.json`.
 
 ```bash
 dotnet build Nulltrap.slnx -c Release
-dotnet test --solution Nulltrap.slnx -c Release
 ```
 
 To regenerate the application icon from the source artwork (needs Python with
@@ -97,14 +96,10 @@ never `net10.0-windows`.** Every existing bootstrapper is a single Windows
 project, which is why none of them has shipped the cross-platform support they
 advertise — by the time anyone tries, Windows assumptions are everywhere.
 
-The rule is enforced three ways, not by discipline:
-
-1. The portable test project cannot even reference a Windows-flavoured Core —
-   NuGet fails the restore with `NU1201`.
-2. `ArchitectureTests` fail if a Windows-only assembly appears on Core's
-   dependency path.
-3. CI builds and tests Core on Linux, where a Windows dependency cannot resolve
-   at all.
+The rule is enforced by the build, not by discipline: CI compiles `Core` and
+everything under it on Linux, where a Windows dependency cannot resolve at all.
+Reach for the registry from the portable half and the build goes red on the
+same push.
 
 ## License
 

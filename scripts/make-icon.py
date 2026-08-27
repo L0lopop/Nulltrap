@@ -15,6 +15,7 @@ ICO_SIZES = [16, 24, 32, 48, 64, 128, 256]
 BACKGROUND_TOLERANCE = 18
 CUTOUT_TOLERANCE = 45
 CUTOUT_OPENING_RADIUS = 8
+CUTOUT_EDGE_BLEED = 10
 MARGIN = 0.04
 
 def border_seeds(height, width):
@@ -48,7 +49,7 @@ def flood_clear(rgba, seeds, reference, tolerance):
     rgba[visited, 3] = 0
     return int(visited.sum())
 
-def clear_centre_cutout(rgba, tolerance, radius):
+def clear_centre_cutout(rgba, tolerance, radius, bleed):
     height, width = rgba.shape[:2]
     centre = (height // 2, width // 2)
 
@@ -71,6 +72,10 @@ def clear_centre_cutout(rgba, tolerance, radius):
     core = labels == label
     region = ndimage.binary_dilation(core, structure=element) & similar
 
+    if bleed > 0:
+        halo = np.ones((2 * bleed + 1, 2 * bleed + 1), dtype=bool)
+        region = ndimage.binary_dilation(region, structure=halo)
+
     rgba[region, 3] = 0
     return int(region.sum())
 
@@ -87,7 +92,9 @@ def prepare(image: Image.Image) -> Image.Image:
     )
     print(f"background {cleared:>10,} px cleared")
 
-    cleared = clear_centre_cutout(rgba, CUTOUT_TOLERANCE, CUTOUT_OPENING_RADIUS)
+    cleared = clear_centre_cutout(
+        rgba, CUTOUT_TOLERANCE, CUTOUT_OPENING_RADIUS, CUTOUT_EDGE_BLEED
+    )
     print(f"cutout     {cleared:>10,} px cleared")
 
     return Image.fromarray(rgba.astype(np.uint8), "RGBA")

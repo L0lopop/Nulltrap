@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and test (Windows)
+    name: Build (Windows)
     runs-on: windows-latest
 
     steps:
@@ -34,9 +34,6 @@ jobs:
 
       - name: Build
         run: dotnet build Nulltrap.slnx -c Release --no-restore -warnaserror
-
-      - name: Test
-        run: dotnet test --solution Nulltrap.slnx -c Release --no-build
 
       - name: Publish
         run: dotnet publish src/Nulltrap.App -c Release -o publish
@@ -78,9 +75,6 @@ jobs:
 
       - name: Build the portable projects
         run: |
-          dotnet build src/Nulltrap.Core -c Release -warnaserror
           dotnet build src/Nulltrap.Platform.Abstractions -c Release -warnaserror
           dotnet build src/Nulltrap.Plugins.Sdk -c Release -warnaserror
-
-      - name: Test the portable projects
-        run: dotnet test --project tests/Nulltrap.Core.Tests -c Release
+          dotnet build src/Nulltrap.Core -c Release -warnaserror
