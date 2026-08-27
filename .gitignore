@@ -16,8 +16,7 @@ publish/
 
 *.nupkg
 *.snupkg
-packages/
-!**/packages/build/
+/packages/
 
 [Tt]est[Rr]esult*/
 coverage*.json
