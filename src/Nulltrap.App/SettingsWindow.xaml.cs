@@ -5,7 +5,7 @@ using Nulltrap.Core.Settings;
 
 namespace Nulltrap.App;
 
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : ChromeWindow
 {
     private readonly SettingsStore _store;
     private readonly NulltrapSettings _settings;

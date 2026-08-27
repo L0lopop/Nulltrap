@@ -1,6 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Windows;
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
@@ -11,8 +11,10 @@ using Nulltrap.Platform.Abstractions;
 
 namespace Nulltrap.App;
 
-public partial class MainWindow : Window
+public partial class MainWindow : ChromeWindow
 {
+    private const string RepositoryUrl = "https://github.com/L0lopop/Nulltrap";
+
     public MainWindow()
     {
         InitializeComponent();
@@ -21,61 +23,43 @@ public partial class MainWindow : Window
 
     private void Refresh()
     {
-        StatusPanel.Children.Clear();
-
         Installer installer = App.Services.Installer;
-        bool installed = installer.IsInstalled;
         InstallState state = App.Services.StateStore.Load();
         NulltrapSettings settings = App.Services.Settings.Load();
 
-        AddRow("Nulltrap", AppServices.Version);
-        AddRow("Installed", installed ? "yes" : "no");
-        AddRow("Location", App.Services.Paths.Root);
-        AddRow("Channel", settings.Channel);
+        bool installed = installer.IsInstalled;
 
-        string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
-        AddRow("Roblox opens with", handler ?? "the official bootstrapper");
+        VersionText.Text = $"Version {AppServices.Version}";
 
         InstalledClient? player = state.Get(BinaryType.WindowsPlayer);
         InstalledClient? studio = state.Get(BinaryType.WindowsStudio64);
 
-        PlayHint.Text = player is null ? "not downloaded" : player.Version;
+        PlayHint.Text = player is null
+            ? "downloads on first launch"
+            : $"Roblox {player.Version}";
+
         StudioHint.Text = studio is null ? "not downloaded" : studio.Version;
 
-        InstallButton.Content = installed ? "Uninstall" : "Install";
+        ClientText.Text = settings.Channel == DeploymentChannel.DefaultName
+            ? string.Empty
+            : $"Channel: {settings.Channel}";
 
-        FooterText.Text = installed
-            ? "Nulltrap handles Roblox launches on this account."
-            : "Not installed yet. Installing needs no administrator rights.";
-    }
+        string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
 
-    private void AddRow(string label, string value)
-    {
-        var row = new Grid { Margin = new Thickness(0, 3, 0, 3) };
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-        var labelBlock = new TextBlock
+        if (installed)
         {
-            Text = label,
-            FontSize = 12,
-            Foreground = (Brush)FindResource("TextSoftBrush"),
-        };
-
-        var valueBlock = new TextBlock
+            HandlerTitle.Text = "Installed";
+            HandlerHint.Text = App.Services.Paths.Root;
+            InstallLink.Content = "Uninstall Nulltrap";
+        }
+        else
         {
-            Text = value,
-            FontSize = 12,
-            FontFamily = new FontFamily("Consolas, Cascadia Mono, Courier New"),
-            Foreground = (Brush)FindResource("TextBrush"),
-            TextWrapping = TextWrapping.Wrap,
-        };
-
-        Grid.SetColumn(valueBlock, 1);
-        row.Children.Add(labelBlock);
-        row.Children.Add(valueBlock);
-
-        StatusPanel.Children.Add(row);
+            HandlerTitle.Text = "Not installed";
+            HandlerHint.Text = handler is null
+                ? "Roblox launches are handled by its own bootstrapper"
+                : $"Roblox opens with {Path.GetFileName(handler)}";
+            InstallLink.Content = "Install Nulltrap";
+        }
     }
 
     private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
@@ -86,6 +70,30 @@ public partial class MainWindow : Window
     {
         new SettingsWindow { Owner = this }.ShowDialog();
         Refresh();
+    }
+
+    private void OnOpenRepository(object sender, RoutedEventArgs e) => OpenExternal(RepositoryUrl);
+
+    private void OnOpenInstallFolder(object sender, RoutedEventArgs e)
+    {
+        string root = App.Services.Paths.Root;
+
+        if (Directory.Exists(root))
+        {
+            OpenExternal(root);
+        }
+    }
+
+    private static void OpenExternal(string target)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(target) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception failure)
+        {
+            MessageBox.Show(failure.Message, "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private async Task LaunchAsync(BinaryType binaryType)

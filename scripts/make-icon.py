@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "assets" / "nulltrap-icon-source.png"
 ICO_OUT = ROOT / "src" / "Nulltrap.App" / "Nulltrap.ico"
 PNG_OUT = ROOT / "assets" / "nulltrap-icon.png"
+APP_PNG_OUT = ROOT / "src" / "Nulltrap.App" / "Nulltrap.png"
+APP_PNG_SIZE = 256
 
 ICO_SIZES = [16, 24, 32, 48, 64, 128, 256]
 
@@ -217,6 +219,9 @@ def main() -> None:
 
     artwork.resize((1024, 1024), Image.LANCZOS).save(PNG_OUT, format="PNG")
     print(f"wrote      {PNG_OUT.relative_to(ROOT)}  (1024x1024)")
+
+    artwork.resize((APP_PNG_SIZE, APP_PNG_SIZE), Image.LANCZOS).save(APP_PNG_OUT, format="PNG", optimize=True)
+    print(f"wrote      {APP_PNG_OUT.relative_to(ROOT)}  ({APP_PNG_SIZE}x{APP_PNG_SIZE})")
 
 if __name__ == "__main__":
     main()

@@ -4,9 +4,11 @@ using Nulltrap.Core.Bootstrapping;
 
 namespace Nulltrap.App;
 
-public partial class ProgressWindow : Window
+public partial class ProgressWindow : ChromeWindow
 {
     private readonly CancellationTokenSource _cancellation = new();
+
+    private double _fraction;
 
     public ProgressWindow()
     {
@@ -16,10 +18,17 @@ public partial class ProgressWindow : Window
 
     public CancellationToken CancellationToken => _cancellation.Token;
 
-    public IProgress<BootstrapProgress> Progress =>
-        new Progress<BootstrapProgress>(Apply);
+    public IProgress<BootstrapProgress> Progress => new Progress<BootstrapProgress>(Apply);
 
-    private double _fraction;
+    public void ShowFailure(string message)
+    {
+        StatusText.Text = "Could not launch Roblox";
+        DetailText.Text = message;
+        DetailText.Foreground = (System.Windows.Media.Brush)FindResource("DangerBrush");
+        CancelButton.Content = "Close";
+        _fraction = 0;
+        Redraw();
+    }
 
     private void Apply(BootstrapProgress progress)
     {
@@ -30,16 +39,8 @@ public partial class ProgressWindow : Window
 
     private void Redraw()
     {
-        double available = Math.Max(0, ActualWidth - 64);
+        double available = Math.Max(0, ActualWidth - 54);
         ProgressFill.Width = available * Math.Clamp(_fraction, 0, 1);
-    }
-
-    public void ShowFailure(string message)
-    {
-        StatusText.Text = message;
-        CancelButton.Content = "Close";
-        _fraction = 0;
-        Redraw();
     }
 
     private void OnCancel(object sender, RoutedEventArgs e)

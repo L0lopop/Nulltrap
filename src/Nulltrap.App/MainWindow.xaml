@@ -1,134 +1,151 @@
-﻿<Window x:Class="Nulltrap.App.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="Nulltrap"
-        Height="470" Width="560"
-        ResizeMode="CanMinimize"
-        WindowStartupLocation="CenterScreen"
-        Background="{StaticResource VoidBrush}"
-        UseLayoutRounding="True">
+﻿<local:ChromeWindow x:Class="Nulltrap.App.MainWindow"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:local="clr-namespace:Nulltrap.App"
+                    mc:Ignorable="d"
+                    Style="{StaticResource ChromeWindowStyle}"
+                    Title="Nulltrap"
+                    Height="330" Width="640"
+                    ResizeMode="CanMinimize"
+                    WindowStartupLocation="CenterScreen">
 
-    <Window.Resources>
-        <Style x:Key="Primary" TargetType="Button">
-            <Setter Property="Height" Value="70" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Face"
-                                Background="{StaticResource SurfaceBrush}"
-                                BorderBrush="{StaticResource PurpleBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource PurpleBrightBrush}" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Face" Property="Opacity" Value="0.45" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+    <Grid Margin="26,22,26,20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="216" />
+            <ColumnDefinition Width="22" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <Style x:Key="Secondary" TargetType="Button">
-            <Setter Property="Height" Value="28" />
-            <Setter Property="MinWidth" Value="110" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="{StaticResource RuleBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-        </Style>
-    </Window.Resources>
+        <StackPanel Grid.Column="0">
+            <Image Source="Nulltrap.png"
+                   Width="72" Height="72"
+                   HorizontalAlignment="Left"
+                   RenderOptions.BitmapScalingMode="HighQuality" />
 
-    <Grid Margin="30,26,30,22">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+            <TextBlock Text="Nulltrap"
+                       Margin="0,14,0,0"
+                       Foreground="{StaticResource TextBrush}"
+                       FontSize="26"
+                       FontWeight="SemiBold" />
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Image Source="Nulltrap.ico" Width="34" Height="34" VerticalAlignment="Center" />
-            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                <TextBlock Text="Nulltrap"
-                           Foreground="{StaticResource TextBrush}"
-                           FontSize="24"
-                           FontWeight="SemiBold" />
-                <TextBlock Text="Alternative Roblox bootstrapper"
-                           Foreground="{StaticResource TextSoftBrush}"
-                           FontSize="11" />
-            </StackPanel>
+            <TextBlock x:Name="VersionText"
+                       Foreground="{StaticResource TextSoftBrush}"
+                       FontSize="12" />
+
+            <TextBlock x:Name="ClientText"
+                       Margin="0,10,0,0"
+                       Foreground="{StaticResource TextSoftBrush}"
+                       FontSize="11"
+                       TextWrapping="Wrap" />
+
+            <Button Style="{StaticResource Link}"
+                    Margin="0,14,0,0"
+                    Content="Project on GitHub"
+                    Click="OnOpenRepository" />
+
+            <Button x:Name="InstallLink"
+                    Style="{StaticResource Link}"
+                    Click="OnInstall" />
         </StackPanel>
 
-        <Grid Grid.Row="1" Margin="0,22,0,0">
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" x:Name="PlayButton" Style="{StaticResource Primary}" Click="OnLaunchPlayer">
-                <StackPanel>
-                    <TextBlock Text="Launch Roblox" HorizontalAlignment="Center" FontWeight="SemiBold" />
-                    <TextBlock x:Name="PlayHint" Text="" HorizontalAlignment="Center" Margin="0,4,0,0"
-                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
-                </StackPanel>
+            <Button Grid.Row="0" Grid.ColumnSpan="3"
+                    x:Name="PlayButton"
+                    Style="{StaticResource Card}"
+                    Click="OnLaunchPlayer">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Launch Roblox" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock x:Name="PlayHint"
+                                   FontSize="11"
+                                   Margin="0,2,0,0"
+                                   Foreground="{StaticResource TextSoftBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="&#xE76C;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="12"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSoftBrush}" />
+                </Grid>
             </Button>
 
-            <Button Grid.Column="2" x:Name="StudioButton" Style="{StaticResource Primary}" Click="OnLaunchStudio">
-                <StackPanel>
-                    <TextBlock Text="Launch Studio" HorizontalAlignment="Center" FontWeight="SemiBold" />
-                    <TextBlock x:Name="StudioHint" Text="" HorizontalAlignment="Center" Margin="0,4,0,0"
-                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
-                </StackPanel>
+            <Button Grid.Row="2" Grid.Column="0"
+                    x:Name="StudioButton"
+                    Style="{StaticResource Card}"
+                    Click="OnLaunchStudio">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Studio" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock x:Name="StudioHint"
+                                   FontSize="11"
+                                   Margin="0,2,0,0"
+                                   Foreground="{StaticResource TextSoftBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="&#xE76C;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="11"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSoftBrush}" />
+                </Grid>
             </Button>
 
-            <Button Grid.Column="4" x:Name="SettingsButton" Style="{StaticResource Primary}" Click="OnSettings">
-                <StackPanel>
-                    <TextBlock Text="Settings" HorizontalAlignment="Center" FontWeight="SemiBold" />
-                    <TextBlock Text="launcher options" HorizontalAlignment="Center" Margin="0,4,0,0"
-                               FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
-                </StackPanel>
+            <Button Grid.Row="2" Grid.Column="2"
+                    Style="{StaticResource Card}"
+                    Click="OnSettings">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Settings" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock Text="launcher options"
+                                   FontSize="11"
+                                   Margin="0,2,0,0"
+                                   Foreground="{StaticResource TextSoftBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="&#xE76C;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="11"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSoftBrush}" />
+                </Grid>
             </Button>
-        </Grid>
 
-        <Border Grid.Row="3"
-                Margin="0,20,0,0"
-                Padding="18,14"
-                VerticalAlignment="Top"
-                Background="{StaticResource SurfaceBrush}"
-                BorderBrush="{StaticResource PurpleBrush}"
-                BorderThickness="2,0,0,0">
-            <StackPanel x:Name="StatusPanel" />
-        </Border>
-
-        <Grid Grid.Row="4">
-            <TextBlock x:Name="FooterText"
-                       VerticalAlignment="Center"
-                       Foreground="{StaticResource TextSoftBrush}"
-                       FontSize="11"
-                       TextWrapping="Wrap"
-                       Margin="0,0,130,0" />
-            <Button x:Name="InstallButton"
-                    Style="{StaticResource Secondary}"
-                    HorizontalAlignment="Right"
-                    Click="OnInstall" />
+            <Button Grid.Row="4" Grid.ColumnSpan="3"
+                    Style="{StaticResource Card}"
+                    Click="OnOpenInstallFolder">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="HandlerTitle" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock x:Name="HandlerHint"
+                                   FontSize="11"
+                                   Margin="0,2,0,0"
+                                   TextTrimming="CharacterEllipsis"
+                                   Foreground="{StaticResource TextSoftBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="&#xE76C;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="11"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSoftBrush}" />
+                </Grid>
+            </Button>
         </Grid>
     </Grid>
-</Window>
+</local:ChromeWindow>
