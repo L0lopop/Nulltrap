@@ -3,7 +3,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -16,8 +16,14 @@ ICO_SIZES = [16, 24, 32, 48, 64, 128, 256]
 BACKGROUND_TOLERANCE = 18
 CUTOUT_TOLERANCE = 45
 CUTOUT_OPENING_RADIUS = 8
-CUTOUT_OFFSET = 8
 CUTOUT_SIMPLIFY = 0.01
+CUTOUT_GROW = 2
+
+HIGHLIGHT_THRESHOLD = 130
+HIGHLIGHT_BAND = 16
+HIGHLIGHT_REACH = 24
+HIGHLIGHT_EDGE_INSET = 0.05
+
 MARGIN = 0.04
 
 def border_seeds(height, width):
@@ -51,39 +57,16 @@ def flood_clear(rgba, seeds, reference, tolerance):
     rgba[visited, 3] = 0
     return int(visited.sum())
 
-def polygon_area(points):
-    x, y = points[:, 0], points[:, 1]
-    return abs(0.5 * np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
+def find_cutout_quad(rgba):
+    height, width = rgba.shape[:2]
+    centre = (height // 2, width // 2)
 
-def offset_polygon(points, distance):
-    points = np.asarray(points, dtype=float)
-    count = len(points)
+    similar = np.all(
+        np.abs(rgba[:, :, :3] - rgba[centre[0], centre[1], :3]) <= CUTOUT_TOLERANCE,
+        axis=2,
+    )
 
-    def build(sign):
-        edges = []
-        for index in range(count):
-            start = points[index]
-            end = points[(index + 1) % count]
-            direction = end - start
-            length = float(np.hypot(*direction))
-            normal = np.array([direction[1], -direction[0]]) / length * sign
-            edges.append((start + normal * distance, direction))
-
-        corners = []
-        for index in range(count):
-            previous_point, previous_direction = edges[index - 1]
-            current_point, current_direction = edges[index]
-            matrix = np.column_stack([previous_direction, -current_direction])
-            steps = np.linalg.solve(matrix, current_point - previous_point)
-            corners.append(previous_point + previous_direction * steps[0])
-        return np.array(corners)
-
-    outward = build(1)
-    inward = build(-1)
-    return outward if polygon_area(outward) > polygon_area(inward) else inward
-
-def find_cutout_quad(similar, centre, radius, simplify):
-    element = np.ones((2 * radius + 1, 2 * radius + 1), dtype=bool)
+    element = np.ones((2 * CUTOUT_OPENING_RADIUS + 1,) * 2, dtype=bool)
     eroded = ndimage.binary_erosion(similar, structure=element)
 
     labels, _ = ndimage.label(eroded)
@@ -94,43 +77,89 @@ def find_cutout_quad(similar, centre, radius, simplify):
             "and CUTOUT_OPENING_RADIUS."
         )
 
-    core = labels == label
-    region = ndimage.binary_dilation(core, structure=element) & similar
+    region = ndimage.binary_dilation(labels == label, structure=element) & similar
 
     contours, _ = cv2.findContours(
         (region * 255).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
     contour = max(contours, key=cv2.contourArea)
-    approximation = cv2.approxPolyDP(
-        contour, simplify * cv2.arcLength(contour, True), True
+    quad = cv2.approxPolyDP(
+        contour, CUTOUT_SIMPLIFY * cv2.arcLength(contour, True), True
     ).reshape(-1, 2)
 
-    if len(approximation) != 4:
+    if len(quad) != 4:
         raise SystemExit(
-            f"The cutout simplified to {len(approximation)} corners, not 4. "
-            "Adjust CUTOUT_SIMPLIFY."
+            f"The cutout simplified to {len(quad)} corners, not 4. Adjust CUTOUT_SIMPLIFY."
         )
 
-    return approximation
+    return quad.astype(float)
 
-def clear_centre_cutout(rgba, tolerance, radius, offset, simplify):
+def outward_edges(quad):
+    centre = quad.mean(0)
+    for index in range(len(quad)):
+        start = quad[index]
+        end = quad[(index + 1) % len(quad)]
+        direction = end - start
+        normal = np.array([direction[1], -direction[0]]) / float(np.hypot(*direction))
+        if np.dot((start + end) / 2 + normal - centre, normal) < 0:
+            normal = -normal
+        yield start, direction, normal
+
+def remove_edge_highlight(rgba, quad):
     height, width = rgba.shape[:2]
-    centre = (height // 2, width // 2)
+    colour = rgba[:, :, :3].astype(np.uint8)
+    gray = cv2.cvtColor(colour, cv2.COLOR_RGB2GRAY)
+    replaced = 0
 
-    similar = np.all(
-        np.abs(rgba[:, :, :3] - rgba[centre[0], centre[1], :3]) <= tolerance,
-        axis=2,
+    for start, direction, normal in outward_edges(quad):
+        near = start + direction * HIGHLIGHT_EDGE_INSET
+        far = start + direction * (1 - HIGHLIGHT_EDGE_INSET)
+        strip = np.array([
+            near,
+            far,
+            far + normal * HIGHLIGHT_BAND,
+            near + normal * HIGHLIGHT_BAND,
+        ])
+
+        stencil = np.zeros((height, width), np.uint8)
+        cv2.fillPoly(stencil, [strip.astype(np.int32)], 255)
+
+        selection = (stencil > 0) & (gray > HIGHLIGHT_THRESHOLD)
+        shift_y = int(round(normal[1] * HIGHLIGHT_REACH))
+        shift_x = int(round(normal[0] * HIGHLIGHT_REACH))
+        sampled = np.roll(np.roll(colour, -shift_y, axis=0), -shift_x, axis=1)
+
+        rgba[selection, :3] = sampled[selection]
+        replaced += int(selection.sum())
+
+    hole = np.zeros((height, width), np.uint8)
+    cv2.fillPoly(hole, [quad.astype(np.int32)], 255)
+    band = cv2.dilate(hole, np.ones((2 * HIGHLIGHT_BAND * 2 + 1,) * 2, np.uint8)) & ~cv2.dilate(
+        hole, np.ones((3, 3), np.uint8)
     )
 
-    quad = find_cutout_quad(similar, centre, radius, simplify)
-    outline = offset_polygon(quad, offset)
+    current = cv2.cvtColor(rgba[:, :, :3].astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    leftover = ((band > 0) & (current > HIGHLIGHT_THRESHOLD)).astype(np.uint8) * 255
 
-    stencil = Image.new("L", (width, height), 0)
-    ImageDraw.Draw(stencil).polygon([tuple(point) for point in outline], fill=255)
+    if leftover.any():
+        patched = cv2.inpaint(
+            rgba[:, :, :3].astype(np.uint8),
+            cv2.dilate(leftover, np.ones((3, 3), np.uint8)),
+            3,
+            cv2.INPAINT_NS,
+        )
+        rgba[:, :, :3] = patched
+        replaced += int((leftover > 0).sum())
 
-    cut = np.array(stencil) > 0
-    rgba[cut, 3] = 0
-    return int(cut.sum())
+    return replaced
+
+def cut_hole(rgba, quad):
+    height, width = rgba.shape[:2]
+    hole = np.zeros((height, width), np.uint8)
+    cv2.fillPoly(hole, [quad.astype(np.int32)], 255)
+    hole = cv2.dilate(hole, np.ones((2 * CUTOUT_GROW + 1,) * 2, np.uint8))
+    rgba[hole > 0, 3] = 0
+    return int((hole > 0).sum())
 
 def prepare(image: Image.Image) -> Image.Image:
     rgba = np.array(image.convert("RGBA"), dtype=np.int16)
@@ -145,10 +174,11 @@ def prepare(image: Image.Image) -> Image.Image:
     )
     print(f"background {cleared:>10,} px cleared")
 
-    cleared = clear_centre_cutout(
-        rgba, CUTOUT_TOLERANCE, CUTOUT_OPENING_RADIUS, CUTOUT_OFFSET, CUTOUT_SIMPLIFY
-    )
-    print(f"cutout     {cleared:>10,} px cleared")
+    quad = find_cutout_quad(rgba)
+    print(f"cutout     corners {[tuple(int(v) for v in p) for p in quad]}")
+
+    print(f"highlight  {remove_edge_highlight(rgba, quad):>10,} px recoloured")
+    print(f"cutout     {cut_hole(rgba, quad):>10,} px cleared")
 
     return Image.fromarray(rgba.astype(np.uint8), "RGBA")
 
