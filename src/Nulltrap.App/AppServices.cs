@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Reflection;
 
 using Nulltrap.Core.Bootstrapping;
+using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.Settings;
@@ -31,6 +32,7 @@ public sealed class AppServices : IDisposable
 
         StateStore = new InstallStateStore(Paths);
         Settings = new SettingsStore(Paths);
+        FastFlags = new FastFlagManager(Paths);
         Deployment = new CoreDeploymentClient(_http);
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
@@ -60,6 +62,8 @@ public sealed class AppServices : IDisposable
     public InstallStateStore StateStore { get; }
 
     public SettingsStore Settings { get; }
+
+    public FastFlagManager FastFlags { get; }
 
     public CoreDeploymentClient Deployment { get; }
 

@@ -30,6 +30,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("confirmMultipleInstances")]
     public bool ConfirmMultipleInstances { get; set; } = true;
 
+    [JsonPropertyName("automaticClientUpdates")]
+    public bool AutomaticClientUpdates { get; set; } = true;
+
     public DeploymentChannel DeploymentChannel =>
         string.IsNullOrWhiteSpace(Channel) ? Deployment.DeploymentChannel.Default : new DeploymentChannel(Channel);
 }

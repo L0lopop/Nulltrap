@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 
 using Nulltrap.Core.Bootstrapping;
 
@@ -22,9 +23,9 @@ public partial class ProgressWindow : ChromeWindow
 
     public void ShowFailure(string message)
     {
-        StatusText.Text = "Could not launch Roblox";
-        DetailText.Text = message;
-        DetailText.Foreground = (System.Windows.Media.Brush)FindResource("DangerBrush");
+        StatusText.Text = message;
+        StatusText.Foreground = (Brush)FindResource("DangerBrush");
+        StatusText.FontSize = 12;
         CancelButton.Content = "Close";
         _fraction = 0;
         Redraw();
@@ -39,7 +40,7 @@ public partial class ProgressWindow : ChromeWindow
 
     private void Redraw()
     {
-        double available = Math.Max(0, ActualWidth - 54);
+        double available = Math.Max(0, ActualWidth - 70);
         ProgressFill.Width = available * Math.Clamp(_fraction, 0, 1);
     }
 

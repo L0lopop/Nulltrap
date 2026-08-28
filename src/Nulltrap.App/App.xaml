@@ -85,11 +85,11 @@
                                 BorderThickness="1">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="34" />
+                                    <RowDefinition x:Name="CaptionRow" Height="34" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
-                                <Grid Grid.Row="0" Background="{StaticResource CaptionBrush}">
+                                <Grid x:Name="Caption" Grid.Row="0" Background="{StaticResource CaptionBrush}">
                                     <StackPanel Orientation="Horizontal"
                                                 Margin="11,0,0,0"
                                                 VerticalAlignment="Center">
@@ -122,6 +122,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="ShowMinimize" Value="False">
                                 <Setter TargetName="MinimiseButton" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="ShowCaption" Value="False">
+                                <Setter TargetName="Caption" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="CaptionRow" Property="Height" Value="0" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

@@ -1,4 +1,5 @@
 using Nulltrap.Core.Deployment;
+using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -16,6 +17,7 @@ public sealed record BootstrapResult(
 public sealed class ClientBootstrapper
 {
     private readonly DeploymentClient _deployment;
+    private readonly FastFlagManager _fastFlags;
     private readonly PackageDownloader _downloader;
     private readonly IApplicationPaths _paths;
     private readonly InstallStateStore _state;
@@ -32,6 +34,7 @@ public sealed class ClientBootstrapper
         ArgumentNullException.ThrowIfNull(state);
 
         _deployment = deployment;
+        _fastFlags = new FastFlagManager(paths);
         _downloader = downloader;
         _paths = paths;
         _state = state;
@@ -62,6 +65,7 @@ public sealed class ClientBootstrapper
 
         if (installed?.VersionGuid == version.VersionGuid && File.Exists(executablePath))
         {
+            _fastFlags.ApplyTo(versionDirectory);
             progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, "Up to date"));
 
             return new BootstrapResult(
@@ -111,6 +115,7 @@ public sealed class ClientBootstrapper
         progress?.Report(BootstrapProgress.For(BootstrapStage.Cleaning, "Tidying up"));
         RemoveSupersededVersions(state);
 
+        _fastFlags.ApplyTo(versionDirectory);
         progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, "Ready"));
 
         return new BootstrapResult(

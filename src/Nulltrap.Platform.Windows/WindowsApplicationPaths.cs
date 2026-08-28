@@ -6,11 +6,22 @@ public sealed class WindowsApplicationPaths : IApplicationPaths
 {
     public const string FolderName = "Nulltrap";
 
+    public const string RootVariable = "NULLTRAP_HOME";
+
     public WindowsApplicationPaths()
-        : this(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            FolderName))
+        : this(DefaultRoot())
     {
+    }
+
+    public static string DefaultRoot()
+    {
+        string? overridden = Environment.GetEnvironmentVariable(RootVariable);
+
+        return string.IsNullOrWhiteSpace(overridden)
+            ? Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                FolderName)
+            : overridden.Trim();
     }
 
     public WindowsApplicationPaths(string root)

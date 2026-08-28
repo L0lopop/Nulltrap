@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 using Nulltrap.Core.Deployment;
+using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -17,14 +18,23 @@ public partial class SettingsWindow : ChromeWindow
         {
             ["General"] = ("General", "How Nulltrap behaves while you use it."),
             ["Integration"] = ("Integration", "Which launches Nulltrap takes over from Roblox."),
+            ["Graphics"] = ("Graphics", "Client settings Roblox still lets a launcher change."),
             ["Shortcuts"] = ("Shortcuts", "Where Nulltrap appears on this machine."),
             ["Deployment"] = ("Deployment", "Which build of Roblox gets downloaded."),
             ["Storage"] = ("Storage", "What Nulltrap keeps on disk and how much of it."),
             ["About"] = ("About Nulltrap", "Version, source and removal."),
         };
 
+    private const string FpsFlag = "DFIntTaskSchedulerTargetFps";
+    private const string TextureQualityEnabledFlag = "DFFlagTextureQualityOverrideEnabled";
+    private const string TextureQualityFlag = "DFIntTextureQualityOverride";
+    private const string MsaaFlag = "FIntDebugForceMSAASamples";
+    private const string DisableDpiScaleFlag = "DFFlagDisableDPIScale";
+
     private readonly SettingsStore _store;
     private readonly NulltrapSettings _settings;
+    private readonly FastFlagManager _fastFlags;
+    private readonly Dictionary<string, string> _flags;
 
     private bool _loaded;
 
@@ -34,6 +44,8 @@ public partial class SettingsWindow : ChromeWindow
 
         _store = App.Services.Settings;
         _settings = _store.Load();
+        _fastFlags = App.Services.FastFlags;
+        _flags = _fastFlags.Load();
 
         CloseAfterLaunchBox.IsChecked = _settings.CloseAfterLaunch;
         ConfirmMultipleInstancesBox.IsChecked = _settings.ConfirmMultipleInstances;
@@ -42,6 +54,21 @@ public partial class SettingsWindow : ChromeWindow
         StartMenuShortcutBox.IsChecked = _settings.StartMenuShortcut;
         KeepDownloadCacheBox.IsChecked = _settings.KeepDownloadCache;
         ChannelBox.Text = _settings.Channel;
+        AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
+
+        FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, string.Empty);
+        TextureQualityEnabledBox.IsChecked =
+            _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
+        TextureQualityBox.Text = _flags.GetValueOrDefault(TextureQualityFlag, string.Empty);
+        MsaaBox.Text = _flags.GetValueOrDefault(MsaaFlag, string.Empty);
+        DisableDpiScaleBox.IsChecked =
+            _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
+
+        FpsWarning.Text = FastFlagAllowlist.IsAllowed(FpsFlag)
+            ? "The frame rate Roblox aims for. Leave empty to follow your monitor."
+            : "Roblox removed this from its allowlist in September 2025, so the client ignores whatever "
+              + "you put here. Nulltrap writes it anyway in case that changes, but it will not raise your "
+              + "frame rate today. Nulltrap will not force it by editing the running client's memory.";
 
         _loaded = true;
 
@@ -74,6 +101,14 @@ public partial class SettingsWindow : ChromeWindow
             $"Player: {(player is null ? "not downloaded" : $"{player.Version} ({player.VersionGuid})")}",
             $"Studio: {(studio is null ? "not downloaded" : $"{studio.Version} ({studio.VersionGuid})")}");
 
+        string[] applied = _flags.Keys.Where(FastFlagAllowlist.IsAllowed).ToArray();
+        string[] ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).ToArray();
+
+        FlagSummaryText.Text = _flags.Count == 0
+            ? "No client settings are set, so Roblox runs with its own defaults."
+            : $"{applied.Length} of {_flags.Count} settings are on Roblox's allowlist and will apply."
+              + (ignored.Length == 0 ? string.Empty : $" Ignored by the client: {string.Join(", ", ignored)}.");
+
         CacheSizeText.Text = Describe(App.Services.Paths.Downloads, "packages");
         VersionsSizeText.Text = Describe(App.Services.Paths.Versions, "files");
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
@@ -98,6 +133,7 @@ public partial class SettingsWindow : ChromeWindow
     {
         PageGeneral.Visibility = page == "General" ? Visibility.Visible : Visibility.Collapsed;
         PageIntegration.Visibility = page == "Integration" ? Visibility.Visible : Visibility.Collapsed;
+        PageGraphics.Visibility = page == "Graphics" ? Visibility.Visible : Visibility.Collapsed;
         PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
         PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
@@ -251,11 +287,31 @@ public partial class SettingsWindow : ChromeWindow
         _settings.Channel = string.IsNullOrWhiteSpace(ChannelBox.Text)
             ? DeploymentChannel.DefaultName
             : ChannelBox.Text.Trim();
+        _settings.AutomaticClientUpdates = AutomaticClientUpdatesBox.IsChecked == true;
 
         _store.Save(_settings);
 
+        SetFlag(FpsFlag, FpsBox.Text);
+        SetFlag(TextureQualityEnabledFlag, TextureQualityEnabledBox.IsChecked == true ? "True" : string.Empty);
+        SetFlag(TextureQualityFlag, TextureQualityBox.Text);
+        SetFlag(MsaaFlag, MsaaBox.Text);
+        SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
+
+        _fastFlags.Save(_flags);
+
         DialogResult = true;
         Close();
+    }
+
+    private void SetFlag(string name, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            _flags.Remove(name);
+            return;
+        }
+
+        _flags[name] = value.Trim();
     }
 
     private void OnCancel(object sender, RoutedEventArgs e)

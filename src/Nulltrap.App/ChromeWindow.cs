@@ -24,9 +24,22 @@ public class ChromeWindow : Window
             (_, _) => SystemCommands.CloseWindow(this)));
     }
 
+    public static readonly DependencyProperty ShowCaptionProperty =
+        DependencyProperty.Register(
+            nameof(ShowCaption),
+            typeof(bool),
+            typeof(ChromeWindow),
+            new PropertyMetadata(true));
+
     public bool ShowMinimize
     {
         get => (bool)GetValue(ShowMinimizeProperty);
         set => SetValue(ShowMinimizeProperty, value);
+    }
+
+    public bool ShowCaption
+    {
+        get => (bool)GetValue(ShowCaptionProperty);
+        set => SetValue(ShowCaptionProperty, value);
     }
 }

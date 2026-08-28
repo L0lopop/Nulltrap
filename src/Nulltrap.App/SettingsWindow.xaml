@@ -38,6 +38,7 @@
                     <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="Shortcuts" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="ROBLOX" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="Graphics" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="Deployment" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="Storage" Checked="OnNavigate" />
 
@@ -83,12 +84,76 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="Keep Roblox up to date" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="Every launch checks the current Roblox version and downloads it if it changed, then starts the client. Turning this off launches whatever is already installed." />
+                                </StackPanel>
+                                <CheckBox x:Name="AutomaticClientUpdatesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="Ask before a second Roblox client" />
                                     <TextBlock Style="{StaticResource RowHint}"
                                                Text="Running several clients at once is disputed under Roblox's terms. Nulltrap will not enable it silently." />
                                 </StackPanel>
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="Frame rate target" />
+                                <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" />
+                                <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="120"
+                                         HorizontalAlignment="Left" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="Override texture quality" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="Forces a texture detail level instead of letting Roblox pick one. 0 is lowest, 3 is highest." />
+                                    <TextBox x:Name="TextureQualityBox" Style="{StaticResource Field}" Width="120"
+                                             HorizontalAlignment="Left" Margin="0,10,0,0" />
+                                </StackPanel>
+                                <CheckBox x:Name="TextureQualityEnabledBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="Anti-aliasing samples" />
+                                <TextBlock Style="{StaticResource RowHint}"
+                                           Text="1, 2 or 4. Leave empty to let Roblox decide." />
+                                <TextBox x:Name="MsaaBox" Style="{StaticResource Field}" Width="120"
+                                         HorizontalAlignment="Left" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="Ignore display scaling" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="Renders at the monitor's real resolution on a scaled display. Sharper, and heavier." />
+                                </StackPanel>
+                                <CheckBox x:Name="DisableDpiScaleBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="What actually applies" />
+                                <TextBlock x:Name="FlagSummaryText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 

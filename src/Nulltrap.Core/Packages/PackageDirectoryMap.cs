@@ -41,6 +41,7 @@ public static class PackageDirectoryMap
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["RobloxStudio.zip"] = "",
+            ["LibrariesQt5.zip"] = "",
             ["ApplicationConfig.zip"] = "ApplicationConfig",
             ["BuiltInPlugins.zip"] = "BuiltInPlugins",
             ["BuiltInStandalonePlugins.zip"] = "BuiltInStandalonePlugins",
@@ -52,6 +53,8 @@ public static class PackageDirectoryMap
             ["content-qt_translations.zip"] = "content/qt_translations",
             ["content-api-docs.zip"] = "content/api_docs",
             ["extracontent-scripts.zip"] = "ExtraContent/scripts",
+            ["studiocontent-models.zip"] = "StudioContent/models",
+            ["studiocontent-textures.zip"] = "StudioContent/textures",
         };
 
     public static IReadOnlyDictionary<string, string> For(BinaryType binaryType)
