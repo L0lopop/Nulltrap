@@ -49,6 +49,8 @@
 
             <Button x:Name="InstallLink"
                     Style="{StaticResource Link}"
+                    Visibility="Collapsed"
+                    Content="{loc:S home.install}"
                     Click="OnInstall" />
         </StackPanel>
 

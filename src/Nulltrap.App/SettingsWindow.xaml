@@ -38,7 +38,7 @@
                     <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Language" Content="{loc:S nav.language}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Launcher" Content="{loc:S nav.launcherApp}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
@@ -108,7 +108,7 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageLanguage" Visibility="Collapsed">
+                    <StackPanel x:Name="PageLauncher" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,220,0">
@@ -121,10 +121,44 @@
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S launcher.location}" />
+                                    <TextBlock x:Name="LauncherLocationText" Style="{StaticResource RowHint}" />
+                                </StackPanel>
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnOpenFolder" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S launcher.repair}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S launcher.repairHint}" />
+                                </StackPanel>
+                                <Button x:Name="RepairButton" Style="{StaticResource Quiet}" Content="{loc:S action.repair}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnRepair" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S language.help}" />
                                 <TextBlock Style="{StaticResource RowHint}" Text="{loc:S language.helpHint}" />
                             </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}" BorderBrush="{StaticResource DangerBrush}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.remove}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.removeHint}" />
+                                </StackPanel>
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.uninstall}"
+                                        Foreground="{StaticResource DangerBrush}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnUninstall" />
+                            </Grid>
                         </Border>
                     </StackPanel>
 
@@ -332,16 +366,6 @@
                             </Grid>
                         </Border>
 
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.remove}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.removeHint}" />
-                                </StackPanel>
-                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.uninstall}" Foreground="{StaticResource DangerBrush}"
-                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnUninstall" />
-                            </Grid>
-                        </Border>
                     </StackPanel>
 
                 </Grid>

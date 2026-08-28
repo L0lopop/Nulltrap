@@ -36,30 +36,30 @@ public partial class MainWindow : ChromeWindow
         InstalledClient? studio = state.Get(BinaryType.WindowsStudio64);
 
         PlayHint.Text = player is null
-            ? "downloads on first launch"
-            : $"Roblox {player.Version}";
+            ? Strings.Get("home.firstLaunch")
+            : Strings.Get("home.robloxVersion", player.Version);
 
-        StudioHint.Text = studio is null ? "not downloaded" : studio.Version;
+        StudioHint.Text = studio is null ? Strings.Get("deployment.notDownloaded") : studio.Version;
 
         ClientText.Text = settings.Channel == DeploymentChannel.DefaultName
             ? string.Empty
-            : $"Channel: {settings.Channel}";
+            : Strings.Get("home.channel", settings.Channel);
 
         string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
 
         if (installed)
         {
-            HandlerTitle.Text = "Installed";
+            HandlerTitle.Text = Strings.Get("home.installed");
             HandlerHint.Text = App.Services.Paths.Root;
-            InstallLink.Content = "Uninstall Nulltrap";
+            InstallLink.Visibility = Visibility.Collapsed;
         }
         else
         {
-            HandlerTitle.Text = "Not installed";
+            HandlerTitle.Text = Strings.Get("home.notInstalled");
             HandlerHint.Text = handler is null
-                ? "Roblox launches are handled by its own bootstrapper"
-                : $"Roblox opens with {Path.GetFileName(handler)}";
-            InstallLink.Content = "Install Nulltrap";
+                ? Strings.Get("home.ownBootstrapper")
+                : Strings.Get("home.opensWith", Path.GetFileName(handler));
+            InstallLink.Visibility = Visibility.Visible;
         }
     }
 
@@ -146,44 +146,26 @@ public partial class MainWindow : ChromeWindow
 
     private void OnInstall(object sender, RoutedEventArgs e)
     {
-        Installer installer = App.Services.Installer;
-
         try
         {
-            if (installer.IsInstalled)
+            NulltrapSettings settings = App.Services.Settings.Load();
+
+            InstallReport report = App.Services.Installer.Install(
+                AppServices.CurrentExecutablePath,
+                AppServices.Version,
+                new InstallOptions(
+                    settings.DesktopShortcut,
+                    settings.StartMenuShortcut,
+                    RegisterPlayer: true,
+                    settings.RegisterStudio));
+
+            if (report.ReplacedAnotherLauncher && report.PreviousPlayerHandler is not null)
             {
-                if (MessageBox.Show(
-                        Strings.Get("confirm.uninstall"),
-                        "Nulltrap",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Question) != MessageBoxResult.Yes)
-                {
-                    return;
-                }
-
-                installer.Uninstall(App.Services.Settings.Load().KeepDownloadCache);
-            }
-            else
-            {
-                NulltrapSettings settings = App.Services.Settings.Load();
-
-                InstallReport report = installer.Install(
-                    AppServices.CurrentExecutablePath,
-                    AppServices.Version,
-                    new InstallOptions(
-                        settings.DesktopShortcut,
-                        settings.StartMenuShortcut,
-                        RegisterPlayer: true,
-                        settings.RegisterStudio));
-
-                if (report.ReplacedAnotherLauncher && report.PreviousPlayerHandler is not null)
-                {
-                    MessageBox.Show(
-                        $"Nulltrap now handles Roblox launches.\n\nIt replaced:\n{report.PreviousPlayerHandler}",
-                        "Nulltrap",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                }
+                MessageBox.Show(
+                    Strings.Get("install.replaced", report.PreviousPlayerHandler),
+                    "Nulltrap",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
             }
         }
         catch (Exception failure)

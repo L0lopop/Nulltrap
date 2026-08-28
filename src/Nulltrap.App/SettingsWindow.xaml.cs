@@ -5,6 +5,7 @@ using System.Windows.Controls;
 
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
+using Nulltrap.Core.Installation;
 using Nulltrap.Core.Localization;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
@@ -149,6 +150,8 @@ public partial class SettingsWindow : ChromeWindow
     {
         SidebarVersion.Text = $"Nulltrap {AppServices.Version}";
         SidebarLocation.Text = App.Services.Paths.Root;
+        LauncherLocationText.Text = App.Services.Paths.Root;
+        RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
 
         bool installed = App.Services.Installer.IsInstalled;
@@ -204,7 +207,7 @@ public partial class SettingsWindow : ChromeWindow
         PageIntegration.Visibility = page == "Integration" ? Visibility.Visible : Visibility.Collapsed;
         PageGraphics.Visibility = page == "Graphics" ? Visibility.Visible : Visibility.Collapsed;
         PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
-        PageLanguage.Visibility = page == "Language" ? Visibility.Visible : Visibility.Collapsed;
+        PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
         PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
@@ -328,6 +331,33 @@ public partial class SettingsWindow : ChromeWindow
         {
             MessageBox.Show(failure.Message, "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+
+    private void OnRepair(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            App.Services.Installer.Install(
+                App.Services.Installer.InstalledExecutablePath,
+                AppServices.Version,
+                new InstallOptions(
+                    _settings.DesktopShortcut,
+                    _settings.StartMenuShortcut,
+                    RegisterPlayer: true,
+                    _settings.RegisterStudio));
+
+            MessageBox.Show(
+                Strings.Get("launcher.repaired"),
+                "Nulltrap",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception failure)
+        {
+            MessageBox.Show(failure.Message, "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        RefreshFacts();
     }
 
     private void OnUninstall(object sender, RoutedEventArgs e)
