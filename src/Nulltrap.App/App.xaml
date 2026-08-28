@@ -5,17 +5,17 @@
              xmlns:local="clr-namespace:Nulltrap.App">
     <Application.Resources>
 
-        <Color x:Key="VoidColor">#FF0F0C15</Color>
-        <Color x:Key="CaptionColor">#FF15111D</Color>
-        <Color x:Key="SurfaceColor">#FF1B1626</Color>
-        <Color x:Key="SurfaceHoverColor">#FF241D32</Color>
-        <Color x:Key="RuleColor">#FF2E2640</Color>
-        <Color x:Key="PurpleColor">#FF62209F</Color>
-        <Color x:Key="PurpleBrightColor">#FFB96FF0</Color>
-        <Color x:Key="GlowColor">#FFE4BAFC</Color>
-        <Color x:Key="TextColor">#FFEDE9F2</Color>
+        <Color x:Key="VoidColor">#FF121019</Color>
+        <Color x:Key="CaptionColor">#FF1A1526</Color>
+        <Color x:Key="SurfaceColor">#FF221C33</Color>
+        <Color x:Key="SurfaceHoverColor">#FF2E2545</Color>
+        <Color x:Key="RuleColor">#FF3D3159</Color>
+        <Color x:Key="PurpleColor">#FF7A2FCC</Color>
+        <Color x:Key="PurpleBrightColor">#FFC77DFF</Color>
+        <Color x:Key="GlowColor">#FFEFD0FF</Color>
+        <Color x:Key="TextColor">#FFF3EFFA</Color>
         <Color x:Key="TextSoftColor">#FFC8C1D8</Color>
-        <Color x:Key="DangerColor">#FFE0736A</Color>
+        <Color x:Key="DangerColor">#FFFF7E74</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
         <SolidColorBrush x:Key="CaptionBrush" Color="{StaticResource CaptionColor}" />
@@ -28,6 +28,11 @@
         <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
         <SolidColorBrush x:Key="TextSoftBrush" Color="{StaticResource TextSoftColor}" />
         <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
+
+        <LinearGradientBrush x:Key="AccentBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="{StaticResource PurpleColor}" Offset="0" />
+            <GradientStop Color="{StaticResource PurpleBrightColor}" Offset="1" />
+        </LinearGradientBrush>
 
         <Style x:Key="CaptionButton" TargetType="Button">
             <Setter Property="Width" Value="44" />
@@ -206,6 +211,15 @@
 
         <Style x:Key="Dropdown" TargetType="ComboBox">
             <Setter Property="Height" Value="32" />
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Label}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextBrush}" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
             <Setter Property="MinWidth" Value="160" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FontSize" Value="12" />
@@ -221,7 +235,7 @@
                             <Setter.Value>
                                 <ControlTemplate TargetType="ComboBoxItem">
                                     <Border x:Name="Row" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="4">
-                                        <ContentPresenter />
+                                        <ContentPresenter TextElement.Foreground="{StaticResource TextBrush}" />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsHighlighted" Value="True">
@@ -256,7 +270,9 @@
                                                 <ContentPresenter Margin="11,0,30,0"
                                                                   HorizontalAlignment="Left"
                                                                   VerticalAlignment="Center"
-                                                                  Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                                                  TextElement.Foreground="{StaticResource TextBrush}"
+                                                                  Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                                                                  ContentTemplate="{Binding ItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
                                                 <Path Data="M 0 0 L 4 4 L 8 0"
                                                       Stroke="{StaticResource TextSoftBrush}"
                                                       StrokeThickness="1.6"

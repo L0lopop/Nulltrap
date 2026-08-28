@@ -180,13 +180,15 @@ public partial class SettingsWindow : ChromeWindow
         Show(page);
     }
 
+    public sealed record Choice(string Label, object? Value);
+
     private static void FillChoices(ComboBox box, (string? Value, string Key)[] choices, string? current)
     {
         box.Items.Clear();
 
         foreach ((string? value, string key) in choices)
         {
-            var item = new ComboBoxItem { Content = Strings.Get(key), Tag = value };
+            var item = new Choice(Strings.Get(key), value);
             box.Items.Add(item);
 
             if (value == current)
@@ -205,7 +207,7 @@ public partial class SettingsWindow : ChromeWindow
 
         foreach ((TValue value, string key) in choices)
         {
-            var item = new ComboBoxItem { Content = Strings.Get(key), Tag = value };
+            var item = new Choice(Strings.Get(key), value);
             box.Items.Add(item);
 
             if (value.Equals(current))
@@ -218,11 +220,11 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static string? ChosenValue(ComboBox box) =>
-        (box.SelectedItem as ComboBoxItem)?.Tag as string;
+        (box.SelectedItem as Choice)?.Value as string;
 
     private static TValue Chosen<TValue>(ComboBox box, TValue fallback)
         where TValue : struct, Enum =>
-        (box.SelectedItem as ComboBoxItem)?.Tag is TValue value ? value : fallback;
+        (box.SelectedItem as Choice)?.Value is TValue value ? value : fallback;
 
     private ComboBox GraphicsApis_Box() => GraphicsApiBox;
 
