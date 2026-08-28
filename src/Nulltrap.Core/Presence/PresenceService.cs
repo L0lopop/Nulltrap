@@ -6,9 +6,10 @@ namespace Nulltrap.Core.Presence;
 
 public sealed class PresenceService : IDisposable
 {
-    public const string BuiltInApplicationId = "";
+    public const string BuiltInApplicationId = "1542960701226622976";
 
     private const string PlaceUrl = "https://www.roblox.com/games/";
+    private const string FallbackImage = "nulltrap";
 
     private readonly DiscordPresenceClient _discord;
     private readonly GameInfoClient _games;
@@ -26,8 +27,6 @@ public sealed class PresenceService : IDisposable
         _games = games;
         _tracker = tracker;
     }
-
-    public static bool IsConfigurable => !string.IsNullOrWhiteSpace(BuiltInApplicationId);
 
     public PresenceOptions Options { get; set; } = PresenceOptions.Default;
 
@@ -84,7 +83,7 @@ public sealed class PresenceService : IDisposable
             Details = headline,
             State = Subline(session, game, options),
             StartedAt = options.ShowElapsed ? session.StartedAt : null,
-            LargeImage = options.ShowGameIcon ? game?.IconUrl : null,
+            LargeImage = options.ShowGameIcon ? game?.IconUrl ?? FallbackImage : null,
             LargeText = game?.Name,
             Buttons = buttons,
         };
