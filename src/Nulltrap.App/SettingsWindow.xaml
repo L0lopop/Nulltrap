@@ -38,6 +38,7 @@
                     <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Language" Content="{loc:S nav.language}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
@@ -72,16 +73,6 @@
                 <Grid>
 
                     <StackPanel x:Name="PageGeneral">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,200,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.language}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.languageHint}" />
-                                </StackPanel>
-                                <StackPanel x:Name="LanguageButtons" Orientation="Horizontal"
-                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
-                            </Grid>
-                        </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
@@ -117,6 +108,26 @@
                         </Border>
                     </StackPanel>
 
+                    <StackPanel x:Name="PageLanguage" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,220,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.language}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.languageHint}" />
+                                </StackPanel>
+                                <StackPanel x:Name="LanguageButtons" Orientation="Horizontal"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S language.help}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S language.helpHint}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
                     <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
@@ -146,8 +157,8 @@
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.textureQuality}" />
                                     <TextBlock Style="{StaticResource RowHint}"
                                                Text="{loc:S graphics.textureQualityHint}" />
-                                    <TextBox x:Name="TextureQualityBox" Style="{StaticResource Field}" Width="120"
-                                             HorizontalAlignment="Left" Margin="0,10,0,0" />
+                                    <ComboBox x:Name="TextureQualityBox" Style="{StaticResource Dropdown}"
+                                              HorizontalAlignment="Left" Margin="0,10,0,0" />
                                 </StackPanel>
                                 <CheckBox x:Name="TextureQualityEnabledBox" Style="{StaticResource Switch}"
                                           HorizontalAlignment="Right" VerticalAlignment="Top" />
@@ -159,8 +170,8 @@
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.msaa}" />
                                 <TextBlock Style="{StaticResource RowHint}"
                                            Text="{loc:S graphics.msaaHint}" />
-                                <TextBox x:Name="MsaaBox" Style="{StaticResource Field}" Width="120"
-                                         HorizontalAlignment="Left" Margin="0,10,0,0" />
+                                <ComboBox x:Name="MsaaBox" Style="{StaticResource Dropdown}"
+                                          HorizontalAlignment="Left" Margin="0,10,0,0" />
                             </StackPanel>
                         </Border>
 

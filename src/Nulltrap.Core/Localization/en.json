@@ -26,7 +26,7 @@
   "graphics.textureQuality": "Override texture quality",
   "graphics.textureQualityHint": "Forces a texture detail level instead of letting Roblox pick one. 0 is lowest, 3 is highest.",
   "graphics.msaa": "Anti-aliasing samples",
-  "graphics.msaaHint": "1, 2 or 4. Leave empty to let Roblox decide.",
+  "graphics.msaaHint": "1, 2 or 4 samples, or let Roblox choose.",
   "graphics.dpi": "Ignore display scaling",
   "graphics.dpiHint": "Renders at the monitor's real resolution on a scaled display. Sharper, and heavier.",
   "graphics.summary": "What actually applies",
@@ -106,5 +106,18 @@
   "storage.nothing": "nothing stored",
   "storage.packages": "packages",
   "storage.files": "files",
-  "confirm.uninstall": "Remove Nulltrap and the Roblox client it downloaded?"
+  "confirm.uninstall": "Remove Nulltrap and the Roblox client it downloaded?",
+  "nav.language": "Language",
+  "page.language.title": "Language",
+  "page.language.subtitle": "The language Nulltrap speaks.",
+  "language.help": "Something worded badly?",
+  "language.helpHint": "Translations live in two JSON files in the repository. Fixing a phrase is editing one line and opening a pull request.",
+  "graphics.automatic": "Roblox decides",
+  "graphics.level0": "0 — lowest",
+  "graphics.level1": "1",
+  "graphics.level2": "2",
+  "graphics.level3": "3 — highest",
+  "graphics.msaa1": "1 sample",
+  "graphics.msaa2": "2 samples",
+  "graphics.msaa4": "4 samples"
 }

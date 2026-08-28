@@ -9,8 +9,6 @@ Small, auditable, and honest about what it can and cannot do.
 
 **English** · [Русский](README.ru.md)
 
-<img src="assets/status.svg" alt="Phase 0 and 1 complete, phase 2 in progress" width="820">
-
 </div>
 
 > [!WARNING]
@@ -62,13 +60,7 @@ a flag will be ignored, rather than letting you believe it applied.
 
 ## Status
 
-| Phase | Scope | State |
-| --- | --- | --- |
-| 0 | Solution structure, architecture guard, CI | Done |
-| 1 | Deployment, package download, protocol handlers, install, launch | Done |
-| 2 | Mods, session tracking, Discord presence | In progress |
-| 3 | Per-game profiles, signed releases, plugin SDK | Planned |
-| 4 | Second platform, if the groundwork holds up | Open |
+<img src="assets/status.svg" alt="Phase 0 and 1 complete, phase 2 in progress" width="820">
 
 Working today: self-installation without administrator rights, Roblox and
 Studio downloads with a checksum-addressed cache, protocol handlers, the

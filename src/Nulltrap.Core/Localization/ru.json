@@ -26,7 +26,7 @@
   "graphics.textureQuality": "Переопределить качество текстур",
   "graphics.textureQualityHint": "Задаёт уровень детализации текстур вместо автоматического. 0 — минимум, 3 — максимум.",
   "graphics.msaa": "Сглаживание (MSAA)",
-  "graphics.msaaHint": "1, 2 или 4. Пусто — на усмотрение Roblox.",
+  "graphics.msaaHint": "1, 2 или 4 отсчёта, либо на усмотрение Roblox.",
   "graphics.dpi": "Игнорировать масштабирование экрана",
   "graphics.dpiHint": "Рендер в реальном разрешении монитора при масштабировании. Чётче и тяжелее.",
   "graphics.summary": "Что реально применится",
@@ -106,5 +106,18 @@
   "storage.nothing": "ничего не хранится",
   "storage.packages": "пакетов",
   "storage.files": "файлов",
-  "confirm.uninstall": "Удалить Nulltrap и скачанный им клиент Roblox?"
+  "confirm.uninstall": "Удалить Nulltrap и скачанный им клиент Roblox?",
+  "nav.language": "Язык",
+  "page.language.title": "Язык",
+  "page.language.subtitle": "На каком языке говорит Nulltrap.",
+  "language.help": "Что-то сформулировано плохо?",
+  "language.helpHint": "Переводы лежат в двух JSON-файлах в репозитории. Поправить формулировку — это одна строка и пул-реквест.",
+  "graphics.automatic": "На усмотрение Roblox",
+  "graphics.level0": "0 — минимум",
+  "graphics.level1": "1",
+  "graphics.level2": "2",
+  "graphics.level3": "3 — максимум",
+  "graphics.msaa1": "1 отсчёт",
+  "graphics.msaa2": "2 отсчёта",
+  "graphics.msaa4": "4 отсчёта"
 }

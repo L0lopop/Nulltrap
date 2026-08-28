@@ -22,6 +22,23 @@ public partial class SettingsWindow : ChromeWindow
     private const string MsaaFlag = "FIntDebugForceMSAASamples";
     private const string DisableDpiScaleFlag = "DFFlagDisableDPIScale";
 
+    private static readonly (string? Value, string Key)[] TextureQualityLevels =
+    [
+        (null, "graphics.automatic"),
+        ("0", "graphics.level0"),
+        ("1", "graphics.level1"),
+        ("2", "graphics.level2"),
+        ("3", "graphics.level3"),
+    ];
+
+    private static readonly (string? Value, string Key)[] MsaaLevels =
+    [
+        (null, "graphics.automatic"),
+        ("1", "graphics.msaa1"),
+        ("2", "graphics.msaa2"),
+        ("4", "graphics.msaa4"),
+    ];
+
     private readonly SettingsStore _store;
     private readonly NulltrapSettings _settings;
     private readonly FastFlagManager _fastFlags;
@@ -53,8 +70,8 @@ public partial class SettingsWindow : ChromeWindow
         FpsBox.IsEnabled = unlocked;
         TextureQualityEnabledBox.IsChecked =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
-        TextureQualityBox.Text = _flags.GetValueOrDefault(TextureQualityFlag, string.Empty);
-        MsaaBox.Text = _flags.GetValueOrDefault(MsaaFlag, string.Empty);
+        FillChoices(TextureQualityBox, TextureQualityLevels, _flags.GetValueOrDefault(TextureQualityFlag));
+        FillChoices(MsaaBox, MsaaLevels, _flags.GetValueOrDefault(MsaaFlag));
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
@@ -68,6 +85,27 @@ public partial class SettingsWindow : ChromeWindow
         Show("General");
         RefreshFacts();
     }
+
+    private static void FillChoices(ComboBox box, (string? Value, string Key)[] choices, string? current)
+    {
+        box.Items.Clear();
+
+        foreach ((string? value, string key) in choices)
+        {
+            var item = new ComboBoxItem { Content = Strings.Get(key), Tag = value };
+            box.Items.Add(item);
+
+            if (value == current)
+            {
+                box.SelectedItem = item;
+            }
+        }
+
+        box.SelectedItem ??= box.Items[0];
+    }
+
+    private static string? ChosenValue(ComboBox box) =>
+        (box.SelectedItem as ComboBoxItem)?.Tag as string;
 
     private void BuildLanguageButtons()
     {
@@ -166,6 +204,7 @@ public partial class SettingsWindow : ChromeWindow
         PageIntegration.Visibility = page == "Integration" ? Visibility.Visible : Visibility.Collapsed;
         PageGraphics.Visibility = page == "Graphics" ? Visibility.Visible : Visibility.Collapsed;
         PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
+        PageLanguage.Visibility = page == "Language" ? Visibility.Visible : Visibility.Collapsed;
         PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
@@ -324,8 +363,8 @@ public partial class SettingsWindow : ChromeWindow
 
         ApplyFrameRate();
         SetFlag(TextureQualityEnabledFlag, TextureQualityEnabledBox.IsChecked == true ? "True" : string.Empty);
-        SetFlag(TextureQualityFlag, TextureQualityBox.Text);
-        SetFlag(MsaaFlag, MsaaBox.Text);
+        SetFlag(TextureQualityFlag, ChosenValue(TextureQualityBox) ?? string.Empty);
+        SetFlag(MsaaFlag, ChosenValue(MsaaBox) ?? string.Empty);
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);
