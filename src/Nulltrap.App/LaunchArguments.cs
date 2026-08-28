@@ -5,6 +5,7 @@ namespace Nulltrap.App;
 public enum LaunchAction
 {
     Menu,
+    Setup,
     Install,
     LaunchPlayer,
     LaunchStudio,
@@ -57,6 +58,9 @@ public sealed record LaunchArguments
                     break;
                 case "studio":
                     action = LaunchAction.LaunchStudio;
+                    break;
+                case "setup":
+                    action = LaunchAction.Setup;
                     break;
                 case "install":
                     action = LaunchAction.Install;

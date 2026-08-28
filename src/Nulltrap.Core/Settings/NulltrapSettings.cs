@@ -6,6 +6,9 @@ namespace Nulltrap.Core.Settings;
 
 public sealed record NulltrapSettings
 {
+    [JsonPropertyName("setupCompleted")]
+    public bool SetupCompleted { get; set; }
+
     [JsonPropertyName("channel")]
     public string Channel { get; set; } = DeploymentChannel.DefaultName;
 

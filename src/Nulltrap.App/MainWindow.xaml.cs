@@ -62,6 +62,10 @@ public partial class MainWindow : ChromeWindow
         }
     }
 
+    public void LaunchPlayer() => _ = LaunchAsync(BinaryType.WindowsPlayer);
+
+    public void OpenSettings() => OnSettings(this, new RoutedEventArgs());
+
     private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
     private void OnLaunchStudio(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsStudio64);

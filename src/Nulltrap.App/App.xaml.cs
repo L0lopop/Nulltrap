@@ -23,6 +23,10 @@ public partial class App : Application
 
         switch (arguments.Action)
         {
+            case LaunchAction.Setup:
+                ShowSetup();
+                break;
+
             case LaunchAction.Install:
                 RunInstall(arguments);
                 break;
@@ -37,9 +41,45 @@ public partial class App : Application
                 break;
 
             default:
-                new MainWindow().Show();
+                ShowHome();
                 break;
         }
+    }
+
+    private void ShowHome()
+    {
+        if (Services.Settings.Load().SetupCompleted || Services.Installer.IsInstalled)
+        {
+            new MainWindow().Show();
+            return;
+        }
+
+        ShowSetup();
+    }
+
+    private void ShowSetup()
+    {
+        var setup = new SetupWindow();
+        setup.Closed += (_, _) =>
+        {
+            if (setup.LaunchRequested)
+            {
+                var home = new MainWindow();
+                home.Show();
+                home.LaunchPlayer();
+                return;
+            }
+
+            var main = new MainWindow();
+            main.Show();
+
+            if (setup.SettingsRequested)
+            {
+                main.OpenSettings();
+            }
+        };
+
+        setup.Show();
     }
 
     private void RunInstall(LaunchArguments arguments)
