@@ -137,30 +137,35 @@
             <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
             <Setter Property="FontSize" Value="10" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="18,16,0,7" />
+            <Setter Property="Margin" Value="24,18,0,6" />
         </Style>
 
         <Style x:Key="NavItem" TargetType="RadioButton">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
             <Setter Property="FontSize" Value="13" />
+            <Setter Property="Margin" Value="10,1,12,1" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Grid>
-                            <Border x:Name="Face" Background="Transparent" Height="34" />
-                            <Border x:Name="Rail" Width="3" HorizontalAlignment="Left" Background="Transparent" />
-                            <ContentPresenter Margin="18,0,0,0" VerticalAlignment="Center" />
-                        </Grid>
+                        <Border x:Name="Face" Height="32" CornerRadius="6" Background="Transparent">
+                            <Grid>
+                                <Border x:Name="Rail" Width="3" Height="16"
+                                        HorizontalAlignment="Left" Margin="0,0,0,0"
+                                        CornerRadius="2" Background="Transparent" />
+                                <ContentPresenter Margin="14,0,10,0" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Face" Property="Background" Value="{StaticResource SurfaceBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                <Setter TargetName="Face" Property="Background" Value="#1AB96FF0" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Face" Property="Background" Value="{StaticResource SurfaceBrush}" />
+                                <Setter TargetName="Face" Property="Background" Value="#33B96FF0" />
                                 <Setter TargetName="Rail" Property="Background" Value="{StaticResource PurpleBrightBrush}" />
                                 <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -285,6 +290,60 @@
                                 </Border>
                             </Popup>
                         </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Slider" TargetType="Slider">
+            <Setter Property="Height" Value="24" />
+            <Setter Property="IsSnapToTickEnabled" Value="True" />
+            <Setter Property="TickFrequency" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="5" CornerRadius="3" Background="{StaticResource VoidBrush}" />
+                            <Border x:Name="PART_SelectionRange" Visibility="Collapsed" />
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="5" CornerRadius="3" Background="{StaticResource PurpleBrightBrush}" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="Transparent" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Ellipse Width="16" Height="16"
+                                                         Fill="{StaticResource GlowBrush}"
+                                                         Stroke="{StaticResource PurpleBrush}"
+                                                         StrokeThickness="2" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

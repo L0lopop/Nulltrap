@@ -22,14 +22,27 @@ public partial class SettingsWindow : ChromeWindow
     private const string TextureQualityFlag = "DFIntTextureQualityOverride";
     private const string MsaaFlag = "FIntDebugForceMSAASamples";
     private const string DisableDpiScaleFlag = "DFFlagDisableDPIScale";
+    private const string PreferD3D11Flag = "FFlagDebugGraphicsPreferD3D11";
+    private const string PreferVulkanFlag = "FFlagDebugGraphicsPreferVulkan";
+    private const string PreferOpenGLFlag = "FFlagDebugGraphicsPreferOpenGL";
+    private const string MaxGrassFlag = "FIntFRMMaxGrassDistance";
+    private const string MinGrassFlag = "FIntFRMMinGrassDistance";
 
-    private static readonly (string? Value, string Key)[] TextureQualityLevels =
+    private static readonly (string? Value, string Key)[] GraphicsApis =
+    [
+        (null, "graphics.apiAuto"),
+        (PreferD3D11Flag, "graphics.apiD3D11"),
+        (PreferVulkanFlag, "graphics.apiVulkan"),
+        (PreferOpenGLFlag, "graphics.apiOpenGL"),
+    ];
+
+    private static readonly (string? Value, string Key)[] GrassDistances =
     [
         (null, "graphics.automatic"),
-        ("0", "graphics.level0"),
-        ("1", "graphics.level1"),
-        ("2", "graphics.level2"),
-        ("3", "graphics.level3"),
+        ("0", "graphics.grassOff"),
+        ("40", "graphics.grassNear"),
+        ("80", "graphics.grassNormal"),
+        ("200", "graphics.grassFar"),
     ];
 
     private static readonly (string? Value, string Key)[] MsaaLevels =
@@ -65,14 +78,23 @@ public partial class SettingsWindow : ChromeWindow
         ChannelBox.Text = _settings.Channel;
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
 
+        TextureQualityEnabledBox.IsChecked =
+            _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
+
         bool unlocked = _flags.ContainsKey(FpsFlag);
         UnlockFpsBox.IsChecked = unlocked;
         FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, DefaultTargetFps.ToString());
         FpsBox.IsEnabled = unlocked;
-        TextureQualityEnabledBox.IsChecked =
-            _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
-        FillChoices(TextureQualityBox, TextureQualityLevels, _flags.GetValueOrDefault(TextureQualityFlag));
         FillChoices(MsaaBox, MsaaLevels, _flags.GetValueOrDefault(MsaaFlag));
+        FillChoices(GrassBox, GrassDistances, _flags.GetValueOrDefault(MaxGrassFlag));
+        FillChoices(GraphicsApis_Box(), GraphicsApis, ChosenGraphicsApi());
+
+        bool overridingTexture =
+            _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
+        TextureQualitySlider.Value =
+            int.TryParse(_flags.GetValueOrDefault(TextureQualityFlag), out int level) ? Math.Clamp(level, 0, 9) : 3;
+        TextureQualitySlider.IsEnabled = overridingTexture;
+        ShowTextureQuality();
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
@@ -80,10 +102,11 @@ public partial class SettingsWindow : ChromeWindow
             FastFlagAllowlist.IsAllowed(FpsFlag) ? "graphics.fpsAllowed" : "graphics.fpsUnlisted");
 
         BuildLanguageButtons();
+        BuildChangelog();
 
         _loaded = true;
 
-        Show("General");
+        Show("Graphics");
         RefreshFacts();
     }
 
@@ -107,6 +130,72 @@ public partial class SettingsWindow : ChromeWindow
 
     private static string? ChosenValue(ComboBox box) =>
         (box.SelectedItem as ComboBoxItem)?.Tag as string;
+
+    private ComboBox GraphicsApis_Box() => GraphicsApiBox;
+
+    private string? ChosenGraphicsApi()
+    {
+        foreach ((string? flag, _) in GraphicsApis)
+        {
+            if (flag is not null
+                && _flags.GetValueOrDefault(flag, "False").Equals("True", StringComparison.OrdinalIgnoreCase))
+            {
+                return flag;
+            }
+        }
+
+        return null;
+    }
+
+    private void ShowTextureQuality()
+    {
+        TextureQualityValue.Text = TextureQualitySlider.IsEnabled
+            ? Strings.Get("graphics.qualityLevel", (int)TextureQualitySlider.Value)
+            : Strings.Get("graphics.qualityAuto");
+    }
+
+    private void OnTextureQualityToggled(object sender, RoutedEventArgs e)
+    {
+        TextureQualitySlider.IsEnabled = TextureQualityEnabledBox.IsChecked == true;
+        ShowTextureQuality();
+    }
+
+    private void OnTextureQualityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_loaded)
+        {
+            ShowTextureQuality();
+        }
+    }
+
+    private void BuildChangelog()
+    {
+        ChangelogPanel.Children.Clear();
+
+        foreach (ChangelogEntry entry in Changelog.Entries)
+        {
+            var heading = new TextBlock
+            {
+                Text = entry.Date is null ? entry.Version : $"{entry.Version} — {entry.Date}",
+                FontSize = 12,
+                Margin = new Thickness(0, 4, 0, 6),
+                Foreground = (System.Windows.Media.Brush)FindResource("PurpleBrightBrush"),
+            };
+            ChangelogPanel.Children.Add(heading);
+
+            foreach (string line in entry.For(_settings.Language))
+            {
+                ChangelogPanel.Children.Add(new TextBlock
+                {
+                    Text = "·  " + line,
+                    FontSize = 11,
+                    Margin = new Thickness(0, 0, 0, 3),
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
+                });
+            }
+        }
+    }
 
     private void BuildLanguageButtons()
     {
@@ -392,9 +481,23 @@ public partial class SettingsWindow : ChromeWindow
         _store.Save(_settings);
 
         ApplyFrameRate();
-        SetFlag(TextureQualityEnabledFlag, TextureQualityEnabledBox.IsChecked == true ? "True" : string.Empty);
-        SetFlag(TextureQualityFlag, ChosenValue(TextureQualityBox) ?? string.Empty);
+        bool overridingTexture = TextureQualityEnabledBox.IsChecked == true;
+        SetFlag(TextureQualityEnabledFlag, overridingTexture ? "True" : string.Empty);
+        SetFlag(TextureQualityFlag, overridingTexture ? ((int)TextureQualitySlider.Value).ToString() : string.Empty);
         SetFlag(MsaaFlag, ChosenValue(MsaaBox) ?? string.Empty);
+
+        string? api = ChosenValue(GraphicsApiBox);
+        foreach ((string? flag, _) in GraphicsApis)
+        {
+            if (flag is not null)
+            {
+                SetFlag(flag, flag == api ? "True" : string.Empty);
+            }
+        }
+
+        string? grass = ChosenValue(GrassBox);
+        SetFlag(MaxGrassFlag, grass ?? string.Empty);
+        SetFlag(MinGrassFlag, grass ?? string.Empty);
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);

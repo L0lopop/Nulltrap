@@ -34,16 +34,16 @@
                 </StackPanel>
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
+                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
+
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Launcher" Content="{loc:S nav.launcherApp}" Checked="OnNavigate" />
-
-                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.about}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
@@ -72,7 +72,7 @@
             <ScrollViewer Grid.Row="1" Margin="38,20,26,0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                 <Grid>
 
-                    <StackPanel x:Name="PageGeneral">
+                    <StackPanel x:Name="PageGeneral" Visibility="Collapsed">
 
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
@@ -162,7 +162,7 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
+                    <StackPanel x:Name="PageGraphics">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
@@ -189,24 +189,62 @@
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.textureQuality}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S graphics.textureQualityHint}" />
-                                    <ComboBox x:Name="TextureQualityBox" Style="{StaticResource Dropdown}"
-                                              HorizontalAlignment="Left" Margin="0,10,0,0" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.textureQualityHint}" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="TextureQualitySlider"
+                                                Style="{StaticResource Slider}"
+                                                Minimum="0" Maximum="9"
+                                                ValueChanged="OnTextureQualityChanged" />
+                                        <TextBlock x:Name="TextureQualityValue"
+                                                   Grid.Column="1"
+                                                   Margin="16,0,0,0"
+                                                   MinWidth="96"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
                                 </StackPanel>
                                 <CheckBox x:Name="TextureQualityEnabledBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Click="OnTextureQualityToggled" />
                             </Grid>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.msaa}" />
-                                <TextBlock Style="{StaticResource RowHint}"
-                                           Text="{loc:S graphics.msaaHint}" />
+                            <Grid>
+                                <StackPanel Margin="0,0,190,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.msaa}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.msaaHint}" />
+                                </StackPanel>
                                 <ComboBox x:Name="MsaaBox" Style="{StaticResource Dropdown}"
-                                          HorizontalAlignment="Left" Margin="0,10,0,0" />
-                            </StackPanel>
+                                          HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,190,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.api}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.apiHint}" />
+                                </StackPanel>
+                                <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,190,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.grass}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.grassHint}" />
+                                </StackPanel>
+                                <ComboBox x:Name="GrassBox" Style="{StaticResource Dropdown}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
@@ -344,6 +382,13 @@
                                     <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
                                                Text="{loc:S about.unofficial}" />
                                 </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.changes}" />
+                                <StackPanel x:Name="ChangelogPanel" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
 

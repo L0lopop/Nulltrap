@@ -1,0 +1,24 @@
+[
+  {
+    "version": "0.0.1",
+    "date": "2026-08-28",
+    "en": [
+      "Installs itself into your user profile without administrator rights",
+      "Downloads and launches Roblox and Roblox Studio",
+      "Takes over the Play button on the Roblox website",
+      "Keeps the client up to date on every launch",
+      "Graphics settings Roblox still allows, with the ignored ones marked",
+      "Frame rate unlock",
+      "English and Russian interface"
+    ],
+    "ru": [
+      "Устанавливается в профиль пользователя без прав администратора",
+      "Скачивает и запускает Roblox и Roblox Studio",
+      "Забирает на себя кнопку «Играть» на сайте Roblox",
+      "Держит клиент в актуальной версии при каждом запуске",
+      "Настройки графики из тех, что Roblox ещё разрешает, с пометкой игнорируемых",
+      "Снятие ограничения кадров",
+      "Интерфейс на русском и английском"
+    ]
+  }
+]
