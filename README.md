@@ -9,12 +9,16 @@ Small, auditable, and honest about what it can and cannot do.
 
 **English** · [Русский](README.ru.md)
 
+<img src="assets/status.svg" alt="Phase 0 and 1 complete, phase 2 in progress" width="820">
+
 </div>
 
 > [!WARNING]
-> **Nulltrap is in early development and does not launch Roblox yet.**
-> Phase 0 is complete: the solution builds, the architecture guard is in place,
-> and CI is running. Nothing else works. See [Status](#status).
+> **Nulltrap works, but there has been no release yet.**
+> It installs itself, downloads Roblox and Studio, and launches them from the
+> Play button on the Roblox website. Mods, session tracking and Discord
+> presence are not built yet. Build it from source until the first release
+> appears. See [Status](#status).
 
 > [!IMPORTANT]
 > When releases exist, this repository will be the only place to download them.
@@ -61,10 +65,14 @@ a flag will be ignored, rather than letting you believe it applied.
 | Phase | Scope | State |
 | --- | --- | --- |
 | 0 | Solution structure, architecture guard, CI | Done |
-| 1 | Deployment, package download, protocol handlers, launch | In progress |
-| 2 | Mods, FastFlags, activity tracking, Discord RPC | Planned |
+| 1 | Deployment, package download, protocol handlers, install, launch | Done |
+| 2 | Mods, session tracking, Discord presence | In progress |
 | 3 | Per-game profiles, signed releases, plugin SDK | Planned |
 | 4 | Second platform, if the groundwork holds up | Open |
+
+Working today: self-installation without administrator rights, Roblox and
+Studio downloads with a checksum-addressed cache, protocol handlers, the
+graphics settings Roblox still allows, and an English and Russian interface.
 
 ## Building
 

@@ -8,14 +8,14 @@
                     mc:Ignorable="d"
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap — Settings"
-                    Height="620" Width="900"
-                    MinHeight="480" MinWidth="720"
+                    Height="740" Width="1240"
+                    MinHeight="560" MinWidth="900"
                     ResizeMode="CanResize"
                     WindowStartupLocation="CenterOwner">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="216" />
+            <ColumnDefinition Width="248" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -57,7 +57,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="30,22,30,0">
+            <StackPanel Grid.Row="0" Margin="38,26,38,0">
                 <TextBlock x:Name="PageTitle"
                            Foreground="{StaticResource TextBrush}"
                            FontSize="22"
@@ -68,7 +68,7 @@
                            Margin="0,3,0,0" />
             </StackPanel>
 
-            <ScrollViewer Grid.Row="1" Margin="30,18,22,0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+            <ScrollViewer Grid.Row="1" Margin="38,20,26,0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                 <Grid>
 
                     <StackPanel x:Name="PageGeneral">
@@ -337,7 +337,7 @@
             </ScrollViewer>
 
             <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,26,12">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,32,14">
                     <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
                     <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
                 </StackPanel>
