@@ -434,6 +434,7 @@ public partial class SettingsWindow : ChromeWindow
         PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
         PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
         PageVersions.Visibility = page == "Versions" ? Visibility.Visible : Visibility.Collapsed;
+        PageActivity.Visibility = page == "Activity" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
 
@@ -453,6 +454,11 @@ public partial class SettingsWindow : ChromeWindow
             {
                 ShowTarget();
                 _ = CheckAsync(_target);
+            }
+
+            if (page == "Activity")
+            {
+                BuildActivity();
             }
         }
     }
@@ -790,6 +796,110 @@ public partial class SettingsWindow : ChromeWindow
 
         ShowTarget();
         RefreshFacts();
+    }
+
+    private void BuildActivity()
+    {
+        SessionHistory history = App.Services.History.Load();
+        DateTimeOffset now = DateTimeOffset.Now;
+
+        PlayedTodayText.Text = Clocks.Describe(history.Since(now.Date));
+        PlayedWeekText.Text = Clocks.Describe(history.Since(now.Date.AddDays(-6)));
+        PlayedTotalText.Text = Clocks.Describe(history.Total());
+
+        FavouritesPanel.Children.Clear();
+
+        foreach (PlayedGame game in history.ByGame(5))
+        {
+            FavouritesPanel.Children.Add(Line(
+                game.Name,
+                Strings.Get("activity.visits", game.Visits),
+                Clocks.Describe(game.Total)));
+        }
+
+        if (FavouritesPanel.Children.Count == 0)
+        {
+            FavouritesPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
+        }
+
+        RecentPanel.Children.Clear();
+
+        foreach (PlayedSession played in App.Services.History.Load().Sessions.Take(20))
+        {
+            RecentPanel.Children.Add(Line(
+                played.Name ?? Strings.Get("activity.unknownGame"),
+                played.StartedAt.ToLocalTime().ToString("g") + (played.Server is null ? string.Empty : "  ·  " + played.Server),
+                Clocks.Describe(played.Duration)));
+        }
+
+        if (RecentPanel.Children.Count == 0)
+        {
+            RecentPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
+        }
+
+        ClearHistoryButton.IsEnabled = history.Sessions.Count > 0;
+    }
+
+    private Grid Line(string title, string detail, string trailing)
+    {
+        var row = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var left = new StackPanel();
+        left.Children.Add(new TextBlock
+        {
+            Text = title,
+            FontSize = 13,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+        });
+        left.Children.Add(new TextBlock
+        {
+            Text = detail,
+            FontSize = 11,
+            Margin = new Thickness(0, 2, 0, 0),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
+        });
+
+        var right = new TextBlock
+        {
+            Text = trailing,
+            FontSize = 13,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(16, 0, 0, 0),
+            Foreground = (System.Windows.Media.Brush)FindResource("PurpleBrightBrush"),
+        };
+
+        Grid.SetColumn(left, 0);
+        Grid.SetColumn(right, 1);
+        row.Children.Add(left);
+        row.Children.Add(right);
+
+        return row;
+    }
+
+    private TextBlock Faint(string text) => new()
+    {
+        Text = text,
+        FontSize = 12,
+        Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
+    };
+
+    private void OnClearHistory(object sender, RoutedEventArgs e)
+    {
+        if (MessageBox.Show(
+                Strings.Get("activity.confirmClear"),
+                "Nulltrap",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        App.Services.History.Clear();
+        BuildActivity();
     }
 
     private void OnSave(object sender, RoutedEventArgs e)

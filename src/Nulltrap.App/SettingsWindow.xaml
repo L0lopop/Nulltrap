@@ -37,6 +37,7 @@
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
 
@@ -527,6 +528,60 @@
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.onDisk}" />
                                 <TextBlock x:Name="VersionsOnDiskText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PageActivity" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock x:Name="PlayedTodayText" FontSize="24" FontWeight="SemiBold"
+                                               Foreground="{StaticResource PurpleBrightBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.today}" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock x:Name="PlayedWeekText" FontSize="24" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.week}" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock x:Name="PlayedTotalText" FontSize="24" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.total}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.favourites}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.favouritesHint}" />
+                                <StackPanel x:Name="FavouritesPanel" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Margin="0,0,150,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.recent}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.recentHint}" />
+                                    </StackPanel>
+                                    <Button x:Name="ClearHistoryButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S activity.clear}" MinWidth="128"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                                            Click="OnClearHistory" />
+                                </Grid>
+                                <StackPanel x:Name="RecentPanel" Margin="0,12,0,0" />
                             </StackPanel>
                         </Border>
                     </StackPanel>

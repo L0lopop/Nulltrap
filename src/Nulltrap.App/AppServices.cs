@@ -44,6 +44,8 @@ public sealed class AppServices : IDisposable
 
         Games = new GameInfoClient(_http);
         Sessions = new SessionTracker();
+        History = new SessionHistoryStore(Paths);
+        Recorder = new SessionRecorder(Sessions, Games, History);
         LogWatcher = new RobloxLogWatcher(RobloxLogWatcher.DefaultDirectory, Sessions);
         PresenceTransports = new WindowsPresenceTransportFactory();
     }
@@ -88,11 +90,21 @@ public sealed class AppServices : IDisposable
 
     public SessionTracker Sessions { get; }
 
+    public SessionHistoryStore History { get; }
+
+    public SessionRecorder Recorder { get; }
+
     public RobloxLogWatcher LogWatcher { get; }
 
     public IPresenceTransportFactory PresenceTransports { get; }
 
     public PresenceService? Presence { get; private set; }
+
+    public void StartTracking()
+    {
+        Recorder.Start();
+        LogWatcher.Start();
+    }
 
     public void StartPresence()
     {
@@ -115,12 +127,12 @@ public sealed class AppServices : IDisposable
         };
 
         Presence.Start();
-        LogWatcher.Start();
     }
 
     public void Dispose()
     {
         Jobs.Dispose();
+        Recorder.Dispose();
         Presence?.Dispose();
         LogWatcher.Dispose();
         _http.Dispose();
