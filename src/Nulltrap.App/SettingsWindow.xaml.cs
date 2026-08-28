@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +7,7 @@ using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Localization;
+using Nulltrap.Core.Presence;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -77,6 +78,9 @@ public partial class SettingsWindow : ChromeWindow
         KeepDownloadCacheBox.IsChecked = _settings.KeepDownloadCache;
         ChannelBox.Text = _settings.Channel;
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
+        PresenceEnabledBox.IsChecked = _settings.DiscordPresence;
+        PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
+        PresenceAppIdBox.Text = _settings.DiscordApplicationId;
 
         TextureQualityEnabledBox.IsChecked =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
@@ -240,6 +244,7 @@ public partial class SettingsWindow : ChromeWindow
         SidebarVersion.Text = $"Nulltrap {AppServices.Version}";
         SidebarLocation.Text = App.Services.Paths.Root;
         LauncherLocationText.Text = App.Services.Paths.Root;
+        PresenceStatusText.Text = DescribePresence();
         RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
 
@@ -276,6 +281,25 @@ public partial class SettingsWindow : ChromeWindow
             && Directory.EnumerateFiles(App.Services.Paths.Downloads).Any();
     }
 
+    private string DescribePresence()
+    {
+        if (!_settings.DiscordPresence)
+        {
+            return Strings.Get("presence.off");
+        }
+
+        if (string.IsNullOrWhiteSpace(_settings.DiscordApplicationId))
+        {
+            return Strings.Get("presence.notConfigured");
+        }
+
+        PresenceActivity? showing = App.Services.Presence?.Last;
+
+        return showing?.Details is null
+            ? Strings.Get("presence.waiting")
+            : Strings.Get("presence.active", showing.Details);
+    }
+
     private static string Describe(string path, string noun)
     {
         if (!Directory.Exists(path))
@@ -297,6 +321,7 @@ public partial class SettingsWindow : ChromeWindow
         PageGraphics.Visibility = page == "Graphics" ? Visibility.Visible : Visibility.Collapsed;
         PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
         PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
+        PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
         PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
@@ -477,6 +502,9 @@ public partial class SettingsWindow : ChromeWindow
             ? DeploymentChannel.DefaultName
             : ChannelBox.Text.Trim();
         _settings.AutomaticClientUpdates = AutomaticClientUpdatesBox.IsChecked == true;
+        _settings.DiscordPresence = PresenceEnabledBox.IsChecked == true;
+        _settings.DiscordShowGameButton = PresenceButtonBox.IsChecked == true;
+        _settings.DiscordApplicationId = PresenceAppIdBox.Text.Trim();
 
         _store.Save(_settings);
 
@@ -501,6 +529,7 @@ public partial class SettingsWindow : ChromeWindow
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);
+        App.Services.StartPresence();
 
         RefreshFacts();
         ShowSaved();
@@ -544,7 +573,6 @@ public partial class SettingsWindow : ChromeWindow
 
         _flags[FpsFlag] = target.ToString();
 
-        // Roblox clamps the scheduler to 240 unless this is turned off.
         if (target > DefaultTargetFps)
         {
             _flags[FpsCapFlag] = "False";

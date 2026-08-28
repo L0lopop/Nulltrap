@@ -1,0 +1,66 @@
+using System.Text.Json.Serialization;
+
+namespace Nulltrap.Core.Roblox;
+
+public sealed record GameInfo
+{
+    public required long UniverseId { get; init; }
+
+    public required string Name { get; init; }
+
+    public string? CreatorName { get; init; }
+
+    public long RootPlaceId { get; init; }
+
+    public int Playing { get; init; }
+
+    public string? IconUrl { get; init; }
+}
+
+internal sealed record GamesResponse
+{
+    [JsonPropertyName("data")]
+    public List<GameRecord> Data { get; init; } = [];
+}
+
+internal sealed record GameRecord
+{
+    [JsonPropertyName("id")]
+    public long Id { get; init; }
+
+    [JsonPropertyName("rootPlaceId")]
+    public long RootPlaceId { get; init; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; init; } = string.Empty;
+
+    [JsonPropertyName("playing")]
+    public int Playing { get; init; }
+
+    [JsonPropertyName("creator")]
+    public CreatorRecord? Creator { get; init; }
+}
+
+internal sealed record CreatorRecord
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; init; }
+}
+
+internal sealed record ThumbnailsResponse
+{
+    [JsonPropertyName("data")]
+    public List<ThumbnailRecord> Data { get; init; } = [];
+}
+
+internal sealed record ThumbnailRecord
+{
+    [JsonPropertyName("targetId")]
+    public long TargetId { get; init; }
+
+    [JsonPropertyName("state")]
+    public string? State { get; init; }
+
+    [JsonPropertyName("imageUrl")]
+    public string? ImageUrl { get; init; }
+}

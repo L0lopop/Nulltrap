@@ -9,7 +9,9 @@
       "Keeps the client up to date on every launch",
       "Graphics settings Roblox still allows, with the ignored ones marked",
       "Frame rate unlock",
-      "English and Russian interface"
+      "English and Russian interface",
+      "Discord status showing the experience you are in",
+      "Session tracking read from Roblox's own log"
     ],
     "ru": [
       "Устанавливается в профиль пользователя без прав администратора",
@@ -18,7 +20,9 @@
       "Держит клиент в актуальной версии при каждом запуске",
       "Настройки графики из тех, что Roblox ещё разрешает, с пометкой игнорируемых",
       "Снятие ограничения кадров",
-      "Интерфейс на русском и английском"
+      "Интерфейс на русском и английском",
+      "Статус в Discord с игрой, в которой вы находитесь",
+      "Отслеживание сессии по логу самого Roblox"
     ]
   }
 ]

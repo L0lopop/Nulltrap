@@ -38,6 +38,7 @@
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
@@ -105,6 +106,46 @@
                                 </StackPanel>
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PagePresence" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.enable}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.enableHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="PresenceEnabledBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.button}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.buttonHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="PresenceButtonBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.appId}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.appIdHint}" />
+                                <TextBox x:Name="PresenceAppIdBox" Style="{StaticResource Field}"
+                                         Width="260" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.status}" />
+                                <TextBlock x:Name="PresenceStatusText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 

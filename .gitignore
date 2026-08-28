@@ -33,10 +33,8 @@ desktop.ini
 
 .claude/settings.local.json
 
-# Tests are kept local, not published
 tests/
 Nulltrap.Local.slnx
 
-# Reference screenshots, not part of the product
 /Скриншоты/
 /TestResults/

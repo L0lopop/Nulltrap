@@ -33,6 +33,15 @@ public sealed record NulltrapSettings
     [JsonPropertyName("confirmMultipleInstances")]
     public bool ConfirmMultipleInstances { get; set; } = true;
 
+    [JsonPropertyName("discordPresence")]
+    public bool DiscordPresence { get; set; } = true;
+
+    [JsonPropertyName("discordShowGameButton")]
+    public bool DiscordShowGameButton { get; set; } = true;
+
+    [JsonPropertyName("discordApplicationId")]
+    public string DiscordApplicationId { get; set; } = string.Empty;
+
     [JsonPropertyName("automaticClientUpdates")]
     public bool AutomaticClientUpdates { get; set; } = true;
 

@@ -6,6 +6,9 @@ using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Packages;
+using Nulltrap.Core.Presence;
+using Nulltrap.Core.Roblox;
+using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -37,6 +40,11 @@ public sealed class AppServices : IDisposable
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
         Installer = new Installer(Paths, Protocols, Shortcuts, UninstallEntry);
+
+        Games = new GameInfoClient(_http);
+        Sessions = new SessionTracker();
+        LogWatcher = new RobloxLogWatcher(RobloxLogWatcher.DefaultDirectory, Sessions);
+        PresenceTransports = new WindowsPresenceTransportFactory();
     }
 
     public static string Version { get; } =
@@ -73,5 +81,42 @@ public sealed class AppServices : IDisposable
 
     public Installer Installer { get; }
 
-    public void Dispose() => _http.Dispose();
+    public GameInfoClient Games { get; }
+
+    public SessionTracker Sessions { get; }
+
+    public RobloxLogWatcher LogWatcher { get; }
+
+    public IPresenceTransportFactory PresenceTransports { get; }
+
+    public PresenceService? Presence { get; private set; }
+
+    public void StartPresence()
+    {
+        NulltrapSettings settings = Settings.Load();
+
+        Presence?.Dispose();
+        Presence = null;
+
+        if (!settings.DiscordPresence || string.IsNullOrWhiteSpace(settings.DiscordApplicationId))
+        {
+            return;
+        }
+
+        var discord = new DiscordPresenceClient(PresenceTransports, settings.DiscordApplicationId);
+        Presence = new PresenceService(discord, Games, Sessions)
+        {
+            ShowGameButton = settings.DiscordShowGameButton,
+        };
+
+        Presence.Start();
+        LogWatcher.Start();
+    }
+
+    public void Dispose()
+    {
+        Presence?.Dispose();
+        LogWatcher.Dispose();
+        _http.Dispose();
+    }
 }

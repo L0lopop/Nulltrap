@@ -107,7 +107,6 @@ public sealed class RobloxLogWatcher : IDisposable
 
             if (line is null)
             {
-                // A newer log means Roblox restarted; go back and pick it up.
                 if (!string.Equals(NewestLog(_directory, DateTimeOffset.MinValue), path, StringComparison.OrdinalIgnoreCase))
                 {
                     return;
