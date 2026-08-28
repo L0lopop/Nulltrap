@@ -8,7 +8,8 @@
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap"
                     Height="330" Width="640"
-                    ResizeMode="CanMinimize"
+                    MinHeight="300" MinWidth="560"
+                    ResizeMode="CanResize"
                     WindowStartupLocation="CenterScreen">
 
     <Grid Margin="26,22,26,20">

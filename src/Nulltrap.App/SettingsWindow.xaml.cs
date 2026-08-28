@@ -26,6 +26,8 @@ public partial class SettingsWindow : ChromeWindow
         };
 
     private const string FpsFlag = "DFIntTaskSchedulerTargetFps";
+    private const string FpsCapFlag = "FFlagTaskSchedulerLimitTargetFpsTo2402";
+    private const int DefaultTargetFps = 240;
     private const string TextureQualityEnabledFlag = "DFFlagTextureQualityOverrideEnabled";
     private const string TextureQualityFlag = "DFIntTextureQualityOverride";
     private const string MsaaFlag = "FIntDebugForceMSAASamples";
@@ -56,7 +58,10 @@ public partial class SettingsWindow : ChromeWindow
         ChannelBox.Text = _settings.Channel;
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
 
-        FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, string.Empty);
+        bool unlocked = _flags.ContainsKey(FpsFlag);
+        UnlockFpsBox.IsChecked = unlocked;
+        FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, DefaultTargetFps.ToString());
+        FpsBox.IsEnabled = unlocked;
         TextureQualityEnabledBox.IsChecked =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
         TextureQualityBox.Text = _flags.GetValueOrDefault(TextureQualityFlag, string.Empty);
@@ -65,10 +70,10 @@ public partial class SettingsWindow : ChromeWindow
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
         FpsWarning.Text = FastFlagAllowlist.IsAllowed(FpsFlag)
-            ? "The frame rate Roblox aims for. Leave empty to follow your monitor."
-            : "Roblox removed this from its allowlist in September 2025, so the client ignores whatever "
-              + "you put here. Nulltrap writes it anyway in case that changes, but it will not raise your "
-              + "frame rate today. Nulltrap will not force it by editing the running client's memory.";
+            ? "This setting is on Roblox's allowlist and applies."
+            : "Roblox's September 2025 allowlist announcement did not include this setting, so the client "
+              + "may ignore it. Every other launcher uses exactly these two flags, so if it works there it "
+              + "works here. Check with Shift+F5 in game after launching.";
 
         _loaded = true;
 
@@ -291,7 +296,7 @@ public partial class SettingsWindow : ChromeWindow
 
         _store.Save(_settings);
 
-        SetFlag(FpsFlag, FpsBox.Text);
+        ApplyFrameRate();
         SetFlag(TextureQualityEnabledFlag, TextureQualityEnabledBox.IsChecked == true ? "True" : string.Empty);
         SetFlag(TextureQualityFlag, TextureQualityBox.Text);
         SetFlag(MsaaFlag, MsaaBox.Text);
@@ -301,6 +306,40 @@ public partial class SettingsWindow : ChromeWindow
 
         DialogResult = true;
         Close();
+    }
+
+    private void OnUnlockFpsChanged(object sender, RoutedEventArgs e)
+    {
+        FpsBox.IsEnabled = UnlockFpsBox.IsChecked == true;
+
+        if (FpsBox.IsEnabled && string.IsNullOrWhiteSpace(FpsBox.Text))
+        {
+            FpsBox.Text = DefaultTargetFps.ToString();
+        }
+    }
+
+    private void ApplyFrameRate()
+    {
+        if (UnlockFpsBox.IsChecked != true
+            || !int.TryParse(FpsBox.Text.Trim(), out int target)
+            || target <= 0)
+        {
+            _flags.Remove(FpsFlag);
+            _flags.Remove(FpsCapFlag);
+            return;
+        }
+
+        _flags[FpsFlag] = target.ToString();
+
+        // Roblox clamps the scheduler to 240 unless this is turned off.
+        if (target > DefaultTargetFps)
+        {
+            _flags[FpsCapFlag] = "False";
+        }
+        else
+        {
+            _flags.Remove(FpsCapFlag);
+        }
     }
 
     private void SetFlag(string name, string value)
