@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 
@@ -34,6 +35,12 @@ public static class Strings
 
         Current = code;
         _active = code == Fallback ? Loaded : Read(code);
+
+        var culture = CultureInfo.GetCultureInfo(code);
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
     }
 
     public static string Get(string key)

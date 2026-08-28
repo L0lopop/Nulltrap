@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
+using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
@@ -89,11 +90,15 @@ public partial class SettingsWindow : ChromeWindow
         ("4", "graphics.msaa4"),
     ];
 
+    private readonly TransferRate _rate = new();
+    private readonly Dictionary<BinaryType, ClientVersion> _available = [];
     private readonly SettingsStore _store;
     private readonly NulltrapSettings _settings;
     private readonly FastFlagManager _fastFlags;
     private readonly Dictionary<string, string> _flags;
 
+    private BinaryType _target = BinaryType.WindowsPlayer;
+    private double _transfer;
     private bool _loaded;
 
     public SettingsWindow()
@@ -147,10 +152,14 @@ public partial class SettingsWindow : ChromeWindow
         BuildLanguageButtons();
         BuildChangelog();
 
+        App.Services.Jobs.Changed += OnJobChanged;
+        Closed += (_, _) => App.Services.Jobs.Changed -= OnJobChanged;
+
         _loaded = true;
 
         Show("Graphics");
         RefreshFacts();
+        ShowTarget();
     }
 
     private static void FillChoices(ComboBox box, (string? Value, string Key)[] choices, string? current)
@@ -340,6 +349,7 @@ public partial class SettingsWindow : ChromeWindow
 
         CacheSizeText.Text = Describe(App.Services.Paths.Downloads, Strings.Get("storage.packages"));
         VersionsSizeText.Text = Describe(App.Services.Paths.Versions, Strings.Get("storage.files"));
+        VersionsOnDiskText.Text = VersionsSizeText.Text;
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
             && Directory.EnumerateFiles(App.Services.Paths.Downloads).Any();
     }
@@ -421,7 +431,7 @@ public partial class SettingsWindow : ChromeWindow
 
         return files.Length == 0
             ? Strings.Get("storage.nothing")
-            : $"{files.Length:N0} {noun}, {files.Sum(file => file.Length) / 1024.0 / 1024.0:N0} MB";
+            : $"{files.Length:N0} {noun}, {Sizes.Describe(files.Sum(file => file.Length))}";
     }
 
     private void Show(string page)
@@ -432,6 +442,7 @@ public partial class SettingsWindow : ChromeWindow
         PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
         PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
         PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
+        PageVersions.Visibility = page == "Versions" ? Visibility.Visible : Visibility.Collapsed;
         PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
@@ -447,6 +458,12 @@ public partial class SettingsWindow : ChromeWindow
         {
             Show(page);
             RefreshFacts();
+
+            if (page == "Versions")
+            {
+                ShowTarget();
+                _ = CheckAsync(_target);
+            }
         }
     }
 
@@ -598,6 +615,186 @@ public partial class SettingsWindow : ChromeWindow
         App.Services.Installer.Uninstall(_settings.KeepDownloadCache);
         DialogResult = true;
         Close();
+    }
+
+    private void OnPickTarget(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string name }
+            || !Enum.TryParse(name, out BinaryType picked)
+            || picked == _target)
+        {
+            return;
+        }
+
+        _target = picked;
+        _rate.Reset();
+        ShowTarget();
+        _ = CheckAsync(_target);
+    }
+
+    private void ShowTarget()
+    {
+        bool player = _target == BinaryType.WindowsPlayer;
+        PlayerTab.Style = (Style)FindResource(player ? "Accent" : "Quiet");
+        StudioTab.Style = (Style)FindResource(player ? "Quiet" : "Accent");
+
+        InstalledClient? installed = App.Services.StateStore.Load().Get(_target);
+
+        InstalledVersionText.Text = installed is null
+            ? Strings.Get("deployment.notDownloaded")
+            : installed.Version;
+        InstalledGuidText.Text = installed?.VersionGuid ?? string.Empty;
+        InstalledGuidText.Visibility = installed is null ? Visibility.Collapsed : Visibility.Visible;
+        RemoveVersionButton.IsEnabled = installed is not null && !App.Services.Jobs.IsRunning(_target);
+
+        ClientVersion? latest = _available.GetValueOrDefault(_target);
+        AvailableVersionText.Text = latest?.Version ?? Strings.Get("versions.unknown");
+        AvailableChannelText.Text = latest is null
+            ? string.Empty
+            : Strings.Get("versions.channelIs", _settings.DeploymentChannel.Name);
+        AvailableChannelText.Visibility = latest is null ? Visibility.Collapsed : Visibility.Visible;
+
+        DownloadButton.Content = Strings.Get(
+            installed is null ? "versions.download"
+            : latest is not null && latest.VersionGuid != installed.VersionGuid ? "versions.update"
+            : "versions.reinstall");
+
+        ShowJob(App.Services.Jobs.Of(_target));
+    }
+
+    private void ShowJob(InstallJob? job)
+    {
+        bool running = App.Services.Jobs.IsRunning(_target);
+
+        DownloadButton.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
+        CancelDownloadButton.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
+        RemoveVersionButton.IsEnabled = RemoveVersionButton.IsEnabled && !running;
+
+        if (job is null)
+        {
+            TransferTitle.Text = Strings.Get("versions.idle");
+            TransferMessage.Text = Strings.Get("versions.idleHint");
+            TransferBytes.Text = string.Empty;
+            TransferRateText.Text = string.Empty;
+            _transfer = 0;
+            DrawTransfer();
+            return;
+        }
+
+        TransferTitle.Text = Strings.Get(
+            job.Failure is not null ? "versions.failed"
+            : job.Cancelled ? "versions.cancelled"
+            : job.Result is not null ? "versions.done"
+            : "versions.working");
+
+        TransferMessage.Text = job.Progress.Message;
+        TransferMessage.Foreground = (System.Windows.Media.Brush)FindResource(
+            job.Failure is null ? "TextSoftBrush" : "DangerBrush");
+
+        _transfer = job.Settled && job.Result is null ? 0 : job.Progress.Fraction;
+        DrawTransfer();
+
+        if (job.Progress.BytesTotal > 0)
+        {
+            _rate.Add(job.Progress.BytesCompleted, DateTimeOffset.UtcNow);
+            TransferBytes.Text = Strings.Get(
+                "versions.transferred",
+                Sizes.Describe(job.Progress.BytesCompleted),
+                Sizes.Describe(job.Progress.BytesTotal));
+            TransferRateText.Text = Sizes.Rate(_rate.BytesPerSecond());
+        }
+        else if (job.Settled)
+        {
+            _rate.Reset();
+            TransferRateText.Text = string.Empty;
+        }
+    }
+
+    private void OnJobChanged(object? sender, InstallJob job) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (job.BinaryType != _target)
+            {
+                return;
+            }
+
+            if (job.Settled)
+            {
+                ShowTarget();
+                RefreshFacts();
+                return;
+            }
+
+            ShowJob(job);
+        });
+
+    private void OnTransferTrackResized(object sender, SizeChangedEventArgs e) => DrawTransfer();
+
+    private void DrawTransfer() =>
+        TransferFill.Width = Math.Max(0, TransferTrack.ActualWidth) * Math.Clamp(_transfer, 0, 1);
+
+    private void OnDownload(object sender, RoutedEventArgs e)
+    {
+        _rate.Reset();
+
+        if (App.Services.Jobs.Start(_target, _settings.DeploymentChannel))
+        {
+            ShowTarget();
+        }
+    }
+
+    private void OnCancelDownload(object sender, RoutedEventArgs e) => App.Services.Jobs.Cancel(_target);
+
+    private async void OnCheckVersion(object sender, RoutedEventArgs e) => await CheckAsync(_target);
+
+    private async Task CheckAsync(BinaryType binaryType)
+    {
+        CheckVersionButton.IsEnabled = false;
+        AvailableVersionText.Text = Strings.Get("versions.checking");
+
+        try
+        {
+            ClientVersion version = await App.Services.Deployment.GetClientVersionAsync(
+                binaryType, _settings.DeploymentChannel);
+
+            _available[binaryType] = version;
+        }
+        catch (Exception failure)
+        {
+            _available.Remove(binaryType);
+            AvailableVersionText.Text = failure.Message;
+        }
+        finally
+        {
+            CheckVersionButton.IsEnabled = true;
+        }
+
+        if (binaryType == _target)
+        {
+            ShowTarget();
+        }
+    }
+
+    private void OnRemoveVersion(object sender, RoutedEventArgs e)
+    {
+        InstallState state = App.Services.StateStore.Load();
+
+        if (state.Get(_target) is null
+            || MessageBox.Show(
+                Strings.Get("versions.confirmRemove"),
+                "Nulltrap",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        state.Remove(_target);
+        App.Services.StateStore.Save(state);
+        App.Services.Bootstrapper.RemoveSupersededVersions(state);
+
+        ShowTarget();
+        RefreshFacts();
     }
 
     private void OnSave(object sender, RoutedEventArgs e)

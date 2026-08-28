@@ -36,6 +36,7 @@
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
@@ -442,6 +443,83 @@
                                 </StackPanel>
                                 <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
                             </Grid>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PageVersions" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <Button x:Name="PlayerTab" Style="{StaticResource Accent}" MinWidth="150"
+                                    Tag="WindowsPlayer" Content="{loc:S versions.player}" Click="OnPickTarget" />
+                            <Button x:Name="StudioTab" Style="{StaticResource Quiet}" MinWidth="150" Margin="10,0,0,0"
+                                    Tag="WindowsStudio64" Content="{loc:S versions.studio}" Click="OnPickTarget" />
+                        </StackPanel>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.installed}" />
+                                    <TextBlock x:Name="InstalledVersionText" Style="{StaticResource RowHint}" />
+                                    <TextBlock x:Name="InstalledGuidText" Style="{StaticResource RowHint}" Margin="0,2,0,0" />
+                                </StackPanel>
+                                <Button x:Name="RemoveVersionButton" Style="{StaticResource Quiet}"
+                                        Content="{loc:S versions.remove}" MinWidth="128"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Click="OnRemoveVersion" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.available}" />
+                                    <TextBlock x:Name="AvailableVersionText" Style="{StaticResource RowHint}" />
+                                    <TextBlock x:Name="AvailableChannelText" Style="{StaticResource RowHint}" Margin="0,2,0,0" />
+                                </StackPanel>
+                                <Button x:Name="CheckVersionButton" Style="{StaticResource Quiet}"
+                                        Content="{loc:S versions.check}" MinWidth="128"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Click="OnCheckVersion" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Margin="0,0,290,0">
+                                        <TextBlock x:Name="TransferTitle" Style="{StaticResource RowTitle}" />
+                                        <TextBlock x:Name="TransferMessage" Style="{StaticResource RowHint}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button x:Name="CancelDownloadButton" Style="{StaticResource Quiet}"
+                                                Content="{loc:S action.cancel}" MinWidth="128"
+                                                Visibility="Collapsed" Click="OnCancelDownload" />
+                                        <Button x:Name="DownloadButton" Style="{StaticResource Accent}"
+                                                Content="{loc:S versions.download}" MinWidth="150" Margin="10,0,0,0"
+                                                Click="OnDownload" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border x:Name="TransferTrack" Height="7" Margin="0,16,0,0"
+                                        Background="{StaticResource SurfaceHoverBrush}" CornerRadius="4"
+                                        SizeChanged="OnTransferTrackResized">
+                                    <Border x:Name="TransferFill" HorizontalAlignment="Left" Width="0"
+                                            Background="{StaticResource PurpleBrightBrush}" CornerRadius="4" />
+                                </Border>
+
+                                <Grid Margin="0,10,0,0">
+                                    <TextBlock x:Name="TransferBytes" Style="{StaticResource RowHint}"
+                                               HorizontalAlignment="Left" />
+                                    <TextBlock x:Name="TransferRateText" Style="{StaticResource RowHint}"
+                                               HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.onDisk}" />
+                                <TextBlock x:Name="VersionsOnDiskText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
 

@@ -40,6 +40,7 @@ public sealed class AppServices : IDisposable
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
         Installer = new Installer(Paths, Protocols, Shortcuts, UninstallEntry);
+        Jobs = new InstallJobs(Bootstrapper);
 
         Games = new GameInfoClient(_http);
         Sessions = new SessionTracker();
@@ -81,6 +82,8 @@ public sealed class AppServices : IDisposable
 
     public Installer Installer { get; }
 
+    public InstallJobs Jobs { get; }
+
     public GameInfoClient Games { get; }
 
     public SessionTracker Sessions { get; }
@@ -117,6 +120,7 @@ public sealed class AppServices : IDisposable
 
     public void Dispose()
     {
+        Jobs.Dispose();
         Presence?.Dispose();
         LogWatcher.Dispose();
         _http.Dispose();

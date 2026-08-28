@@ -12,6 +12,10 @@ public enum BootstrapStage
 
 public sealed record BootstrapProgress(BootstrapStage Stage, string Message, double Fraction)
 {
+    public long BytesCompleted { get; init; }
+
+    public long BytesTotal { get; init; }
+
     public static BootstrapProgress For(BootstrapStage stage, string message) =>
         new(stage, message, StageFloor(stage));
 
@@ -21,6 +25,13 @@ public sealed record BootstrapProgress(BootstrapStage Stage, string Message, dou
         double ceiling = StageCeiling(stage);
         return new BootstrapProgress(stage, message, floor + (ceiling - floor) * Math.Clamp(fraction, 0, 1));
     }
+
+    public static BootstrapProgress Transferring(string message, long completed, long total) =>
+        Within(BootstrapStage.Downloading, message, total == 0 ? 0 : (double)completed / total) with
+        {
+            BytesCompleted = completed,
+            BytesTotal = total,
+        };
 
     private static double StageFloor(BootstrapStage stage) => stage switch
     {

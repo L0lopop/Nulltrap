@@ -1,5 +1,6 @@
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
+using Nulltrap.Core.Localization;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -48,11 +49,11 @@ public sealed class ClientBootstrapper
     {
         _paths.EnsureCreated();
 
-        progress?.Report(BootstrapProgress.For(BootstrapStage.Connecting, "Contacting Roblox"));
+        progress?.Report(BootstrapProgress.For(BootstrapStage.Connecting, Strings.Get("bootstrap.connecting")));
         DeploymentMirror mirror = await _deployment.ResolveFastestMirrorAsync(cancellationToken)
             .ConfigureAwait(false);
 
-        progress?.Report(BootstrapProgress.For(BootstrapStage.CheckingVersion, "Checking for updates"));
+        progress?.Report(BootstrapProgress.For(BootstrapStage.CheckingVersion, Strings.Get("bootstrap.checking")));
         ClientVersion version = await _deployment
             .GetClientVersionAsync(binaryType, channel, cancellationToken)
             .ConfigureAwait(false);
@@ -66,7 +67,7 @@ public sealed class ClientBootstrapper
         if (installed?.VersionGuid == version.VersionGuid && File.Exists(executablePath))
         {
             _fastFlags.ApplyTo(versionDirectory);
-            progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, "Up to date"));
+            progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, Strings.Get("bootstrap.upToDate")));
 
             return new BootstrapResult(
                 binaryType, version.Version, version.VersionGuid,
@@ -78,10 +79,10 @@ public sealed class ClientBootstrapper
             .ConfigureAwait(false);
 
         var downloadProgress = new Progress<PackageDownloadProgress>(report =>
-            progress?.Report(BootstrapProgress.Within(
-                BootstrapStage.Downloading,
-                $"Downloading Roblox {version.Version}",
-                report.Fraction)));
+            progress?.Report(BootstrapProgress.Transferring(
+                Strings.Get("bootstrap.downloading", version.Version),
+                report.BytesCompleted,
+                report.BytesTotal)));
 
         IReadOnlyDictionary<string, string> downloads = await _downloader
             .DownloadAsync(mirror, manifest, downloadProgress, cancellationToken)
@@ -90,7 +91,7 @@ public sealed class ClientBootstrapper
         var installProgress = new Progress<PackageInstallProgress>(report =>
             progress?.Report(BootstrapProgress.Within(
                 BootstrapStage.Installing,
-                $"Installing {report.Current}",
+                Strings.Get("bootstrap.installing", report.Current),
                 report.Fraction)));
 
         var installer = new PackageInstaller(binaryType);
@@ -112,11 +113,11 @@ public sealed class ClientBootstrapper
         });
         _state.Save(state);
 
-        progress?.Report(BootstrapProgress.For(BootstrapStage.Cleaning, "Tidying up"));
+        progress?.Report(BootstrapProgress.For(BootstrapStage.Cleaning, Strings.Get("bootstrap.cleaning")));
         RemoveSupersededVersions(state);
 
         _fastFlags.ApplyTo(versionDirectory);
-        progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, "Ready"));
+        progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, Strings.Get("bootstrap.ready")));
 
         return new BootstrapResult(
             binaryType, version.Version, version.VersionGuid,
