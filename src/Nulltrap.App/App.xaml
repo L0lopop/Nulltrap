@@ -14,7 +14,7 @@
         <Color x:Key="PurpleBrightColor">#FFB96FF0</Color>
         <Color x:Key="GlowColor">#FFE4BAFC</Color>
         <Color x:Key="TextColor">#FFEDE9F2</Color>
-        <Color x:Key="TextSoftColor">#FF938BA6</Color>
+        <Color x:Key="TextSoftColor">#FFC8C1D8</Color>
         <Color x:Key="DangerColor">#FFE0736A</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
@@ -135,7 +135,7 @@
 
         <Style x:Key="NavSection" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="11" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Margin" Value="24,18,0,6" />
         </Style>
@@ -412,7 +412,7 @@
 
         <Style x:Key="RowHint" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
-            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,3,0,0" />
         </Style>

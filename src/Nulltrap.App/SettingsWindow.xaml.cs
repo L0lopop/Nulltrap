@@ -281,7 +281,7 @@ public partial class SettingsWindow : ChromeWindow
                 ChangelogPanel.Children.Add(new TextBlock
                 {
                     Text = "·  " + line,
-                    FontSize = 11,
+                    FontSize = 12,
                     Margin = new Thickness(0, 0, 0, 3),
                     TextWrapping = TextWrapping.Wrap,
                     Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
@@ -939,7 +939,7 @@ public partial class SettingsWindow : ChromeWindow
         left.Children.Add(new TextBlock
         {
             Text = detail,
-            FontSize = 11,
+            FontSize = 12,
             Margin = new Thickness(0, 2, 0, 0),
             TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),

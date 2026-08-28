@@ -39,7 +39,7 @@
                        HorizontalAlignment="Right"
                        VerticalAlignment="Top"
                        Foreground="{StaticResource TextSoftBrush}"
-                       FontSize="11" />
+                       FontSize="12" />
         </Grid>
 
         <ScrollViewer Grid.Row="1" Margin="34,22,26,0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">

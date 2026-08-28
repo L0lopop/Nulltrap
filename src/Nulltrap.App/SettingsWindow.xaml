@@ -30,10 +30,10 @@
                     <StackPanel Margin="16,0,16,0">
                         <TextBlock x:Name="SidebarVersion"
                                    Foreground="{StaticResource TextSoftBrush}"
-                                   FontSize="11" />
+                                   FontSize="12" />
                         <TextBlock x:Name="SidebarLocation"
                                    Foreground="{StaticResource TextSoftBrush}"
-                                   FontSize="10"
+                                   FontSize="12"
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,3,0,0" />
                     </StackPanel>
@@ -225,7 +225,7 @@
                                                        Foreground="{StaticResource PurpleBrightBrush}" />
                                         </Grid>
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                            <TextBlock Text="Nulltrap" FontSize="11" FontWeight="Bold"
+                                            <TextBlock Text="Nulltrap" FontSize="12" FontWeight="Bold"
                                                        Foreground="{StaticResource TextSoftBrush}" />
                                             <TextBlock x:Name="PreviewDetails" FontSize="13" FontWeight="SemiBold"
                                                        Margin="0,4,0,0" Foreground="{StaticResource TextBrush}" />
@@ -236,7 +236,7 @@
                                             <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="14,5"
                                                     CornerRadius="4" HorizontalAlignment="Left"
                                                     Background="{StaticResource SurfaceHoverBrush}">
-                                                <TextBlock x:Name="PreviewButtonText" FontSize="11"
+                                                <TextBlock x:Name="PreviewButtonText" FontSize="12"
                                                            Foreground="{StaticResource TextBrush}" />
                                             </Border>
                                         </StackPanel>
@@ -476,7 +476,7 @@
                                         <TextBlock Text="{loc:S graphics.fpsUnit}"
                                                    VerticalAlignment="Center"
                                                    Margin="10,0,0,0"
-                                                   FontSize="11"
+                                                   FontSize="12"
                                                    Foreground="{StaticResource TextSoftBrush}" />
                                     </StackPanel>
                                     <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" Margin="0,10,0,0" />

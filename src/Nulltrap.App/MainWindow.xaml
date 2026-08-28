@@ -39,7 +39,7 @@
             <TextBlock x:Name="ClientText"
                        Margin="0,10,0,0"
                        Foreground="{StaticResource TextSoftBrush}"
-                       FontSize="11"
+                       FontSize="12"
                        TextWrapping="Wrap" />
 
             <Button Style="{StaticResource Link}"
@@ -76,7 +76,7 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{loc:S home.launch}" FontSize="14" FontWeight="SemiBold" />
                         <TextBlock x:Name="PlayHint"
-                                   FontSize="11"
+                                   FontSize="12"
                                    Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
@@ -97,13 +97,13 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{loc:S home.studio}" FontSize="13" FontWeight="SemiBold" />
                         <TextBlock x:Name="StudioHint"
-                                   FontSize="11"
+                                   FontSize="12"
                                    Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
-                               FontSize="11"
+                               FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Foreground="{StaticResource TextSoftBrush}" />
@@ -118,13 +118,13 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{loc:S home.settings}" FontSize="13" FontWeight="SemiBold" />
                         <TextBlock Text="{loc:S home.settingsHint}"
-                                   FontSize="11"
+                                   FontSize="12"
                                    Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
-                               FontSize="11"
+                               FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Foreground="{StaticResource TextSoftBrush}" />
@@ -138,14 +138,14 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock x:Name="HandlerTitle" FontSize="13" FontWeight="SemiBold" />
                         <TextBlock x:Name="HandlerHint"
-                                   FontSize="11"
+                                   FontSize="12"
                                    Margin="0,2,0,0"
                                    TextTrimming="CharacterEllipsis"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
-                               FontSize="11"
+                               FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Foreground="{StaticResource TextSoftBrush}" />
@@ -159,13 +159,13 @@
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{loc:S home.about}" FontSize="13" FontWeight="SemiBold" />
                         <TextBlock Text="{loc:S home.aboutHint}"
-                                   FontSize="11"
+                                   FontSize="12"
                                    Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
-                               FontSize="11"
+                               FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
                                Foreground="{StaticResource TextSoftBrush}" />
