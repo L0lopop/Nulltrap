@@ -37,7 +37,6 @@
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
 
@@ -517,26 +516,17 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S deployment.channel}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S deployment.channelHint}" />
+                                <TextBox x:Name="ChannelBox" Style="{StaticResource Field}"
+                                         Width="260" HorizontalAlignment="Left" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.onDisk}" />
                                 <TextBlock x:Name="VersionsOnDiskText" Style="{StaticResource RowHint}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <StackPanel x:Name="PageDeployment" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S deployment.channel}" />
-                                <TextBlock Style="{StaticResource RowHint}"
-                                           Text="{loc:S deployment.channelHint}" />
-                                <TextBox x:Name="ChannelBox" Style="{StaticResource Field}" Margin="0,10,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S deployment.installed}" />
-                                <TextBlock x:Name="InstalledClientsText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>

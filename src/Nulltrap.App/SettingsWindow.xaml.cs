@@ -328,15 +328,6 @@ public partial class SettingsWindow : ChromeWindow
 
         HandlerText.Text = handler ?? Strings.Get("integration.noHandler");
 
-        InstallState state = App.Services.StateStore.Load();
-        InstalledClient? player = state.Get(BinaryType.WindowsPlayer);
-        InstalledClient? studio = state.Get(BinaryType.WindowsStudio64);
-
-        InstalledClientsText.Text = string.Join(
-            "\n",
-            $"Player: {(player is null ? Strings.Get("deployment.notDownloaded") : $"{player.Version} ({player.VersionGuid})")}",
-            $"Studio: {(studio is null ? Strings.Get("deployment.notDownloaded") : $"{studio.Version} ({studio.VersionGuid})")}");
-
         string[] applied = _flags.Keys.Where(FastFlagAllowlist.IsAllowed).ToArray();
         string[] ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).ToArray();
 
@@ -443,7 +434,6 @@ public partial class SettingsWindow : ChromeWindow
         PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
         PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
         PageVersions.Visibility = page == "Versions" ? Visibility.Visible : Visibility.Collapsed;
-        PageDeployment.Visibility = page == "Deployment" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
 
@@ -632,6 +622,11 @@ public partial class SettingsWindow : ChromeWindow
         _ = CheckAsync(_target);
     }
 
+    private DeploymentChannel ChosenChannel() =>
+        string.IsNullOrWhiteSpace(ChannelBox.Text)
+            ? DeploymentChannel.Default
+            : new DeploymentChannel(ChannelBox.Text.Trim());
+
     private void ShowTarget()
     {
         bool player = _target == BinaryType.WindowsPlayer;
@@ -651,7 +646,7 @@ public partial class SettingsWindow : ChromeWindow
         AvailableVersionText.Text = latest?.Version ?? Strings.Get("versions.unknown");
         AvailableChannelText.Text = latest is null
             ? string.Empty
-            : Strings.Get("versions.channelIs", _settings.DeploymentChannel.Name);
+            : Strings.Get("versions.channelIs", ChosenChannel().Name);
         AvailableChannelText.Visibility = latest is null ? Visibility.Collapsed : Visibility.Visible;
 
         DownloadButton.Content = Strings.Get(
@@ -737,7 +732,7 @@ public partial class SettingsWindow : ChromeWindow
     {
         _rate.Reset();
 
-        if (App.Services.Jobs.Start(_target, _settings.DeploymentChannel))
+        if (App.Services.Jobs.Start(_target, ChosenChannel()))
         {
             ShowTarget();
         }
@@ -755,7 +750,7 @@ public partial class SettingsWindow : ChromeWindow
         try
         {
             ClientVersion version = await App.Services.Deployment.GetClientVersionAsync(
-                binaryType, _settings.DeploymentChannel);
+                binaryType, ChosenChannel());
 
             _available[binaryType] = version;
         }
