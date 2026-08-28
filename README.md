@@ -60,7 +60,7 @@ a flag will be ignored, rather than letting you believe it applied.
 
 ## Status
 
-<img src="assets/status.svg" alt="Phase 0 and 1 complete, phase 2 in progress" width="820">
+<img src="assets/status.svg" alt="Phases 0, 1 and 2 complete, phase 3 in progress" width="820">
 
 Working today: self-installation without administrator rights, Roblox and
 Studio downloads with a checksum-addressed cache, protocol handlers, the

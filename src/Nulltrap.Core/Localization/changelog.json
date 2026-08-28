@@ -11,7 +11,10 @@
       "Frame rate unlock",
       "English and Russian interface",
       "Discord status showing the experience you are in, with no Discord setup and a choice of what it shows",
-      "Session tracking read from Roblox's own log"
+      "Session tracking read from Roblox's own log",
+      "A Versions page that downloads Roblox and Studio before you need them",
+      "An Activity page: what you played, for how long, and on which server",
+      "Mods: your own files laid over the client and kept there across updates"
     ],
     "ru": [
       "Устанавливается в профиль пользователя без прав администратора",
@@ -22,7 +25,10 @@
       "Снятие ограничения кадров",
       "Интерфейс на русском и английском",
       "Статус в Discord с игрой, в которой вы находитесь: без настройки Discord и с выбором того, что показывать",
-      "Отслеживание сессии по логу самого Roblox"
+      "Отслеживание сессии по логу самого Roblox",
+      "Страница «Версии»: скачивает Roblox и Studio заранее",
+      "Страница «Активность»: во что играли, сколько и на каком сервере",
+      "Моды: ваши файлы поверх клиента, переживающие обновления"
     ]
   }
 ]
