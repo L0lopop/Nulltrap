@@ -131,7 +131,7 @@
                 </Grid>
             </Button>
 
-            <Button Grid.Row="4" Grid.ColumnSpan="3"
+            <Button Grid.Row="4" Grid.Column="0"
                     Style="{StaticResource Card}"
                     Click="OnOpenInstallFolder">
                 <Grid>
@@ -141,6 +141,26 @@
                                    FontSize="11"
                                    Margin="0,2,0,0"
                                    TextTrimming="CharacterEllipsis"
+                                   Foreground="{StaticResource TextSoftBrush}" />
+                    </StackPanel>
+                    <TextBlock Text="&#xE76C;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="11"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSoftBrush}" />
+                </Grid>
+            </Button>
+            <Button Grid.Row="4" Grid.Column="2"
+                    x:Name="AboutButton"
+                    Style="{StaticResource Card}"
+                    Click="OnAbout">
+                <Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{loc:S home.about}" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock Text="{loc:S home.aboutHint}"
+                                   FontSize="11"
+                                   Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"

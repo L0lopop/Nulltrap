@@ -160,8 +160,24 @@ public partial class SettingsWindow : ChromeWindow
         _loaded = true;
 
         Show("Graphics");
+
+        foreach ((string page, string[] groups) in Groups)
+        {
+            ShowGroup(page, groups[0]);
+        }
+
         RefreshFacts();
         ShowTarget();
+    }
+
+    public void GoTo(string page)
+    {
+        if (FindName("Nav" + page) is RadioButton nav)
+        {
+            nav.IsChecked = true;
+        }
+
+        Show(page);
     }
 
     private static void FillChoices(ComboBox box, (string? Value, string Key)[] choices, string? current)
@@ -342,7 +358,6 @@ public partial class SettingsWindow : ChromeWindow
 
         CacheSizeText.Text = Describe(App.Services.Paths.Downloads, Strings.Get("storage.packages"));
         VersionsSizeText.Text = Describe(App.Services.Paths.Versions, Strings.Get("storage.files"));
-        VersionsOnDiskText.Text = VersionsSizeText.Text;
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
             && Directory.EnumerateFiles(App.Services.Paths.Downloads).Any();
     }
@@ -427,23 +442,99 @@ public partial class SettingsWindow : ChromeWindow
             : $"{files.Length:N0} {noun}, {Sizes.Describe(files.Sum(file => file.Length))}";
     }
 
+    private static readonly string[] Pages =
+        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "About"];
+
+    private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
+    {
+        ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFlags"],
+        ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
+        ["Presence"] = ["PresenceStatus", "PresenceShown", "PresenceApp"],
+        ["General"] = ["GeneralBehaviour", "GeneralIntegration", "GeneralShortcuts"],
+    };
+
+    private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
+    {
+        ["GraphicsQuality"] = ("Graphics", "GraphicsQuality"),
+        ["GraphicsSpeed"] = ("Graphics", "GraphicsSpeed"),
+        ["GraphicsFlags"] = ("Graphics", "GraphicsFlags"),
+        ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
+        ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
+        ["VersionsStorage"] = ("Versions", "VersionsStorage"),
+        ["PresenceStatus"] = ("Presence", "PresenceStatus"),
+        ["PresenceShown"] = ("Presence", "PresenceShown"),
+        ["PresenceApp"] = ("Presence", "PresenceApp"),
+        ["GeneralBehaviour"] = ("General", "GeneralBehaviour"),
+        ["GeneralIntegration"] = ("General", "GeneralIntegration"),
+        ["GeneralShortcuts"] = ("General", "GeneralShortcuts"),
+    };
+
     private void Show(string page)
     {
-        PageGeneral.Visibility = page == "General" ? Visibility.Visible : Visibility.Collapsed;
-        PageIntegration.Visibility = page == "Integration" ? Visibility.Visible : Visibility.Collapsed;
-        PageGraphics.Visibility = page == "Graphics" ? Visibility.Visible : Visibility.Collapsed;
-        PageShortcuts.Visibility = page == "Shortcuts" ? Visibility.Visible : Visibility.Collapsed;
-        PageLauncher.Visibility = page == "Launcher" ? Visibility.Visible : Visibility.Collapsed;
-        PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
-        PageVersions.Visibility = page == "Versions" ? Visibility.Visible : Visibility.Collapsed;
-        PageActivity.Visibility = page == "Activity" ? Visibility.Visible : Visibility.Collapsed;
-        PageMods.Visibility = page == "Mods" ? Visibility.Visible : Visibility.Collapsed;
-        PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
-        PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
+        foreach (string name in Pages)
+        {
+            if (FindName("Page" + name) is FrameworkElement panel)
+            {
+                panel.Visibility = name == page ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
 
         string key = char.ToLowerInvariant(page[0]) + page[1..];
         PageTitle.Text = Strings.Get($"page.{key}.title");
         PageSubtitle.Text = Strings.Get($"page.{key}.subtitle");
+    }
+
+    private void ShowGroup(string page, string group)
+    {
+        if (!Groups.TryGetValue(page, out string[]? groups))
+        {
+            return;
+        }
+
+        foreach (string name in groups)
+        {
+            if (FindName(name) is FrameworkElement panel)
+            {
+                panel.Visibility = name == group ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+    }
+
+    private void OnSubTab(object sender, RoutedEventArgs e)
+    {
+        if (!_loaded
+            || sender is not RadioButton { Tag: string tab }
+            || !Tabs.TryGetValue(tab, out (string Page, string Group) chosen))
+        {
+            return;
+        }
+
+        ShowGroup(chosen.Page, chosen.Group);
+
+        if (chosen.Group == "VersionsStorage")
+        {
+            RefreshFacts();
+            return;
+        }
+
+        if (chosen.Page != "Versions")
+        {
+            return;
+        }
+
+        BinaryType picked = tab == "VersionsStudio"
+            ? BinaryType.WindowsStudio64
+            : BinaryType.WindowsPlayer;
+
+        if (picked == _target)
+        {
+            return;
+        }
+
+        _target = picked;
+        _rate.Reset();
+        ShowTarget();
+        _ = CheckAsync(_target);
     }
 
     private void OnNavigate(object sender, RoutedEventArgs e)
@@ -455,6 +546,7 @@ public partial class SettingsWindow : ChromeWindow
 
             if (page == "Versions")
             {
+                ShowGroup("Versions", TabVersionsStorage.IsChecked == true ? "VersionsStorage" : "VersionsPlayer");
                 ShowTarget();
                 _ = CheckAsync(_target);
             }
@@ -621,21 +713,6 @@ public partial class SettingsWindow : ChromeWindow
         Close();
     }
 
-    private void OnPickTarget(object sender, RoutedEventArgs e)
-    {
-        if (sender is not System.Windows.Controls.Button { Tag: string name }
-            || !Enum.TryParse(name, out BinaryType picked)
-            || picked == _target)
-        {
-            return;
-        }
-
-        _target = picked;
-        _rate.Reset();
-        ShowTarget();
-        _ = CheckAsync(_target);
-    }
-
     private DeploymentChannel ChosenChannel() =>
         string.IsNullOrWhiteSpace(ChannelBox.Text)
             ? DeploymentChannel.Default
@@ -643,10 +720,6 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowTarget()
     {
-        bool player = _target == BinaryType.WindowsPlayer;
-        PlayerTab.Style = (Style)FindResource(player ? "Accent" : "Quiet");
-        StudioTab.Style = (Style)FindResource(player ? "Quiet" : "Accent");
-
         InstalledClient? installed = App.Services.StateStore.Load().Get(_target);
 
         InstalledVersionText.Text = installed is null

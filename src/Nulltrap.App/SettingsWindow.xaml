@@ -21,16 +21,22 @@
 
         <Border Grid.Column="0" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,0,1,0">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Bottom" Margin="16,0,16,16">
-                    <Border Height="1" Background="{StaticResource RuleBrush}" Margin="0,0,0,12" />
-                    <TextBlock x:Name="SidebarVersion"
-                               Foreground="{StaticResource TextSoftBrush}"
-                               FontSize="11" />
-                    <TextBlock x:Name="SidebarLocation"
-                               Foreground="{StaticResource TextSoftBrush}"
-                               FontSize="10"
-                               TextTrimming="CharacterEllipsis"
-                               Margin="0,3,0,0" />
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,16">
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.settings}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
+
+                    <Border Height="1" Background="{StaticResource RuleBrush}" Margin="16,12,16,12" />
+
+                    <StackPanel Margin="16,0,16,0">
+                        <TextBlock x:Name="SidebarVersion"
+                                   Foreground="{StaticResource TextSoftBrush}"
+                                   FontSize="11" />
+                        <TextBlock x:Name="SidebarLocation"
+                                   Foreground="{StaticResource TextSoftBrush}"
+                                   FontSize="10"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,3,0,0" />
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
@@ -39,17 +45,10 @@
                     <RadioButton Style="{StaticResource NavItem}" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavStorage" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
                     <RadioButton Style="{StaticResource NavItem}" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavIntegration" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavShortcuts" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.launcherApp}" Checked="OnNavigate" />
-
-                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.about}" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -76,7 +75,22 @@
                 <Grid>
 
                     <StackPanel x:Name="PageGeneral" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
+                                             x:Name="TabGeneralBehaviour" Tag="GeneralBehaviour"
+                                             Content="{loc:S general.tabBehaviour}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
+                                             x:Name="TabGeneralIntegration" Tag="GeneralIntegration"
+                                             Content="{loc:S nav.integration}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
+                                             x:Name="TabGeneralShortcuts" Tag="GeneralShortcuts"
+                                             Content="{loc:S nav.shortcuts}" Checked="OnSubTab" />
+                            </StackPanel>
+                        </Border>
 
+                        <StackPanel x:Name="GeneralBehaviour">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S general.tabBehaviour}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
@@ -109,9 +123,80 @@
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
                         </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="GeneralIntegration">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S nav.integration}" />
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="{loc:S integration.playerHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="{loc:S integration.studioHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.handler}" />
+                                <TextBlock x:Name="HandlerText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                        </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="GeneralShortcuts">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S nav.shortcuts}" />
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S shortcuts.desktopHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
+                                </StackPanel>
+                                <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
+                            </Grid>
+                        </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PagePresence" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
+                                             x:Name="TabPresenceStatus" Tag="PresenceStatus"
+                                             Content="{loc:S presence.tabStatus}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
+                                             x:Name="TabPresenceShown" Tag="PresenceShown"
+                                             Content="{loc:S presence.tabShape}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
+                                             x:Name="TabPresenceApp" Tag="PresenceApp"
+                                             Content="{loc:S presence.tabApp}" Checked="OnSubTab" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel x:Name="PresenceStatus">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabStatus}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
@@ -159,7 +244,10 @@
                                 </Border>
                             </StackPanel>
                         </Border>
+                        </StackPanel>
 
+                        <StackPanel x:Name="PresenceShown">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabShape}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,210,0">
@@ -219,7 +307,10 @@
                                           Click="OnPresenceChanged" />
                             </Grid>
                         </Border>
+                        </StackPanel>
 
+                        <StackPanel x:Name="PresenceApp">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabApp}" />
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.appId}" />
@@ -235,6 +326,7 @@
                                 <TextBlock x:Name="PresenceStatusText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PageLauncher" Visibility="Collapsed">
@@ -291,29 +383,23 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageGraphics">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S graphics.unlockFpsHint}" />
-                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
-                                        <TextBlock Text="{loc:S graphics.fpsUnit}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="10,0,0,0"
-                                                   FontSize="11"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" Margin="0,10,0,0" />
-                                </StackPanel>
-                                <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnUnlockFpsChanged" />
-                            </Grid>
+                    <StackPanel x:Name="PageGraphics" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
+                                             x:Name="TabGraphicsQuality" Tag="GraphicsQuality"
+                                             Content="{loc:S graphics.tabQuality}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
+                                             x:Name="TabGraphicsSpeed" Tag="GraphicsSpeed"
+                                             Content="{loc:S graphics.tabSpeed}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
+                                             x:Name="TabGraphicsFlags" Tag="GraphicsFlags"
+                                             Content="{loc:S graphics.tabFlags}" Checked="OnSubTab" />
+                            </StackPanel>
                         </Border>
 
+                        <StackPanel x:Name="GraphicsQuality">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabQuality}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
@@ -357,17 +443,6 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,190,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.api}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.apiHint}" />
-                                </StackPanel>
-                                <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Center" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,190,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.grass}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.grassHint}" />
                                 </StackPanel>
@@ -386,75 +461,74 @@
                                 <CheckBox x:Name="DisableDpiScaleBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
                         </Border>
+                        </StackPanel>
 
+                        <StackPanel x:Name="GraphicsSpeed">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabSpeed}" />
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="{loc:S graphics.unlockFpsHint}" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
+                                        <TextBlock Text="{loc:S graphics.fpsUnit}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                    </StackPanel>
+                                    <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" Margin="0,10,0,0" />
+                                </StackPanel>
+                                <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Click="OnUnlockFpsChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,190,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.api}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.apiHint}" />
+                                </StackPanel>
+                                <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="GraphicsFlags">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabFlags}" />
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.summary}" />
                                 <TextBlock x:Name="FlagSummaryText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageIntegration" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S integration.playerHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
-                            </Grid>
-                        </Border>
 
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S integration.studioHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.handler}" />
-                                <TextBlock x:Name="HandlerText" Style="{StaticResource RowHint}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <StackPanel x:Name="PageShortcuts" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S shortcuts.desktopHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
-                                </StackPanel>
-                                <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
-                            </Grid>
-                        </Border>
-                    </StackPanel>
 
                     <StackPanel x:Name="PageVersions" Visibility="Collapsed">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                            <Button x:Name="PlayerTab" Style="{StaticResource Accent}" MinWidth="150"
-                                    Tag="WindowsPlayer" Content="{loc:S versions.player}" Click="OnPickTarget" />
-                            <Button x:Name="StudioTab" Style="{StaticResource Quiet}" MinWidth="150" Margin="10,0,0,0"
-                                    Tag="WindowsStudio64" Content="{loc:S versions.studio}" Click="OnPickTarget" />
-                        </StackPanel>
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="VersionsTabs"
+                                             x:Name="TabVersionsPlayer" Tag="VersionsPlayer"
+                                             Content="{loc:S versions.player}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="VersionsTabs"
+                                             x:Name="TabVersionsStudio" Tag="VersionsStudio"
+                                             Content="{loc:S versions.studio}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="VersionsTabs"
+                                             x:Name="TabVersionsStorage" Tag="VersionsStorage"
+                                             Content="{loc:S nav.storage}" Checked="OnSubTab" />
+                            </StackPanel>
+                        </Border>
 
+                        <StackPanel x:Name="VersionsPlayer">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S versions.forClient}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,150,0">
@@ -524,13 +598,43 @@
                                          Width="260" HorizontalAlignment="Left" Margin="0,10,0,0" />
                             </StackPanel>
                         </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="VersionsStorage">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S nav.storage}" />
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.keepCache}" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="{loc:S storage.keepCacheHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="KeepDownloadCacheBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Border>
 
                         <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.onDisk}" />
-                                <TextBlock x:Name="VersionsOnDiskText" Style="{StaticResource RowHint}" />
-                            </StackPanel>
+                            <Grid>
+                                <StackPanel Margin="0,0,130,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.cache}" />
+                                    <TextBlock x:Name="CacheSizeText" Style="{StaticResource RowHint}" />
+                                </StackPanel>
+                                <Button x:Name="ClearCacheButton" Style="{StaticResource Quiet}" Content="{loc:S action.clear}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnClearCache" />
+                            </Grid>
                         </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,130,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.versions}" />
+                                    <TextBlock x:Name="VersionsSizeText" Style="{StaticResource RowHint}" />
+                                </StackPanel>
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnOpenFolder" />
+                            </Grid>
+                        </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PageMods" Visibility="Collapsed">
@@ -638,40 +742,6 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageStorage" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.keepCache}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S storage.keepCacheHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="KeepDownloadCacheBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.cache}" />
-                                    <TextBlock x:Name="CacheSizeText" Style="{StaticResource RowHint}" />
-                                </StackPanel>
-                                <Button x:Name="ClearCacheButton" Style="{StaticResource Quiet}" Content="{loc:S action.clear}"
-                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnClearCache" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.versions}" />
-                                    <TextBlock x:Name="VersionsSizeText" Style="{StaticResource RowHint}" />
-                                </StackPanel>
-                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
-                                        HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnOpenFolder" />
-                            </Grid>
-                        </Border>
-                    </StackPanel>
 
                     <StackPanel x:Name="PageAbout" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">

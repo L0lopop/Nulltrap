@@ -65,15 +65,21 @@ public partial class MainWindow : ChromeWindow
 
     public void LaunchPlayer() => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
-    public void OpenSettings() => OnSettings(this, new RoutedEventArgs());
+    public void OpenSettings() => OpenSettings("Graphics");
 
     private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
     private void OnLaunchStudio(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsStudio64);
 
-    private void OnSettings(object sender, RoutedEventArgs e)
+    private void OnSettings(object sender, RoutedEventArgs e) => OpenSettings("Graphics");
+
+    private void OnAbout(object sender, RoutedEventArgs e) => OpenSettings("About");
+
+    private void OpenSettings(string page)
     {
-        new SettingsWindow { Owner = this }.ShowDialog();
+        var settings = new SettingsWindow { Owner = this };
+        settings.GoTo(page);
+        settings.ShowDialog();
         Refresh();
     }
 
