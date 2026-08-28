@@ -8,6 +8,8 @@ using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Localization;
 using Nulltrap.Core.Presence;
+using Nulltrap.Core.Roblox;
+using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -46,6 +48,39 @@ public partial class SettingsWindow : ChromeWindow
         ("200", "graphics.grassFar"),
     ];
 
+    private static readonly RobloxSession SampleSession = new()
+    {
+        PlaceId = 920587237,
+        UniverseId = 245662005,
+        ServerAddress = "128.116.115.14",
+        ServerPort = 49872,
+        StartedAt = DateTimeOffset.UtcNow.AddMinutes(-7),
+    };
+
+    private static readonly GameInfo SampleGame = new()
+    {
+        UniverseId = 245662005,
+        Name = "Neon Racers",
+        CreatorName = "Starfall Studio",
+        RootPlaceId = 920587237,
+        Playing = 12480,
+        IconUrl = "https://tr.rbxcdn.com/sample",
+    };
+
+    private static readonly (PresenceHeadline Value, string Key)[] Headlines =
+    [
+        (PresenceHeadline.GameName, "presence.headlineGame"),
+        (PresenceHeadline.PlayingRoblox, "presence.headlinePlaying"),
+    ];
+
+    private static readonly (PresenceSubline Value, string Key)[] Sublines =
+    [
+        (PresenceSubline.Creator, "presence.sublineCreator"),
+        (PresenceSubline.PlayerCount, "presence.sublinePlayers"),
+        (PresenceSubline.ServerRegion, "presence.sublineServer"),
+        (PresenceSubline.Nothing, "presence.sublineNothing"),
+    ];
+
     private static readonly (string? Value, string Key)[] MsaaLevels =
     [
         (null, "graphics.automatic"),
@@ -79,8 +114,12 @@ public partial class SettingsWindow : ChromeWindow
         ChannelBox.Text = _settings.Channel;
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
         PresenceEnabledBox.IsChecked = _settings.DiscordPresence;
+        PresenceElapsedBox.IsChecked = _settings.DiscordShowElapsed;
+        PresenceIconBox.IsChecked = _settings.DiscordShowGameIcon;
         PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
         PresenceAppIdBox.Text = _settings.DiscordApplicationId;
+        FillChoices(PresenceHeadlineBox, Headlines, _settings.DiscordHeadline);
+        FillChoices(PresenceSublineBox, Sublines, _settings.DiscordSubline);
 
         TextureQualityEnabledBox.IsChecked =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
@@ -132,8 +171,31 @@ public partial class SettingsWindow : ChromeWindow
         box.SelectedItem ??= box.Items[0];
     }
 
+    private static void FillChoices<TValue>(ComboBox box, (TValue Value, string Key)[] choices, TValue current)
+        where TValue : struct, Enum
+    {
+        box.Items.Clear();
+
+        foreach ((TValue value, string key) in choices)
+        {
+            var item = new ComboBoxItem { Content = Strings.Get(key), Tag = value };
+            box.Items.Add(item);
+
+            if (value.Equals(current))
+            {
+                box.SelectedItem = item;
+            }
+        }
+
+        box.SelectedItem ??= box.Items[0];
+    }
+
     private static string? ChosenValue(ComboBox box) =>
         (box.SelectedItem as ComboBoxItem)?.Tag as string;
+
+    private static TValue Chosen<TValue>(ComboBox box, TValue fallback)
+        where TValue : struct, Enum =>
+        (box.SelectedItem as ComboBoxItem)?.Tag is TValue value ? value : fallback;
 
     private ComboBox GraphicsApis_Box() => GraphicsApiBox;
 
@@ -245,6 +307,7 @@ public partial class SettingsWindow : ChromeWindow
         SidebarLocation.Text = App.Services.Paths.Root;
         LauncherLocationText.Text = App.Services.Paths.Root;
         PresenceStatusText.Text = DescribePresence();
+        ShowPresencePreview();
         RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
 
@@ -288,16 +351,63 @@ public partial class SettingsWindow : ChromeWindow
             return Strings.Get("presence.off");
         }
 
-        if (string.IsNullOrWhiteSpace(_settings.DiscordApplicationId))
+        if (string.IsNullOrWhiteSpace(PresenceService.ApplicationId(_settings.DiscordApplicationId)))
         {
             return Strings.Get("presence.notConfigured");
         }
 
+        string application = string.IsNullOrWhiteSpace(_settings.DiscordApplicationId)
+            ? Strings.Get("presence.usingBuiltIn")
+            : Strings.Get("presence.usingOwn");
+
         PresenceActivity? showing = App.Services.Presence?.Last;
 
-        return showing?.Details is null
+        return application + " " + (showing?.Details is null
             ? Strings.Get("presence.waiting")
-            : Strings.Get("presence.active", showing.Details);
+            : Strings.Get("presence.active", showing.Details));
+    }
+
+    private PresenceOptions PresenceShape() => new()
+    {
+        Headline = Chosen(PresenceHeadlineBox, PresenceHeadline.GameName),
+        Subline = Chosen(PresenceSublineBox, PresenceSubline.Creator),
+        ShowElapsed = PresenceElapsedBox.IsChecked == true,
+        ShowGameIcon = PresenceIconBox.IsChecked == true,
+        ShowGameButton = PresenceButtonBox.IsChecked == true,
+    };
+
+    private void ShowPresencePreview()
+    {
+        bool on = PresenceEnabledBox.IsChecked == true;
+        PresenceOptions shape = PresenceShape();
+        PresenceActivity sample = PresenceService.Compose(SampleSession, SampleGame, shape);
+
+        PresencePreview.Opacity = on ? 1 : 0.35;
+        PreviewDetails.Text = sample.Details;
+        PreviewState.Text = sample.State ?? string.Empty;
+        PreviewState.Visibility = sample.State is null ? Visibility.Collapsed : Visibility.Visible;
+        PreviewElapsed.Text = Strings.Get("presence.elapsedSample");
+        PreviewElapsed.Visibility = shape.ShowElapsed ? Visibility.Visible : Visibility.Collapsed;
+        PreviewIcon.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
+        PreviewIconGlyph.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
+        PreviewButtonText.Text = sample.Buttons.Count == 0 ? string.Empty : sample.Buttons[0].Label;
+        PreviewButton.Visibility = sample.Buttons.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void OnPresenceChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loaded)
+        {
+            ShowPresencePreview();
+        }
+    }
+
+    private void OnPresenceShapeChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loaded)
+        {
+            ShowPresencePreview();
+        }
     }
 
     private static string Describe(string path, string noun)
@@ -502,8 +612,13 @@ public partial class SettingsWindow : ChromeWindow
             ? DeploymentChannel.DefaultName
             : ChannelBox.Text.Trim();
         _settings.AutomaticClientUpdates = AutomaticClientUpdatesBox.IsChecked == true;
+        PresenceOptions shape = PresenceShape();
         _settings.DiscordPresence = PresenceEnabledBox.IsChecked == true;
-        _settings.DiscordShowGameButton = PresenceButtonBox.IsChecked == true;
+        _settings.DiscordHeadline = shape.Headline;
+        _settings.DiscordSubline = shape.Subline;
+        _settings.DiscordShowElapsed = shape.ShowElapsed;
+        _settings.DiscordShowGameIcon = shape.ShowGameIcon;
+        _settings.DiscordShowGameButton = shape.ShowGameButton;
         _settings.DiscordApplicationId = PresenceAppIdBox.Text.Trim();
 
         _store.Save(_settings);

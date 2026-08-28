@@ -10,7 +10,7 @@
       "Graphics settings Roblox still allows, with the ignored ones marked",
       "Frame rate unlock",
       "English and Russian interface",
-      "Discord status showing the experience you are in",
+      "Discord status showing the experience you are in, with no Discord setup and a choice of what it shows",
       "Session tracking read from Roblox's own log"
     ],
     "ru": [
@@ -21,7 +21,7 @@
       "Настройки графики из тех, что Roblox ещё разрешает, с пометкой игнорируемых",
       "Снятие ограничения кадров",
       "Интерфейс на русском и английском",
-      "Статус в Discord с игрой, в которой вы находитесь",
+      "Статус в Discord с игрой, в которой вы находитесь: без настройки Discord и с выбором того, что показывать",
       "Отслеживание сессии по логу самого Roblox"
     ]
   }

@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Nulltrap.Platform.Abstractions;
 
@@ -9,6 +10,7 @@ public sealed class SettingsStore
     private static readonly JsonSerializerOptions Options = new()
     {
         WriteIndented = true,
+        Converters = { new JsonStringEnumConverter() },
     };
 
     private readonly string _path;

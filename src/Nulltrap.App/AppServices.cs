@@ -98,15 +98,17 @@ public sealed class AppServices : IDisposable
         Presence?.Dispose();
         Presence = null;
 
-        if (!settings.DiscordPresence || string.IsNullOrWhiteSpace(settings.DiscordApplicationId))
+        string applicationId = PresenceService.ApplicationId(settings.DiscordApplicationId);
+
+        if (!settings.DiscordPresence || string.IsNullOrWhiteSpace(applicationId))
         {
             return;
         }
 
-        var discord = new DiscordPresenceClient(PresenceTransports, settings.DiscordApplicationId);
+        var discord = new DiscordPresenceClient(PresenceTransports, applicationId);
         Presence = new PresenceService(discord, Games, Sessions)
         {
-            ShowGameButton = settings.DiscordShowGameButton,
+            Options = settings.PresenceOptions,
         };
 
         Presence.Start();
