@@ -55,6 +55,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("discordApplicationId")]
     public string DiscordApplicationId { get; set; } = string.Empty;
 
+    [JsonPropertyName("mods")]
+    public bool Mods { get; set; } = true;
+
     [JsonPropertyName("automaticClientUpdates")]
     public bool AutomaticClientUpdates { get; set; } = true;
 

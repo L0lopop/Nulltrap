@@ -11,6 +11,7 @@ public sealed class InstallStateStore
         WriteIndented = true,
     };
 
+    private readonly Lock _gate = new();
     private readonly string _path;
 
     public InstallStateStore(IApplicationPaths paths)
@@ -41,6 +42,28 @@ public sealed class InstallStateStore
     {
         ArgumentNullException.ThrowIfNull(state);
 
+        lock (_gate)
+        {
+            Write(state);
+        }
+    }
+
+    public InstallState Update(Action<InstallState> change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+
+        lock (_gate)
+        {
+            InstallState state = Load();
+            change(state);
+            Write(state);
+
+            return state;
+        }
+    }
+
+    private void Write(InstallState state)
+    {
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
 
         string staging = _path + ".tmp";

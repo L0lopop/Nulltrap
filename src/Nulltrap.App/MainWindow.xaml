@@ -111,6 +111,7 @@
             </Button>
 
             <Button Grid.Row="2" Grid.Column="2"
+                    x:Name="SettingsButton"
                     Style="{StaticResource Card}"
                     Click="OnSettings">
                 <Grid>

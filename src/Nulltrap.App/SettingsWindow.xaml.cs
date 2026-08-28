@@ -8,6 +8,7 @@ using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Localization;
+using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Presence;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
@@ -118,6 +119,7 @@ public partial class SettingsWindow : ChromeWindow
         KeepDownloadCacheBox.IsChecked = _settings.KeepDownloadCache;
         ChannelBox.Text = _settings.Channel;
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
+        ModsEnabledBox.IsChecked = _settings.Mods;
         PresenceEnabledBox.IsChecked = _settings.DiscordPresence;
         PresenceElapsedBox.IsChecked = _settings.DiscordShowElapsed;
         PresenceIconBox.IsChecked = _settings.DiscordShowGameIcon;
@@ -435,6 +437,7 @@ public partial class SettingsWindow : ChromeWindow
         PagePresence.Visibility = page == "Presence" ? Visibility.Visible : Visibility.Collapsed;
         PageVersions.Visibility = page == "Versions" ? Visibility.Visible : Visibility.Collapsed;
         PageActivity.Visibility = page == "Activity" ? Visibility.Visible : Visibility.Collapsed;
+        PageMods.Visibility = page == "Mods" ? Visibility.Visible : Visibility.Collapsed;
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
 
@@ -459,6 +462,11 @@ public partial class SettingsWindow : ChromeWindow
             if (page == "Activity")
             {
                 BuildActivity();
+            }
+
+            if (page == "Mods")
+            {
+                BuildMods();
             }
         }
     }
@@ -759,6 +767,7 @@ public partial class SettingsWindow : ChromeWindow
                 binaryType, ChosenChannel());
 
             _available[binaryType] = version;
+            App.Services.Bootstrapper.Adopt(binaryType, version, ChosenChannel());
         }
         catch (Exception failure)
         {
@@ -902,6 +911,68 @@ public partial class SettingsWindow : ChromeWindow
         BuildActivity();
     }
 
+    private void BuildMods()
+    {
+        ModsFolderText.Text = App.Services.Mods.SourceDirectory;
+        ModsEnabledBox.IsChecked = _settings.Mods;
+
+        IReadOnlyList<ModFile> files = App.Services.Mods.List();
+
+        ModsPanel.Children.Clear();
+
+        foreach (ModFile file in files)
+        {
+            ModsPanel.Children.Add(Line(
+                file.RelativePath,
+                file.ChangedAt.ToLocalTime().ToString("g"),
+                Sizes.Describe(file.Size)));
+        }
+
+        if (files.Count == 0)
+        {
+            ModsPanel.Children.Add(Faint(Strings.Get("mods.noFiles")));
+        }
+
+        InstalledClient? player = App.Services.StateStore.Load().Get(BinaryType.WindowsPlayer);
+
+        ModsAppliedText.Text = player is null
+            ? Strings.Get("mods.noClient")
+            : Strings.Get("mods.readyFor", player.Version);
+
+        ApplyModsButton.IsEnabled = player is not null;
+    }
+
+    private void OnModsToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loaded)
+        {
+            BuildMods();
+        }
+    }
+
+    private void OnOpenMods(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(App.Services.Mods.SourceDirectory);
+        Open(App.Services.Mods.SourceDirectory);
+    }
+
+    private void OnApplyMods(object sender, RoutedEventArgs e)
+    {
+        InstalledClient? player = App.Services.StateStore.Load().Get(BinaryType.WindowsPlayer);
+
+        if (player is null)
+        {
+            return;
+        }
+
+        App.Services.Mods.Enabled = ModsEnabledBox.IsChecked == true;
+        ModOutcome outcome = App.Services.Mods.ApplyTo(
+            Path.Combine(App.Services.Paths.Versions, player.VersionGuid));
+
+        ModsAppliedText.Text = Strings.Get("mods.outcome", outcome.Applied, outcome.Reverted);
+        ShowSaved();
+    }
+
     private void OnSave(object sender, RoutedEventArgs e)
     {
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
@@ -915,6 +986,7 @@ public partial class SettingsWindow : ChromeWindow
             : ChannelBox.Text.Trim();
         _settings.AutomaticClientUpdates = AutomaticClientUpdatesBox.IsChecked == true;
         PresenceOptions shape = PresenceShape();
+        _settings.Mods = ModsEnabledBox.IsChecked == true;
         _settings.DiscordPresence = PresenceEnabledBox.IsChecked == true;
         _settings.DiscordHeadline = shape.Headline;
         _settings.DiscordSubline = shape.Subline;
@@ -946,6 +1018,7 @@ public partial class SettingsWindow : ChromeWindow
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);
+        App.Services.Mods.Enabled = _settings.Mods;
         App.Services.StartPresence();
 
         RefreshFacts();

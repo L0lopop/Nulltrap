@@ -5,6 +5,7 @@ using System.Reflection;
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.Presence;
 using Nulltrap.Core.Roblox;
@@ -41,6 +42,8 @@ public sealed class AppServices : IDisposable
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
         Installer = new Installer(Paths, Protocols, Shortcuts, UninstallEntry);
         Jobs = new InstallJobs(Bootstrapper);
+        Mods = Bootstrapper.Mods;
+        Mods.Enabled = Settings.Load().Mods;
 
         Games = new GameInfoClient(_http);
         Sessions = new SessionTracker();
@@ -85,6 +88,8 @@ public sealed class AppServices : IDisposable
     public Installer Installer { get; }
 
     public InstallJobs Jobs { get; }
+
+    public ModManager Mods { get; }
 
     public GameInfoClient Games { get; }
 

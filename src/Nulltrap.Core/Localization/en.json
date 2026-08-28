@@ -240,5 +240,21 @@
   "time.daysHours": "{0} d {1} h",
   "time.hoursMinutes": "{0} h {1} min",
   "time.minutes": "{0} min",
-  "time.seconds": "{0} s"
+  "time.seconds": "{0} s",
+  "nav.mods": "Mods",
+  "page.mods.title": "Mods",
+  "page.mods.subtitle": "Your own files, laid over the Roblox client after every update.",
+  "mods.enable": "Use mods",
+  "mods.enableHint": "Off puts every original file back and leaves the client untouched. Your files stay in the folder.",
+  "mods.folder": "Where they live",
+  "mods.apply": "Apply now",
+  "mods.files": "What will be laid over",
+  "mods.filesHint": "Put a file at the same path it has inside the client, and it replaces that file. Nulltrap keeps the original and puts it back if you remove yours.",
+  "mods.noFiles": "Nothing in the folder yet.",
+  "mods.noClient": "Roblox is not downloaded yet, so there is nothing to lay them over.",
+  "mods.readyFor": "Will be applied to {0} on the next launch.",
+  "mods.outcome": "{0} laid over, {1} put back.",
+  "mods.examples": "Paths that do something",
+  "mods.examplesHint": "The client's own layout, so a file at one of these replaces what Roblox ships.",
+  "mods.examplesList": "content/textures/Cursors/KeyboardMouse/ArrowCursor.png\ncontent/sounds/ouch.ogg\ncontent/fonts/GothamSSm-Medium.otf\ncontent/textures/sky/"
 }

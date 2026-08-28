@@ -240,5 +240,21 @@
   "time.daysHours": "{0} д {1} ч",
   "time.hoursMinutes": "{0} ч {1} мин",
   "time.minutes": "{0} мин",
-  "time.seconds": "{0} с"
+  "time.seconds": "{0} с",
+  "nav.mods": "Моды",
+  "page.mods.title": "Моды",
+  "page.mods.subtitle": "Ваши файлы, укладываемые поверх клиента Roblox после каждого обновления.",
+  "mods.enable": "Использовать моды",
+  "mods.enableHint": "Выключение возвращает все оригиналы на место и не трогает клиент. Ваши файлы остаются в папке.",
+  "mods.folder": "Где они лежат",
+  "mods.apply": "Применить сейчас",
+  "mods.files": "Что будет уложено",
+  "mods.filesHint": "Положите файл по тому же пути, что он занимает внутри клиента, — он заменит собой этот файл. Nulltrap сохраняет оригинал и вернёт его, если убрать ваш.",
+  "mods.noFiles": "В папке пока ничего нет.",
+  "mods.noClient": "Roblox ещё не скачан, поэтому укладывать не на что.",
+  "mods.readyFor": "Будут применены к {0} при следующем запуске.",
+  "mods.outcome": "Уложено: {0}, возвращено: {1}.",
+  "mods.examples": "Пути, которые что-то меняют",
+  "mods.examplesHint": "Раскладка самого клиента: файл по такому пути заменяет то, что кладёт Roblox.",
+  "mods.examplesList": "content/textures/Cursors/KeyboardMouse/ArrowCursor.png\ncontent/sounds/ouch.ogg\ncontent/fonts/GothamSSm-Medium.otf\ncontent/textures/sky/"
 }

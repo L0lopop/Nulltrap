@@ -1,6 +1,7 @@
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Localization;
+using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -36,10 +37,13 @@ public sealed class ClientBootstrapper
 
         _deployment = deployment;
         _fastFlags = new FastFlagManager(paths);
+        Mods = new ModManager(paths);
         _downloader = downloader;
         _paths = paths;
         _state = state;
     }
+
+    public ModManager Mods { get; }
 
     public async Task<BootstrapResult> EnsureUpToDateAsync(
         BinaryType binaryType,
@@ -61,12 +65,11 @@ public sealed class ClientBootstrapper
         string versionDirectory = Path.Combine(_paths.Versions, version.VersionGuid);
         string executablePath = Path.Combine(versionDirectory, binaryType.ToExecutableName());
 
-        InstallState state = _state.Load();
-        InstalledClient? installed = state.Get(binaryType);
-
-        if (installed?.VersionGuid == version.VersionGuid && File.Exists(executablePath))
+        if (File.Exists(executablePath))
         {
+            Record(binaryType, version, channel);
             _fastFlags.ApplyTo(versionDirectory);
+            Mods.ApplyTo(versionDirectory);
             progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, Strings.Get("bootstrap.upToDate")));
 
             return new BootstrapResult(
@@ -105,24 +108,44 @@ public sealed class ClientBootstrapper
                 $"{binaryType.ToExecutableName()} is missing after installing {version.VersionGuid}.");
         }
 
-        state.Set(binaryType, new InstalledClient
-        {
-            VersionGuid = version.VersionGuid,
-            Version = version.Version,
-            Channel = string.IsNullOrEmpty(channel.Name) ? DeploymentChannel.DefaultName : channel.Name,
-        });
-        _state.Save(state);
+        InstallState state = Record(binaryType, version, channel);
 
         progress?.Report(BootstrapProgress.For(BootstrapStage.Cleaning, Strings.Get("bootstrap.cleaning")));
         RemoveSupersededVersions(state);
 
         _fastFlags.ApplyTo(versionDirectory);
+        Mods.ApplyTo(versionDirectory);
         progress?.Report(BootstrapProgress.For(BootstrapStage.Ready, Strings.Get("bootstrap.ready")));
 
         return new BootstrapResult(
             binaryType, version.Version, version.VersionGuid,
             versionDirectory, executablePath, WasAlreadyInstalled: false);
     }
+
+    public bool Adopt(BinaryType binaryType, ClientVersion version, DeploymentChannel channel = default)
+    {
+        ArgumentNullException.ThrowIfNull(version);
+
+        string directory = Path.Combine(_paths.Versions, version.VersionGuid);
+        string executable = Path.Combine(directory, binaryType.ToExecutableName());
+
+        if (_state.Load().Get(binaryType)?.VersionGuid == version.VersionGuid || !File.Exists(executable))
+        {
+            return false;
+        }
+
+        Record(binaryType, version, channel);
+
+        return true;
+    }
+
+    private InstallState Record(BinaryType binaryType, ClientVersion version, DeploymentChannel channel) =>
+        _state.Update(state => state.Set(binaryType, new InstalledClient
+        {
+            VersionGuid = version.VersionGuid,
+            Version = version.Version,
+            Channel = string.IsNullOrEmpty(channel.Name) ? DeploymentChannel.DefaultName : channel.Name,
+        }));
 
     public void RemoveSupersededVersions(InstallState state)
     {

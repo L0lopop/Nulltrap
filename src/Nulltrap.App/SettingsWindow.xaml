@@ -35,20 +35,21 @@
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavStorage" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Launcher" Content="{loc:S nav.launcherApp}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavIntegration" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavShortcuts" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.launcherApp}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.about}" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -528,6 +529,57 @@
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S versions.onDisk}" />
                                 <TextBlock x:Name="VersionsOnDiskText" Style="{StaticResource RowHint}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PageMods" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.enable}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.enableHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="ModsEnabledBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Click="OnModsToggled" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Margin="0,0,290,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.folder}" />
+                                        <TextBlock x:Name="ModsFolderText" Style="{StaticResource RowHint}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
+                                                MinWidth="128" Click="OnOpenMods" />
+                                        <Button x:Name="ApplyModsButton" Style="{StaticResource Accent}"
+                                                Content="{loc:S mods.apply}" MinWidth="150" Margin="10,0,0,0"
+                                                Click="OnApplyMods" />
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock x:Name="ModsAppliedText" Style="{StaticResource RowHint}" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.files}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.filesHint}" />
+                                <StackPanel x:Name="ModsPanel" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.examples}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.examplesHint}" />
+                                <TextBlock Style="{StaticResource RowHint}" Margin="0,10,0,0" FontFamily="Consolas"
+                                           Text="{loc:S mods.examplesList}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
