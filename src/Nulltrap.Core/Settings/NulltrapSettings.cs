@@ -9,6 +9,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("setupCompleted")]
     public bool SetupCompleted { get; set; }
 
+    [JsonPropertyName("language")]
+    public string Language { get; set; } = Localization.Strings.Fallback;
+
     [JsonPropertyName("channel")]
     public string Channel { get; set; } = DeploymentChannel.DefaultName;
 

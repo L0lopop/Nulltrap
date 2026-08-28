@@ -1,6 +1,6 @@
 using Nulltrap.Core.Deployment;
 
-namespace Nulltrap.App;
+namespace Nulltrap.Core.Launching;
 
 public enum LaunchAction
 {
@@ -14,6 +14,18 @@ public enum LaunchAction
 
 public sealed record LaunchArguments
 {
+    private static readonly string[] PlayerSchemes =
+    [
+        "roblox-player:",
+        "roblox:",
+    ];
+
+    private static readonly string[] StudioSchemes =
+    [
+        "roblox-studio-auth:",
+        "roblox-studio:",
+    ];
+
     public required LaunchAction Action { get; init; }
 
     public string? RobloxUri { get; init; }
@@ -32,20 +44,27 @@ public sealed record LaunchArguments
         string? uri = null;
         bool quiet = false;
 
-        for (int index = 0; index < args.Count; index++)
+        foreach (string argument in args)
         {
-            string argument = args[index];
+            if (string.IsNullOrWhiteSpace(argument))
+            {
+                continue;
+            }
 
-            if (argument.StartsWith("roblox", StringComparison.OrdinalIgnoreCase)
-                && argument.Contains("://", StringComparison.Ordinal))
+            if (TryReadUri(argument, StudioSchemes))
+            {
+                uri = argument;
+                action = LaunchAction.LaunchStudio;
+                continue;
+            }
+
+            if (TryReadUri(argument, PlayerSchemes))
             {
                 uri = argument;
 
-                if (action == LaunchAction.Menu)
+                if (action != LaunchAction.LaunchStudio)
                 {
-                    action = argument.StartsWith("roblox-studio", StringComparison.OrdinalIgnoreCase)
-                        ? LaunchAction.LaunchStudio
-                        : LaunchAction.LaunchPlayer;
+                    action = LaunchAction.LaunchPlayer;
                 }
 
                 continue;
@@ -54,7 +73,11 @@ public sealed record LaunchArguments
             switch (argument.TrimStart('-', '/').ToLowerInvariant())
             {
                 case "player":
-                    action = LaunchAction.LaunchPlayer;
+                    if (action != LaunchAction.LaunchStudio)
+                    {
+                        action = LaunchAction.LaunchPlayer;
+                    }
+
                     break;
                 case "studio":
                     action = LaunchAction.LaunchStudio;
@@ -69,6 +92,7 @@ public sealed record LaunchArguments
                     action = LaunchAction.Uninstall;
                     break;
                 case "quiet":
+                case "silent":
                     quiet = true;
                     break;
             }
@@ -81,4 +105,7 @@ public sealed record LaunchArguments
             Quiet = quiet,
         };
     }
+
+    private static bool TryReadUri(string argument, IEnumerable<string> schemes) =>
+        schemes.Any(scheme => argument.StartsWith(scheme, StringComparison.OrdinalIgnoreCase));
 }

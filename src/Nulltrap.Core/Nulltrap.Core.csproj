@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Localization\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Nulltrap.Platform.Abstractions\Nulltrap.Platform.Abstractions.csproj" />
     <ProjectReference Include="..\Nulltrap.Plugins.Sdk\Nulltrap.Plugins.Sdk.csproj" />
   </ItemGroup>

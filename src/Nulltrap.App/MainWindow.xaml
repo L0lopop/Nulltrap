@@ -4,6 +4,7 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
                     mc:Ignorable="d"
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap"
@@ -43,7 +44,7 @@
 
             <Button Style="{StaticResource Link}"
                     Margin="0,14,0,0"
-                    Content="Project on GitHub"
+                    Content="{loc:S home.github}"
                     Click="OnOpenRepository" />
 
             <Button x:Name="InstallLink"
@@ -71,7 +72,7 @@
                     Click="OnLaunchPlayer">
                 <Grid>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Launch Roblox" FontSize="14" FontWeight="SemiBold" />
+                        <TextBlock Text="{loc:S home.launch}" FontSize="14" FontWeight="SemiBold" />
                         <TextBlock x:Name="PlayHint"
                                    FontSize="11"
                                    Margin="0,2,0,0"
@@ -92,7 +93,7 @@
                     Click="OnLaunchStudio">
                 <Grid>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Studio" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock Text="{loc:S home.studio}" FontSize="13" FontWeight="SemiBold" />
                         <TextBlock x:Name="StudioHint"
                                    FontSize="11"
                                    Margin="0,2,0,0"
@@ -112,8 +113,8 @@
                     Click="OnSettings">
                 <Grid>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Settings" FontSize="13" FontWeight="SemiBold" />
-                        <TextBlock Text="launcher options"
+                        <TextBlock Text="{loc:S home.settings}" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock Text="{loc:S home.settingsHint}"
                                    FontSize="11"
                                    Margin="0,2,0,0"
                                    Foreground="{StaticResource TextSoftBrush}" />

@@ -5,6 +5,7 @@ using System.Windows.Controls;
 
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
+using Nulltrap.Core.Localization;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -13,18 +14,6 @@ namespace Nulltrap.App;
 
 public partial class SettingsWindow : ChromeWindow
 {
-    private static readonly IReadOnlyDictionary<string, (string Title, string Subtitle)> Pages =
-        new Dictionary<string, (string, string)>
-        {
-            ["General"] = ("General", "How Nulltrap behaves while you use it."),
-            ["Integration"] = ("Integration", "Which launches Nulltrap takes over from Roblox."),
-            ["Graphics"] = ("Graphics", "Client settings Roblox still lets a launcher change."),
-            ["Shortcuts"] = ("Shortcuts", "Where Nulltrap appears on this machine."),
-            ["Deployment"] = ("Deployment", "Which build of Roblox gets downloaded."),
-            ["Storage"] = ("Storage", "What Nulltrap keeps on disk and how much of it."),
-            ["About"] = ("About Nulltrap", "Version, source and removal."),
-        };
-
     private const string FpsFlag = "DFIntTaskSchedulerTargetFps";
     private const string FpsCapFlag = "FFlagTaskSchedulerLimitTargetFpsTo2402";
     private const int DefaultTargetFps = 240;
@@ -69,16 +58,53 @@ public partial class SettingsWindow : ChromeWindow
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
-        FpsWarning.Text = FastFlagAllowlist.IsAllowed(FpsFlag)
-            ? "This setting is on Roblox's allowlist and applies."
-            : "Roblox's September 2025 allowlist announcement did not include this setting, so the client "
-              + "may ignore it. Every other launcher uses exactly these two flags, so if it works there it "
-              + "works here. Check with Shift+F5 in game after launching.";
+        FpsWarning.Text = Strings.Get(
+            FastFlagAllowlist.IsAllowed(FpsFlag) ? "graphics.fpsAllowed" : "graphics.fpsUnlisted");
+
+        BuildLanguageButtons();
 
         _loaded = true;
 
         Show("General");
         RefreshFacts();
+    }
+
+    private void BuildLanguageButtons()
+    {
+        LanguageButtons.Children.Clear();
+
+        foreach (Language language in Strings.Available)
+        {
+            bool active = language.Code == _settings.Language;
+
+            var button = new System.Windows.Controls.Button
+            {
+                Content = language.NativeName,
+                Style = (Style)FindResource(active ? "Accent" : "Quiet"),
+                Margin = new Thickness(0, 0, 8, 0),
+                MinWidth = 92,
+                Tag = language.Code,
+            };
+
+            button.Click += OnLanguageChosen;
+            LanguageButtons.Children.Add(button);
+        }
+    }
+
+    private void OnLanguageChosen(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string code } || code == _settings.Language)
+        {
+            return;
+        }
+
+        _settings.Language = code;
+        _store.Save(_settings);
+        Strings.Use(code);
+
+        var replacement = new SettingsWindow { Owner = Owner };
+        Close();
+        replacement.ShowDialog();
     }
 
     private void RefreshFacts()
@@ -93,9 +119,7 @@ public partial class SettingsWindow : ChromeWindow
         RegisterPlayerBox.IsChecked = installed;
         RegisterPlayerBox.IsEnabled = installed || handler is null;
 
-        HandlerText.Text = handler is null
-            ? "Nothing is registered. Roblox will use its own bootstrapper."
-            : handler;
+        HandlerText.Text = handler ?? Strings.Get("integration.noHandler");
 
         InstallState state = App.Services.StateStore.Load();
         InstalledClient? player = state.Get(BinaryType.WindowsPlayer);
@@ -103,19 +127,21 @@ public partial class SettingsWindow : ChromeWindow
 
         InstalledClientsText.Text = string.Join(
             "\n",
-            $"Player: {(player is null ? "not downloaded" : $"{player.Version} ({player.VersionGuid})")}",
-            $"Studio: {(studio is null ? "not downloaded" : $"{studio.Version} ({studio.VersionGuid})")}");
+            $"Player: {(player is null ? Strings.Get("deployment.notDownloaded") : $"{player.Version} ({player.VersionGuid})")}",
+            $"Studio: {(studio is null ? Strings.Get("deployment.notDownloaded") : $"{studio.Version} ({studio.VersionGuid})")}");
 
         string[] applied = _flags.Keys.Where(FastFlagAllowlist.IsAllowed).ToArray();
         string[] ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).ToArray();
 
         FlagSummaryText.Text = _flags.Count == 0
-            ? "No client settings are set, so Roblox runs with its own defaults."
-            : $"{applied.Length} of {_flags.Count} settings are on Roblox's allowlist and will apply."
-              + (ignored.Length == 0 ? string.Empty : $" Ignored by the client: {string.Join(", ", ignored)}.");
+            ? Strings.Get("graphics.noFlags")
+            : Strings.Get("graphics.flagsApplied", applied.Length, _flags.Count)
+              + (ignored.Length == 0
+                  ? string.Empty
+                  : Strings.Get("graphics.flagsIgnored", string.Join(", ", ignored)));
 
-        CacheSizeText.Text = Describe(App.Services.Paths.Downloads, "packages");
-        VersionsSizeText.Text = Describe(App.Services.Paths.Versions, "files");
+        CacheSizeText.Text = Describe(App.Services.Paths.Downloads, Strings.Get("storage.packages"));
+        VersionsSizeText.Text = Describe(App.Services.Paths.Versions, Strings.Get("storage.files"));
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
             && Directory.EnumerateFiles(App.Services.Paths.Downloads).Any();
     }
@@ -124,13 +150,13 @@ public partial class SettingsWindow : ChromeWindow
     {
         if (!Directory.Exists(path))
         {
-            return "nothing stored";
+            return Strings.Get("storage.nothing");
         }
 
         FileInfo[] files = new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories);
 
         return files.Length == 0
-            ? "nothing stored"
+            ? Strings.Get("storage.nothing")
             : $"{files.Length:N0} {noun}, {files.Sum(file => file.Length) / 1024.0 / 1024.0:N0} MB";
     }
 
@@ -144,9 +170,9 @@ public partial class SettingsWindow : ChromeWindow
         PageStorage.Visibility = page == "Storage" ? Visibility.Visible : Visibility.Collapsed;
         PageAbout.Visibility = page == "About" ? Visibility.Visible : Visibility.Collapsed;
 
-        (string title, string subtitle) = Pages[page];
-        PageTitle.Text = title;
-        PageSubtitle.Text = subtitle;
+        string key = char.ToLowerInvariant(page[0]) + page[1..];
+        PageTitle.Text = Strings.Get($"page.{key}.title");
+        PageSubtitle.Text = Strings.Get($"page.{key}.subtitle");
     }
 
     private void OnNavigate(object sender, RoutedEventArgs e)
@@ -268,7 +294,7 @@ public partial class SettingsWindow : ChromeWindow
     private void OnUninstall(object sender, RoutedEventArgs e)
     {
         if (MessageBox.Show(
-                "Remove Nulltrap and the Roblox client it downloaded?",
+                Strings.Get("confirm.uninstall"),
                 "Nulltrap",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question) != MessageBoxResult.Yes)

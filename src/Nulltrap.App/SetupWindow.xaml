@@ -4,6 +4,7 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
                     mc:Ignorable="d"
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap — Setup"
@@ -47,25 +48,25 @@
                 <StackPanel x:Name="StepWelcome">
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="What Nulltrap is" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.whatIs}" />
                             <TextBlock Style="{StaticResource RowHint}"
-                                       Text="It replaces the Roblox bootstrapper. It downloads the official Roblox client from Roblox's own servers, unpacks it into your user profile and starts it. Nothing is installed for other users and no administrator rights are needed." />
+                                       Text="{loc:S setup.whatIsHint}" />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="What Nulltrap does not do" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.notDo}" />
                             <TextBlock Style="{StaticResource RowHint}"
-                                       Text="It does not inject into, modify or read the memory of the Roblox client. It does not bypass anti-cheat. It does not try to work around the FastFlag allowlist - Roblox has said that editing flags in memory carries consequences, and Nulltrap will not do it." />
+                                       Text="{loc:S setup.notDoHint}" />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="Who is responsible" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.responsible}" />
                             <TextBlock Style="{StaticResource RowHint}"
-                                       Text="Nulltrap is an unofficial project, not affiliated with or endorsed by Roblox Corporation. It is provided as is, under the MIT licence, with no warranty. You are responsible for how you use it." />
+                                       Text="{loc:S setup.responsibleHint}" />
                         </StackPanel>
                     </Border>
 
@@ -74,7 +75,7 @@
                               Foreground="{StaticResource TextBrush}"
                               FontSize="12"
                               Cursor="Hand"
-                              Content="I have read the above and want to continue"
+                              Content="{loc:S setup.agree}"
                               Click="OnAgreeChanged" />
                 </StackPanel>
 
@@ -82,7 +83,7 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Handle Roblox launches" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
                                 <TextBlock x:Name="ReplaceHint" Style="{StaticResource RowHint}" />
                             </StackPanel>
                             <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" IsChecked="True" HorizontalAlignment="Right" />
@@ -92,9 +93,9 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Handle Roblox Studio launches" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="Off by default. Studio is not affected by the FastFlag allowlist." />
+                                           Text="{loc:S setup.studioHint}" />
                             </StackPanel>
                             <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                         </Grid>
@@ -103,7 +104,7 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Desktop shortcut" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
                             </StackPanel>
                             <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" IsChecked="True" HorizontalAlignment="Right" />
                         </Grid>
@@ -112,7 +113,7 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Start menu shortcut" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
                             </StackPanel>
                             <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" IsChecked="True" HorizontalAlignment="Right" />
                         </Grid>
@@ -120,7 +121,7 @@
 
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="Install location" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.location}" />
                             <TextBlock x:Name="LocationText" Style="{StaticResource RowHint}" />
                         </StackPanel>
                     </Border>
@@ -130,9 +131,9 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Roblox Player" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.player}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="About 200 MB to download, roughly 320 MB once unpacked. Needed to play." />
+                                           Text="{loc:S setup.playerHint}" />
                             </StackPanel>
                             <CheckBox x:Name="DownloadPlayerBox" Style="{StaticResource Switch}" IsChecked="True" HorizontalAlignment="Right" />
                         </Grid>
@@ -141,9 +142,9 @@
                     <Border Style="{StaticResource RowCard}">
                         <Grid>
                             <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Roblox Studio" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.studio}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="Considerably larger and only needed if you build experiences. It can be downloaded later from the launcher." />
+                                           Text="{loc:S setup.studioSizeHint}" />
                             </StackPanel>
                             <CheckBox x:Name="DownloadStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                         </Grid>
@@ -151,9 +152,9 @@
 
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="Nothing selected?" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.nothing}" />
                             <TextBlock Style="{StaticResource RowHint}"
-                                       Text="That is fine. Nulltrap installs itself now and downloads the client the first time you press Launch." />
+                                       Text="{loc:S setup.nothingHint}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -161,7 +162,7 @@
                 <StackPanel x:Name="StepProgress" Visibility="Collapsed">
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock x:Name="ProgressStatus" Style="{StaticResource RowTitle}" Text="Working" />
+                            <TextBlock x:Name="ProgressStatus" Style="{StaticResource RowTitle}" Text="{loc:S setup.working}" />
                             <Border Height="5" Margin="0,14,0,0" Background="{StaticResource VoidBrush}" CornerRadius="3">
                                 <Border x:Name="ProgressFill" HorizontalAlignment="Left" Width="0"
                                         Background="{StaticResource PurpleBrightBrush}" CornerRadius="3" />
@@ -174,16 +175,16 @@
                 <StackPanel x:Name="StepDone" Visibility="Collapsed">
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="Nulltrap is ready" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.ready}" />
                             <TextBlock x:Name="DoneSummary" Style="{StaticResource RowHint}" />
                         </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource RowCard}">
                         <StackPanel>
-                            <TextBlock Style="{StaticResource RowTitle}" Text="What happens now" />
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.next}" />
                             <TextBlock Style="{StaticResource RowHint}"
-                                       Text="The Play button on the Roblox website opens Nulltrap, which checks for a client update and starts Roblox. You can change any of this later in Settings." />
+                                       Text="{loc:S setup.nextHint}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -193,12 +194,12 @@
 
         <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
             <Grid Margin="26,12,26,12">
-                <Button x:Name="BackButton" Style="{StaticResource Quiet}" Content="Back"
+                <Button x:Name="BackButton" Style="{StaticResource Quiet}" Content="{loc:S action.back}"
                         HorizontalAlignment="Left" Click="OnBack" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button x:Name="SecondaryButton" Style="{StaticResource Quiet}" Content="Settings"
+                    <Button x:Name="SecondaryButton" Style="{StaticResource Quiet}" Content="{loc:S home.settings}"
                             Margin="0,0,8,0" Visibility="Collapsed" Click="OnSecondary" />
-                    <Button x:Name="NextButton" Style="{StaticResource Accent}" Content="Continue" Click="OnNext" />
+                    <Button x:Name="NextButton" Style="{StaticResource Accent}" Content="{loc:S action.continue}" Click="OnNext" />
                 </StackPanel>
             </Grid>
         </Border>

@@ -5,6 +5,7 @@ using System.Windows;
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Localization;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
@@ -152,7 +153,7 @@ public partial class MainWindow : ChromeWindow
             if (installer.IsInstalled)
             {
                 if (MessageBox.Show(
-                        "Remove Nulltrap and the Roblox client it downloaded?",
+                        Strings.Get("confirm.uninstall"),
                         "Nulltrap",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question) != MessageBoxResult.Yes)

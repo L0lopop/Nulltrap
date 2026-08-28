@@ -4,6 +4,7 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
                     mc:Ignorable="d"
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap — Settings"
@@ -33,18 +34,18 @@
                 </StackPanel>
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
-                    <TextBlock Style="{StaticResource NavSection}" Text="LAUNCHER" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="General" IsChecked="True" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="Integration" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="Shortcuts" Checked="OnNavigate" />
+                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Integration" Content="{loc:S nav.integration}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Shortcuts" Content="{loc:S nav.shortcuts}" Checked="OnNavigate" />
 
-                    <TextBlock Style="{StaticResource NavSection}" Text="ROBLOX" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="Graphics" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="Deployment" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="Storage" Checked="OnNavigate" />
+                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Deployment" Content="{loc:S nav.deployment}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="Storage" Content="{loc:S nav.storage}" Checked="OnNavigate" />
 
-                    <TextBlock Style="{StaticResource NavSection}" Text="ABOUT" />
-                    <RadioButton Style="{StaticResource NavItem}" Tag="About" Content="About Nulltrap" Checked="OnNavigate" />
+                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.about}" />
+                    <RadioButton Style="{StaticResource NavItem}" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -73,10 +74,21 @@
                     <StackPanel x:Name="PageGeneral">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
+                                <StackPanel Margin="0,0,200,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.language}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.languageHint}" />
+                                </StackPanel>
+                                <StackPanel x:Name="LanguageButtons" Orientation="Horizontal"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Close once Roblox starts" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.closeAfterLaunch}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Staying open costs about a hundred megabytes for no benefit yet. Session tracking will need it running later." />
+                                               Text="{loc:S general.closeAfterLaunchHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="CloseAfterLaunchBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
@@ -85,9 +97,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Keep Roblox up to date" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.autoUpdate}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Every launch checks the current Roblox version and downloads it if it changed, then starts the client. Turning this off launches whatever is already installed." />
+                                               Text="{loc:S general.autoUpdateHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="AutomaticClientUpdatesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
@@ -96,9 +108,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Ask before a second Roblox client" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.multiInstance}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Running several clients at once is disputed under Roblox's terms. Nulltrap will not enable it silently." />
+                                               Text="{loc:S general.multiInstanceHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
@@ -109,12 +121,12 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Unlock frame rate" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Raises the frame rate the Roblox scheduler aims for. Written to the client's own settings file before launch - Nulltrap never touches the running client." />
+                                               Text="{loc:S graphics.unlockFpsHint}" />
                                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                                         <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
-                                        <TextBlock Text="frames per second"
+                                        <TextBlock Text="{loc:S graphics.fpsUnit}"
                                                    VerticalAlignment="Center"
                                                    Margin="10,0,0,0"
                                                    FontSize="11"
@@ -131,9 +143,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Override texture quality" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.textureQuality}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Forces a texture detail level instead of letting Roblox pick one. 0 is lowest, 3 is highest." />
+                                               Text="{loc:S graphics.textureQualityHint}" />
                                     <TextBox x:Name="TextureQualityBox" Style="{StaticResource Field}" Width="120"
                                              HorizontalAlignment="Left" Margin="0,10,0,0" />
                                 </StackPanel>
@@ -144,9 +156,9 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Anti-aliasing samples" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.msaa}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="1, 2 or 4. Leave empty to let Roblox decide." />
+                                           Text="{loc:S graphics.msaaHint}" />
                                 <TextBox x:Name="MsaaBox" Style="{StaticResource Field}" Width="120"
                                          HorizontalAlignment="Left" Margin="0,10,0,0" />
                             </StackPanel>
@@ -155,9 +167,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Ignore display scaling" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.dpi}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Renders at the monitor's real resolution on a scaled display. Sharper, and heavier." />
+                                               Text="{loc:S graphics.dpiHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="DisableDpiScaleBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
@@ -165,7 +177,7 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="What actually applies" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.summary}" />
                                 <TextBlock x:Name="FlagSummaryText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
@@ -175,9 +187,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Handle Roblox launches" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="The Play button on the Roblox website opens Nulltrap. Turning this off hands it back to whatever was registered before." />
+                                               Text="{loc:S integration.playerHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
                             </Grid>
@@ -186,9 +198,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Handle Roblox Studio launches" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Off by default. Studio is not affected by the FastFlag allowlist, so there is less reason to intercept it." />
+                                               Text="{loc:S integration.studioHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
                             </Grid>
@@ -196,7 +208,7 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Current handler" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.handler}" />
                                 <TextBlock x:Name="HandlerText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
@@ -206,8 +218,8 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Desktop shortcut" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="Created and removed as you change this." />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S shortcuts.desktopHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
                             </Grid>
@@ -216,7 +228,7 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Start menu shortcut" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
                                 </StackPanel>
                                 <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
                             </Grid>
@@ -226,16 +238,16 @@
                     <StackPanel x:Name="PageDeployment" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Channel" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S deployment.channel}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="Leave as production unless you know why you are changing it. An unknown channel simply fails to launch, it does not fall back." />
+                                           Text="{loc:S deployment.channelHint}" />
                                 <TextBox x:Name="ChannelBox" Style="{StaticResource Field}" Margin="0,10,0,0" />
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="Installed clients" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S deployment.installed}" />
                                 <TextBlock x:Name="InstalledClientsText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
@@ -245,9 +257,9 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Keep downloaded packages" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.keepCache}" />
                                     <TextBlock Style="{StaticResource RowHint}"
-                                               Text="Packages are cached under their checksum, so an update only fetches what actually changed." />
+                                               Text="{loc:S storage.keepCacheHint}" />
                                 </StackPanel>
                                 <CheckBox x:Name="KeepDownloadCacheBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
@@ -256,10 +268,10 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Download cache" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.cache}" />
                                     <TextBlock x:Name="CacheSizeText" Style="{StaticResource RowHint}" />
                                 </StackPanel>
-                                <Button x:Name="ClearCacheButton" Style="{StaticResource Quiet}" Content="Clear"
+                                <Button x:Name="ClearCacheButton" Style="{StaticResource Quiet}" Content="{loc:S action.clear}"
                                         HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnClearCache" />
                             </Grid>
                         </Border>
@@ -267,10 +279,10 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Installed Roblox versions" />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S storage.versions}" />
                                     <TextBlock x:Name="VersionsSizeText" Style="{StaticResource RowHint}" />
                                 </StackPanel>
-                                <Button Style="{StaticResource Quiet}" Content="Open folder"
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
                                         HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnOpenFolder" />
                             </Grid>
                         </Border>
@@ -285,26 +297,26 @@
                                     <TextBlock Text="Nulltrap" Foreground="{StaticResource TextBrush}" FontSize="17" FontWeight="SemiBold" />
                                     <TextBlock x:Name="AboutVersionText" Style="{StaticResource RowHint}" Margin="0,2,0,0" />
                                     <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
-                                               Text="An unofficial project, not affiliated with or endorsed by Roblox Corporation." />
+                                               Text="{loc:S about.unofficial}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="What Nulltrap does not do" />
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.notDo}" />
                                 <TextBlock Style="{StaticResource RowHint}"
-                                           Text="It does not inject into, modify or read the memory of the Roblox client. It does not bypass anti-cheat. It does not try to work around the FastFlag allowlist - Roblox has said that editing flags in memory carries consequences." />
+                                           Text="{loc:S about.notDoHint}" />
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Source code" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="Releases are published only in this repository." />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.source}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.sourceHint}" />
                                 </StackPanel>
-                                <Button Style="{StaticResource Quiet}" Content="Open" HorizontalAlignment="Right"
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.open}" HorizontalAlignment="Right"
                                         VerticalAlignment="Center" Click="OnOpenRepository" />
                             </Grid>
                         </Border>
@@ -312,10 +324,10 @@
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,130,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="Remove Nulltrap" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="Unregisters the handlers, removes shortcuts and deletes the downloaded client." />
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.remove}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.removeHint}" />
                                 </StackPanel>
-                                <Button Style="{StaticResource Quiet}" Content="Uninstall" Foreground="{StaticResource DangerBrush}"
+                                <Button Style="{StaticResource Quiet}" Content="{loc:S action.uninstall}" Foreground="{StaticResource DangerBrush}"
                                         HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnUninstall" />
                             </Grid>
                         </Border>
@@ -326,8 +338,8 @@
 
             <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,26,12">
-                    <Button Style="{StaticResource Quiet}" Content="Close" Margin="0,0,8,0" Click="OnCancel" />
-                    <Button Style="{StaticResource Accent}" Content="Save" Click="OnSave" />
+                    <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
+                    <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
                 </StackPanel>
             </Border>
         </Grid>

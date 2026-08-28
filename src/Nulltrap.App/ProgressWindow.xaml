@@ -5,6 +5,7 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
                     xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
                     mc:Ignorable="d"
                     Style="{StaticResource ChromeWindowStyle}"
                     Title="Nulltrap"
@@ -30,7 +31,7 @@
 
         <TextBlock Grid.Row="1"
                    x:Name="StatusText"
-                   Text="Starting Roblox"
+                   Text="{loc:S progress.starting}"
                    Margin="0,18,0,0"
                    HorizontalAlignment="Center"
                    TextAlignment="Center"
@@ -52,7 +53,7 @@
 
         <Button Grid.Row="3"
                 x:Name="CancelButton"
-                Content="Cancel"
+                Content="{loc:S action.cancel}"
                 Width="196"
                 Height="34"
                 Margin="0,18,0,0"

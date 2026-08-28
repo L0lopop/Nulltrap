@@ -2,6 +2,8 @@
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Launching;
+using Nulltrap.Core.Localization;
 using Nulltrap.Platform.Abstractions;
 
 namespace Nulltrap.App;
@@ -19,6 +21,8 @@ public partial class App : Application
         base.OnStartup(e);
 
         _services = new AppServices();
+        Strings.Use(_services.Settings.Load().Language);
+
         LaunchArguments arguments = LaunchArguments.Parse(e.Args);
 
         switch (arguments.Action)
@@ -128,7 +132,7 @@ public partial class App : Application
         if (!arguments.Quiet)
         {
             MessageBoxResult answer = MessageBox.Show(
-                "Remove Nulltrap and the Roblox client it downloaded?",
+                Strings.Get("confirm.uninstall"),
                 "Nulltrap",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
