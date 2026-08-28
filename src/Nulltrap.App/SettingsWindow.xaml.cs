@@ -502,8 +502,23 @@ public partial class SettingsWindow : ChromeWindow
 
         _fastFlags.Save(_flags);
 
-        DialogResult = true;
-        Close();
+        RefreshFacts();
+        ShowSaved();
+    }
+
+    private void ShowSaved()
+    {
+        SavedToastText.Text = Strings.Get("settings.saved");
+
+        var fade = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames();
+        fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
+            1, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(160))));
+        fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
+            1, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(2.4))));
+        fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
+            0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(3))));
+
+        SavedToast.BeginAnimation(OpacityProperty, fade);
     }
 
     private void OnUnlockFpsChanged(object sender, RoutedEventArgs e)

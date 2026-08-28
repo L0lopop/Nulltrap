@@ -148,5 +148,6 @@
   "graphics.grassFar": "Далеко",
   "graphics.qualityAuto": "На усмотрение Roblox",
   "graphics.qualityLevel": "Уровень {0} из 9",
-  "about.changes": "Что изменилось"
+  "about.changes": "Что изменилось",
+  "settings.saved": "Настройки сохранены"
 }

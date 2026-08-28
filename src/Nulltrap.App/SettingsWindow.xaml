@@ -417,10 +417,31 @@
             </ScrollViewer>
 
             <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,32,14">
-                    <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
-                    <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
-                </StackPanel>
+                <Grid Margin="32,14,32,14">
+                    <Border x:Name="SavedToast"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource SurfaceBrush}"
+                            BorderBrush="{StaticResource PurpleBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12,6"
+                            Opacity="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                     Fill="{StaticResource PurpleBrightBrush}" />
+                            <TextBlock x:Name="SavedToastText"
+                                       Margin="9,0,0,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
+                        <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
     </Grid>

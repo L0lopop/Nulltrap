@@ -148,5 +148,6 @@
   "graphics.grassFar": "Far",
   "graphics.qualityAuto": "Roblox decides",
   "graphics.qualityLevel": "Level {0} of 9",
-  "about.changes": "What has changed"
+  "about.changes": "What has changed",
+  "settings.saved": "Settings saved"
 }
