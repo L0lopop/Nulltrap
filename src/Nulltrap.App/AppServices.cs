@@ -42,6 +42,7 @@ public sealed class AppServices : IDisposable
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
         Installer = new Installer(Paths, Protocols, Shortcuts, UninstallEntry);
         Jobs = new InstallJobs(Bootstrapper);
+        Updates = new ClientUpdateWatcher(Deployment, StateStore, Jobs);
         Mods = Bootstrapper.Mods;
         Mods.Enabled = Settings.Load().Mods;
 
@@ -89,6 +90,8 @@ public sealed class AppServices : IDisposable
 
     public InstallJobs Jobs { get; }
 
+    public ClientUpdateWatcher Updates { get; }
+
     public ModManager Mods { get; }
 
     public GameInfoClient Games { get; }
@@ -129,6 +132,19 @@ public sealed class AppServices : IDisposable
         }
     }
 
+    public void StartClientUpdates()
+    {
+        NulltrapSettings settings = Settings.Load();
+
+        if (!settings.AutomaticClientUpdates)
+        {
+            return;
+        }
+
+        Updates.Channel = settings.DeploymentChannel;
+        Updates.Start();
+    }
+
     public void StartTracking()
     {
         Recorder.Start();
@@ -160,6 +176,7 @@ public sealed class AppServices : IDisposable
 
     public void Dispose()
     {
+        Updates.Dispose();
         Jobs.Dispose();
         Recorder.Dispose();
         Presence?.Dispose();

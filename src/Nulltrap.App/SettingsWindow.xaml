@@ -11,6 +11,7 @@
                     Height="740" Width="1240"
                     MinHeight="560" MinWidth="900"
                     ResizeMode="CanResize"
+                    ShowInTaskbar="False"
                     WindowStartupLocation="CenterOwner">
 
     <Grid>
@@ -76,19 +77,6 @@
                 <Grid>
 
                     <StackPanel x:Name="PageGeneral" Visibility="Collapsed">
-                        <Border Style="{StaticResource SubTabStrip}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
-                                             x:Name="TabGeneralBehaviour" Tag="GeneralBehaviour"
-                                             Content="{loc:S general.tabBehaviour}" IsChecked="True" Checked="OnSubTab" />
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
-                                             x:Name="TabGeneralShortcuts" Tag="GeneralShortcuts"
-                                             Content="{loc:S nav.shortcuts}" Checked="OnSubTab" />
-                            </StackPanel>
-                        </Border>
-
-                        <StackPanel x:Name="GeneralBehaviour">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S general.tabBehaviour}" />
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,60,0">
@@ -121,29 +109,7 @@
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
                         </Border>
-                        </StackPanel>
 
-                        <StackPanel x:Name="GeneralShortcuts">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S nav.shortcuts}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S shortcuts.desktopHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
-                                </StackPanel>
-                                <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
-                            </Grid>
-                        </Border>
-                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PagePresence" Visibility="Collapsed">
@@ -298,6 +264,25 @@
                     <StackPanel x:Name="PageLauncher" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.desktop}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S shortcuts.desktopHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="DesktopShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S shortcuts.startMenu}" />
+                                </StackPanel>
+                                <CheckBox x:Name="StartMenuShortcutBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnShortcutsChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
                                 <StackPanel Margin="0,0,220,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.language}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.languageHint}" />
@@ -431,27 +416,6 @@
 
                         <StackPanel x:Name="GraphicsSpeed">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabSpeed}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S graphics.unlockFpsHint}" />
-                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
-                                        <TextBlock Text="{loc:S graphics.fpsUnit}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="10,0,0,0"
-                                                   FontSize="12"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" Margin="0,10,0,0" />
-                                </StackPanel>
-                                <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnUnlockFpsChanged" />
-                            </Grid>
-                        </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
@@ -655,6 +619,63 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PageFlags" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="FlagsTabs"
+                                             x:Name="TabFlagsFrames" Tag="FlagsFrames"
+                                             Content="{loc:S flags.tabFrames}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="FlagsTabs"
+                                             x:Name="TabFlagsReady" Tag="FlagsReady"
+                                             Content="{loc:S flags.tabReady}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="FlagsTabs"
+                                             x:Name="TabFlagsEditor" Tag="FlagsEditor"
+                                             Content="{loc:S flags.tabEditor}" Checked="OnSubTab" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel x:Name="FlagsFrames">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S flags.tabFrames}" />
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
+                                    <TextBlock Style="{StaticResource RowHint}"
+                                               Text="{loc:S graphics.unlockFpsHint}" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
+                                        <TextBlock Text="{loc:S graphics.fpsUnit}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0,0,0"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                    </StackPanel>
+                                    <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" Margin="0,10,0,0" />
+                                </StackPanel>
+                                <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Click="OnUnlockFpsChanged" />
+                            </Grid>
+                        </Border>
+
+                        </StackPanel>
+
+                        <StackPanel x:Name="FlagsReady" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S flags.tabReady}" />
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S flags.readyWhat}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S flags.readyWhatHint}" />
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel x:Name="ReadyPanel" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="FlagsEditor" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S flags.tabEditor}" />
+
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S flags.yours}" />
@@ -702,6 +723,7 @@
                                 <StackPanel x:Name="FlagsPanel" Margin="0,12,0,0" />
                             </StackPanel>
                         </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PageActivity" Visibility="Collapsed">

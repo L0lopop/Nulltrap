@@ -184,24 +184,67 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="CheckBox">
-                        <Border x:Name="Track" Width="40" Height="22" CornerRadius="11"
-                                Background="{StaticResource RuleBrush}">
+                        <Grid Width="40" Height="22">
+                            <Border x:Name="Track" CornerRadius="11"
+                                    Background="{StaticResource RuleBrush}" />
+                            <Border x:Name="Lit" CornerRadius="11" Opacity="0"
+                                    Background="{StaticResource AccentBrush}" />
                             <Ellipse x:Name="Knob" Width="16" Height="16"
                                      HorizontalAlignment="Left" Margin="3,0,0,0"
-                                     Fill="{StaticResource TextSoftBrush}" />
-                        </Border>
+                                     Fill="{StaticResource TextSoftBrush}"
+                                     RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform x:Name="Slide" X="0" />
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Track" Property="Background" Value="{StaticResource PurpleBrush}" />
-                                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
-                                <Setter TargetName="Knob" Property="Margin" Value="0,0,3,0" />
-                                <Setter TargetName="Knob" Property="Fill" Value="{StaticResource GlowBrush}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Slide"
+                                                             Storyboard.TargetProperty="X"
+                                                             To="18" Duration="0:0:0.18">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.45" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="Lit"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.18" />
+                                            <ColorAnimation Storyboard.TargetName="Knob"
+                                                            Storyboard.TargetProperty="Fill.Color"
+                                                            To="{StaticResource GlowColor}" Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Slide"
+                                                             Storyboard.TargetProperty="X"
+                                                             To="0" Duration="0:0:0.18">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="Lit"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.18" />
+                                            <ColorAnimation Storyboard.TargetName="Knob"
+                                                            Storyboard.TargetProperty="Fill.Color"
+                                                            To="{StaticResource TextSoftColor}" Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Track" Property="Opacity" Value="0.85" />
+                                <Setter TargetName="Knob" Property="Width" Value="18" />
+                                <Setter TargetName="Knob" Property="Height" Value="18" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Track" Property="Opacity" Value="0.4" />
+                                <Setter Property="Opacity" Value="0.4" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

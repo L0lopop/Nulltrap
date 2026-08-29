@@ -24,6 +24,7 @@ public partial class App : Application
         Strings.Use(_services.Settings.Load().Language);
         _services.KeepHandlersRegistered();
         _services.StartTracking();
+        _services.StartClientUpdates();
         _services.StartPresence();
 
         LaunchArguments arguments = LaunchArguments.Parse(e.Args);

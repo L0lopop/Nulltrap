@@ -22,7 +22,7 @@ public partial class SettingsWindow : ChromeWindow
 {
     private const string FpsFlag = "DFIntTaskSchedulerTargetFps";
     private const string FpsCapFlag = "FFlagTaskSchedulerLimitTargetFpsTo2402";
-    private const int DefaultTargetFps = 240;
+    private const int DefaultTargetFps = 9999;
     private const string TextureQualityEnabledFlag = "DFFlagTextureQualityOverrideEnabled";
     private const string TextureQualityFlag = "DFIntTextureQualityOverride";
     private const string MsaaFlag = "FIntDebugForceMSAASamples";
@@ -443,7 +443,7 @@ public partial class SettingsWindow : ChromeWindow
         ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFlags"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
         ["Presence"] = ["PresenceStatus", "PresenceShown", "PresenceApp"],
-        ["General"] = ["GeneralBehaviour", "GeneralShortcuts"],
+        ["Flags"] = ["FlagsFrames", "FlagsReady", "FlagsEditor"],
     };
 
     private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
@@ -457,8 +457,9 @@ public partial class SettingsWindow : ChromeWindow
         ["PresenceStatus"] = ("Presence", "PresenceStatus"),
         ["PresenceShown"] = ("Presence", "PresenceShown"),
         ["PresenceApp"] = ("Presence", "PresenceApp"),
-        ["GeneralBehaviour"] = ("General", "GeneralBehaviour"),
-        ["GeneralShortcuts"] = ("General", "GeneralShortcuts"),
+        ["FlagsFrames"] = ("Flags", "FlagsFrames"),
+        ["FlagsReady"] = ("Flags", "FlagsReady"),
+        ["FlagsEditor"] = ("Flags", "FlagsEditor"),
     };
 
     private void Show(string page)
@@ -600,6 +601,7 @@ public partial class SettingsWindow : ChromeWindow
 
             if (page == "Flags")
             {
+                BuildReady();
                 BuildFlags();
             }
         }
@@ -1058,6 +1060,90 @@ public partial class SettingsWindow : ChromeWindow
         ShowSaved();
     }
 
+    private sealed record Ready(string Flag, string TitleKey, string HintKey, (string? Value, string Key)[] Choices);
+
+    private static readonly Ready[] ReadyMade =
+    [
+        new("FFlagDebugSkyGray", "ready.skyGray", "ready.skyGrayHint",
+            [(null, "ready.off"), ("True", "ready.on")]),
+        new("DFFlagDebugPauseVoxelizer", "ready.pauseVoxelizer", "ready.pauseVoxelizerHint",
+            [(null, "ready.off"), ("True", "ready.on")]),
+        new("FFlagHandleAltEnterFullscreenManually", "ready.altEnter", "ready.altEnterHint",
+            [(null, "ready.off"), ("True", "ready.on")]),
+        new("DFIntDebugFRMQualityLevelOverride", "ready.quality", "ready.qualityHint",
+            [(null, "ready.off"), ("1", "graphics.qualityLevel1"), ("10", "graphics.qualityLevel10"), ("21", "graphics.qualityLevel21")]),
+        new("FIntGrassMovementReducedMotionFactor", "ready.grassMotion", "ready.grassMotionHint",
+            [(null, "ready.off"), ("0", "ready.still"), ("50", "ready.gentle"), ("100", "ready.normal")]),
+        new("DFIntCSGLevelOfDetailSwitchingDistance", "ready.geometry", "ready.geometryHint",
+            [(null, "ready.off"), ("50", "ready.near"), ("100", "ready.normal"), ("250", "ready.far")]),
+    ];
+
+    private static readonly string[] OwnedElsewhere =
+    [
+        FpsFlag, FpsCapFlag, TextureQualityEnabledFlag, TextureQualityFlag, MsaaFlag,
+        DisableDpiScaleFlag, PreferD3D11Flag, PreferVulkanFlag, PreferOpenGLFlag,
+        MaxGrassFlag, MinGrassFlag,
+        .. ReadyMade.Select(ready => ready.Flag),
+    ];
+
+    private void BuildReady()
+    {
+        if (ReadyPanel.Children.Count > 0)
+        {
+            return;
+        }
+
+        foreach (Ready ready in ReadyMade)
+        {
+            var card = new Border { Style = (Style)FindResource("RowCard") };
+            var row = new Grid();
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var left = new StackPanel { Margin = new Thickness(0, 0, 20, 0) };
+            left.Children.Add(new TextBlock
+            {
+                Text = Strings.Get(ready.TitleKey),
+                Style = (Style)FindResource("RowTitle"),
+            });
+            left.Children.Add(new TextBlock
+            {
+                Text = Strings.Get(ready.HintKey),
+                Style = (Style)FindResource("RowHint"),
+            });
+
+            var box = new ComboBox
+            {
+                Style = (Style)FindResource("Dropdown"),
+                Width = 200,
+                VerticalAlignment = VerticalAlignment.Center,
+                Tag = ready.Flag,
+            };
+            FillChoices(box, ready.Choices, _flags.GetValueOrDefault(ready.Flag));
+            box.SelectionChanged += OnReadyChanged;
+
+            Grid.SetColumn(left, 0);
+            Grid.SetColumn(box, 1);
+            row.Children.Add(left);
+            row.Children.Add(box);
+            card.Child = row;
+
+            ReadyPanel.Children.Add(card);
+        }
+    }
+
+    private void OnReadyChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_loaded || sender is not ComboBox { Tag: string flag } box)
+        {
+            return;
+        }
+
+        SetFlag(flag, ChosenValue(box) ?? string.Empty);
+        _fastFlags.Save(_flags);
+        RefreshFacts();
+    }
+
     private static readonly string[] KnownPrefixes =
         ["FFlag", "DFFlag", "FInt", "DFInt", "FString", "DFString", "FLog", "DFLog", "SFFlag"];
 
@@ -1066,6 +1152,7 @@ public partial class SettingsWindow : ChromeWindow
         FlagsPanel.Children.Clear();
 
         KeyValuePair<string, string>[] mine = _flags
+            .Where(pair => !OwnedElsewhere.Contains(pair.Key, StringComparer.Ordinal))
             .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -1079,10 +1166,10 @@ public partial class SettingsWindow : ChromeWindow
             FlagsPanel.Children.Add(Faint(Strings.Get("flags.none")));
         }
 
-        int ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).Count();
+        int ignored = FastFlagAllowlist.RejectedIn(mine.Select(pair => pair.Key)).Count;
 
         FlagCountText.Text = mine.Length == 0
-            ? Strings.Get("flags.noneShort")
+            ? Strings.Get("flags.editorOnlyYours")
             : Strings.Get("flags.count", mine.Length, ignored);
     }
 
@@ -1146,7 +1233,9 @@ public partial class SettingsWindow : ChromeWindow
     {
         string name = FlagNameBox.Text.Trim();
         string value = FlagValueBox.Text.Trim();
-        string? problem = Problem(name, value);
+        string? problem = OwnedElsewhere.Contains(name, StringComparer.Ordinal)
+            ? Strings.Get("flags.systemOwned")
+            : Problem(name, value);
 
         FlagProblemText.Text = problem ?? string.Empty;
         FlagProblemText.Visibility = problem is null ? Visibility.Collapsed : Visibility.Visible;
