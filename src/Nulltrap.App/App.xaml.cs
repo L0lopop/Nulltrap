@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Installation;

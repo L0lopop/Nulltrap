@@ -43,7 +43,7 @@ public sealed class PackageDownloader
         long completed = 0;
 
         var results = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var gate = new SemaphoreSlim(MaxConcurrentDownloads);
+        using var gate = new SemaphoreSlim(MaxConcurrentDownloads);
         var writeLock = new object();
 
         async Task RunAsync(PackageEntry entry)

@@ -124,7 +124,7 @@ public sealed class AppServices : IDisposable
 
         string handler = Installer.InstalledExecutablePath;
 
-        foreach (LaunchTarget target in (LaunchTarget[])Enum.GetValues(typeof(LaunchTarget)))
+        foreach (LaunchTarget target in Enum.GetValues<LaunchTarget>())
         {
             try
             {
@@ -133,7 +133,7 @@ public sealed class AppServices : IDisposable
                     Protocols.Register(target, handler);
                 }
             }
-            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException or System.Security.SecurityException)
             {
             }
         }

@@ -72,7 +72,7 @@ public sealed class DeploymentClient
 
                 if (finished.IsCompletedSuccessfully)
                 {
-                    return finished.Result;
+                    return await finished.ConfigureAwait(false);
                 }
 
                 if (finished.Exception?.InnerException is { } failure)

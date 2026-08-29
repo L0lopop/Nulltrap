@@ -13,8 +13,8 @@ using Nulltrap.Core.Presence;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
-using Nulltrap.Core.Updating;
 using Nulltrap.Core.State;
+using Nulltrap.Core.Updating;
 using Nulltrap.Platform.Abstractions;
 
 namespace Nulltrap.App;

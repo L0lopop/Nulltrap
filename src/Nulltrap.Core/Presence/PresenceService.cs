@@ -57,6 +57,7 @@ public sealed class PresenceService : IDisposable
 
         _work.Cancel();
         _work.Dispose();
+        _discord.Dispose();
     }
 
     public async Task<PresenceActivity> DescribeAsync(
