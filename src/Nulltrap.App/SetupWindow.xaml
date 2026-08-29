@@ -22,8 +22,11 @@
 
         <Grid Grid.Row="0" Margin="34,26,34,0">
             <StackPanel Orientation="Horizontal">
-                <Image Source="Nulltrap.png" Width="44" Height="44"
-                       RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top" />
+                <Image Width="44" Height="44" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top">
+                    <Image.Source>
+                        <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="88" />
+                    </Image.Source>
+                </Image>
                 <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                     <TextBlock x:Name="StepTitle"
                                Foreground="{StaticResource TextBrush}"

@@ -98,9 +98,11 @@
                                     <StackPanel Orientation="Horizontal"
                                                 Margin="11,0,0,0"
                                                 VerticalAlignment="Center">
-                                        <Image Source="Nulltrap.png"
-                                               Width="16" Height="16"
-                                               RenderOptions.BitmapScalingMode="HighQuality" />
+                                        <Image Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality">
+                                            <Image.Source>
+                                                <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="32" />
+                                            </Image.Source>
+                                        </Image>
                                         <TextBlock Text="{TemplateBinding Title}"
                                                    Margin="9,0,0,0"
                                                    VerticalAlignment="Center"

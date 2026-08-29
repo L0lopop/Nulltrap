@@ -928,8 +928,11 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="Nulltrap.png" Width="52" Height="52"
-                                       RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top" />
+                                <Image Width="52" Height="52" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top">
+                                    <Image.Source>
+                                        <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="104" />
+                                    </Image.Source>
+                                </Image>
                                 <StackPanel Margin="16,0,0,0">
                                     <TextBlock Text="Nulltrap" Foreground="{StaticResource TextBrush}" FontSize="17" FontWeight="SemiBold" />
                                     <TextBlock x:Name="AboutVersionText" Style="{StaticResource RowHint}" Margin="0,2,0,0" />

@@ -21,10 +21,11 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0">
-            <Image Source="Nulltrap.png"
-                   Width="72" Height="72"
-                   HorizontalAlignment="Left"
-                   RenderOptions.BitmapScalingMode="HighQuality" />
+            <Image Width="72" Height="72" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality">
+                <Image.Source>
+                    <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="144" />
+                </Image.Source>
+            </Image>
 
             <TextBlock Text="Nulltrap"
                        Margin="0,14,0,0"

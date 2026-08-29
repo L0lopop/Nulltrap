@@ -3,7 +3,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,7 +26,11 @@ HIGHLIGHT_BAND = 16
 HIGHLIGHT_REACH = 24
 HIGHLIGHT_EDGE_INSET = 0.05
 
-MARGIN = 0.04
+MARGIN = 0.012
+
+SHARPEN_BELOW = 512
+SHARPEN_PERCENT = 190
+SHARPEN_THRESHOLD = 2
 
 def border_seeds(height, width):
     for x in range(width):
@@ -203,6 +207,21 @@ def crop_to_square(image: Image.Image) -> Image.Image:
     )
     return canvas
 
+def downscale(artwork: Image.Image, size: int) -> Image.Image:
+    small = artwork.resize((size, size), Image.LANCZOS)
+
+    if size >= SHARPEN_BELOW:
+        return small
+
+    radius = max(0.4, size / 220)
+    colour, alpha = small.convert("RGB"), small.getchannel("A")
+    crisp = colour.filter(
+        ImageFilter.UnsharpMask(radius=radius, percent=SHARPEN_PERCENT, threshold=SHARPEN_THRESHOLD)
+    )
+    crisp.putalpha(alpha)
+
+    return crisp
+
 def main() -> None:
     if not SOURCE.exists():
         raise SystemExit(f"Source artwork not found: {SOURCE}")
@@ -214,16 +233,14 @@ def main() -> None:
     print(f"cropped    {artwork.size[0]}x{artwork.size[1]} RGBA")
 
     ICO_OUT.parent.mkdir(parents=True, exist_ok=True)
-    frames = [
-        artwork.resize((size, size), Image.LANCZOS) for size in ICO_SIZES
-    ]
+    frames = [downscale(artwork, size) for size in ICO_SIZES]
     frames[-1].save(ICO_OUT, format="ICO", sizes=[(s, s) for s in ICO_SIZES])
     print(f"wrote      {ICO_OUT.relative_to(ROOT)}  ({', '.join(map(str, ICO_SIZES))})")
 
-    artwork.resize((1024, 1024), Image.LANCZOS).save(PNG_OUT, format="PNG")
+    downscale(artwork, 1024).save(PNG_OUT, format="PNG")
     print(f"wrote      {PNG_OUT.relative_to(ROOT)}  (1024x1024)")
 
-    artwork.resize((APP_PNG_SIZE, APP_PNG_SIZE), Image.LANCZOS).save(APP_PNG_OUT, format="PNG", optimize=True)
+    downscale(artwork, APP_PNG_SIZE).save(APP_PNG_OUT, format="PNG", optimize=True)
     print(f"wrote      {APP_PNG_OUT.relative_to(ROOT)}  ({APP_PNG_SIZE}x{APP_PNG_SIZE})")
 
 if __name__ == "__main__":

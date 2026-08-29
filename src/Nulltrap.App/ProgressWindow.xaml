@@ -23,11 +23,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0"
-               Source="Nulltrap.png"
-               Width="76" Height="76"
-               HorizontalAlignment="Center"
-               RenderOptions.BitmapScalingMode="HighQuality" />
+        <Image Grid.Row="0" Width="76" Height="76" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality">
+            <Image.Source>
+                <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="152" />
+            </Image.Source>
+        </Image>
 
         <TextBlock Grid.Row="1"
                    x:Name="StatusText"
