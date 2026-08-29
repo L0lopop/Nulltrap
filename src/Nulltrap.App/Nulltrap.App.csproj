@@ -27,6 +27,7 @@
   <ItemGroup>
     <Resource Include="Nulltrap.ico" />
     <Resource Include="Nulltrap.png" />
+    <Resource Include="NulltrapSmall.png" />
   </ItemGroup>
 
 </Project>

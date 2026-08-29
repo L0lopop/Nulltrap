@@ -930,7 +930,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <Image Width="52" Height="52" RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Top">
                                     <Image.Source>
-                                        <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="104" />
+                                        <BitmapImage UriSource="Nulltrap.png" />
                                     </Image.Source>
                                 </Image>
                                 <StackPanel Margin="16,0,0,0">

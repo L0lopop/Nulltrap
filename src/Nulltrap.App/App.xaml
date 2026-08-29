@@ -100,7 +100,7 @@
                                                 VerticalAlignment="Center">
                                         <Image Width="16" Height="16" RenderOptions.BitmapScalingMode="HighQuality">
                                             <Image.Source>
-                                                <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="32" />
+                                                <BitmapImage UriSource="NulltrapSmall.png" />
                                             </Image.Source>
                                         </Image>
                                         <TextBlock Text="{TemplateBinding Title}"

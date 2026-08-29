@@ -25,7 +25,7 @@
 
         <Image Grid.Row="0" Width="76" Height="76" HorizontalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality">
             <Image.Source>
-                <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="152" />
+                <BitmapImage UriSource="Nulltrap.png" />
             </Image.Source>
         </Image>
 

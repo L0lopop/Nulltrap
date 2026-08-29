@@ -23,7 +23,7 @@
         <StackPanel Grid.Column="0">
             <Image Width="72" Height="72" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.Source>
-                    <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="144" />
+                    <BitmapImage UriSource="Nulltrap.png" />
                 </Image.Source>
             </Image>
 
