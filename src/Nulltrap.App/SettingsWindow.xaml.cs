@@ -91,6 +91,8 @@ public partial class SettingsWindow : ChromeWindow
     private BinaryType _target = BinaryType.WindowsPlayer;
     private double _transfer;
     private LauncherRelease? _release;
+    private const double TileSize = 148;
+
     private long _lastPlace;
     private bool _loaded;
 
@@ -312,22 +314,97 @@ public partial class SettingsWindow : ChromeWindow
     {
         RecentGamesPanel.Children.Clear();
 
-        PlayedGame[] games = history.ByGame(6)
+        PlayedGame[] games = history.ByGame(8)
             .Where(game => skip is null || game.UniverseId != skip.UniverseId)
-            .Take(4)
+            .Take(6)
             .ToArray();
 
         foreach (PlayedGame game in games)
         {
-            RecentGamesPanel.Children.Add(Line(
-                game.Name,
-                Strings.Get("activity.visits", game.Visits),
-                Clocks.Describe(game.Total)));
+            RecentGamesPanel.Children.Add(Tile(game));
         }
 
         if (games.Length == 0)
         {
             RecentGamesPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
+        }
+    }
+
+    private Button Tile(PlayedGame game)
+    {
+        var art = new Border
+        {
+            Width = TileSize,
+            Height = TileSize,
+            CornerRadius = new CornerRadius(8),
+            Background = (System.Windows.Media.Brush)FindResource("SurfaceHoverBrush"),
+            ClipToBounds = true,
+        };
+
+        var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
+        art.Child = picture;
+
+        var name = new TextBlock
+        {
+            Text = game.Name,
+            FontSize = 13,
+            Margin = new Thickness(0, 10, 0, 0),
+            MaxWidth = TileSize,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+        };
+
+        var spent = new TextBlock
+        {
+            Text = Strings.Get("home.playedFor", Clocks.Describe(game.Total)),
+            FontSize = 12,
+            Margin = new Thickness(0, 2, 0, 0),
+            MaxWidth = TileSize,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
+        };
+
+        var stack = new StackPanel();
+        stack.Children.Add(art);
+        stack.Children.Add(name);
+        stack.Children.Add(spent);
+
+        var tile = new Button
+        {
+            Style = (Style)FindResource("Tile"),
+            Margin = new Thickness(0, 0, 14, 0),
+            Content = stack,
+            Tag = game.UniverseId,
+        };
+        tile.Click += OnPlayTile;
+
+        _ = FillTileAsync(picture, tile, game.UniverseId);
+
+        return tile;
+    }
+
+    private async Task FillTileAsync(Image picture, Button tile, long universeId)
+    {
+        GameInfo? game = await App.Services.Games.DescribeAsync(universeId);
+
+        if (game is null)
+        {
+            return;
+        }
+
+        tile.Tag = game.RootPlaceId;
+
+        if (game.IconUrl is not null)
+        {
+            picture.Source = Picture(game.IconUrl);
+        }
+    }
+
+    private void OnPlayTile(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: long place } && place > 0)
+        {
+            Open($"https://www.roblox.com/games/start?placeId={place}");
         }
     }
 

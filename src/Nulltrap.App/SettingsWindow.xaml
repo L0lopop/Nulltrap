@@ -143,7 +143,10 @@
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S home.before}" />
-                                <StackPanel x:Name="RecentGamesPanel" Margin="0,12,0,0" />
+                                <ScrollViewer Margin="0,12,0,0" HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Disabled" Padding="0,0,0,6">
+                                    <StackPanel x:Name="RecentGamesPanel" Orientation="Horizontal" />
+                                </ScrollViewer>
                             </StackPanel>
                         </Border>
                     </StackPanel>
