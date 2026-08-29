@@ -52,6 +52,7 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly RobloxSession SampleSession = new()
     {
+        JobId = "807e45a6-4f14-4673-8b85-d82c98c8713e",
         PlaceId = 920587237,
         UniverseId = 245662005,
         ServerAddress = "128.116.115.14",
@@ -68,6 +69,8 @@ public partial class SettingsWindow : ChromeWindow
         Playing = 12480,
         IconUrl = "https://tr.rbxcdn.com/sample",
     };
+
+    private static readonly AccountInfo SampleAccount = new(2374586903, "Roblox683038", "Roblox683038", null);
 
     private static readonly (PresenceHeadline Value, string Key)[] Headlines =
     [
@@ -120,6 +123,8 @@ public partial class SettingsWindow : ChromeWindow
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
         ModsEnabledBox.IsChecked = _settings.Mods;
         PresenceEnabledBox.IsChecked = _settings.DiscordPresence;
+        PresenceAccountBox.IsChecked = _settings.DiscordShowAccount;
+        PresenceJoinBox.IsChecked = _settings.DiscordAllowJoin;
         PresenceElapsedBox.IsChecked = _settings.DiscordShowElapsed;
         PresenceIconBox.IsChecked = _settings.DiscordShowGameIcon;
         PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
@@ -385,15 +390,17 @@ public partial class SettingsWindow : ChromeWindow
         ShowElapsed = PresenceElapsedBox.IsChecked == true,
         ShowGameIcon = PresenceIconBox.IsChecked == true,
         ShowGameButton = PresenceButtonBox.IsChecked == true,
+        ShowAccount = PresenceAccountBox.IsChecked == true,
+        AllowJoin = PresenceJoinBox.IsChecked == true,
     };
 
     private void ShowPresencePreview()
     {
         bool on = PresenceEnabledBox.IsChecked == true;
         PresenceOptions shape = PresenceShape();
-        PresenceActivity sample = PresenceService.Compose(SampleSession, SampleGame, shape);
+        PresenceActivity sample = PresenceService.Compose(SampleSession, SampleGame, shape, SampleAccount);
 
-        PresencePreview.Opacity = on ? 1 : 0.35;
+        PresencePreview.Opacity = on ? 1 : 0.4;
         PreviewDetails.Text = sample.Details;
         PreviewState.Text = sample.State ?? string.Empty;
         PreviewState.Visibility = sample.State is null ? Visibility.Collapsed : Visibility.Visible;
@@ -401,8 +408,23 @@ public partial class SettingsWindow : ChromeWindow
         PreviewElapsed.Visibility = shape.ShowElapsed ? Visibility.Visible : Visibility.Collapsed;
         PreviewIcon.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
         PreviewIconGlyph.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
-        PreviewButtonText.Text = sample.Buttons.Count == 0 ? string.Empty : sample.Buttons[0].Label;
-        PreviewButton.Visibility = sample.Buttons.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+
+        PreviewAccount.Visibility = sample.SmallText is null ? Visibility.Collapsed : Visibility.Visible;
+        PreviewAccountGlyph.Text = sample.SmallText?[..1].ToUpperInvariant() ?? string.Empty;
+
+        PresenceButton? join = sample.Buttons.FirstOrDefault(button => button.Url.Contains("gameInstanceId", StringComparison.Ordinal));
+        PresenceButton? page = sample.Buttons.FirstOrDefault(button => !button.Url.Contains("gameInstanceId", StringComparison.Ordinal));
+
+        PreviewJoinText.Text = join?.Label ?? string.Empty;
+        PreviewJoin.Visibility = join is null ? Visibility.Collapsed : Visibility.Visible;
+        PreviewButtonText.Text = page?.Label ?? string.Empty;
+        PreviewButton.Visibility = page is null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void OnOpenPresenceShape(object sender, RoutedEventArgs e)
+    {
+        TabPresenceShown.IsChecked = true;
+        ShowGroup("Presence", "PresenceShown");
     }
 
     private void OnPresenceChanged(object sender, RoutedEventArgs e)
@@ -1317,6 +1339,8 @@ public partial class SettingsWindow : ChromeWindow
         _settings.DiscordShowElapsed = shape.ShowElapsed;
         _settings.DiscordShowGameIcon = shape.ShowGameIcon;
         _settings.DiscordShowGameButton = shape.ShowGameButton;
+        _settings.DiscordShowAccount = shape.ShowAccount;
+        _settings.DiscordAllowJoin = shape.AllowJoin;
         _settings.DiscordApplicationId = PresenceAppIdBox.Text.Trim();
 
         _store.Save(_settings);

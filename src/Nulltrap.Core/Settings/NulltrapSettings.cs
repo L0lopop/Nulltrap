@@ -52,6 +52,12 @@ public sealed record NulltrapSettings
     [JsonPropertyName("discordShowGameButton")]
     public bool DiscordShowGameButton { get; set; } = true;
 
+    [JsonPropertyName("discordShowAccount")]
+    public bool DiscordShowAccount { get; set; } = true;
+
+    [JsonPropertyName("discordAllowJoin")]
+    public bool DiscordAllowJoin { get; set; } = true;
+
     [JsonPropertyName("discordApplicationId")]
     public string DiscordApplicationId { get; set; } = string.Empty;
 
@@ -69,6 +75,8 @@ public sealed record NulltrapSettings
         ShowElapsed = DiscordShowElapsed,
         ShowGameIcon = DiscordShowGameIcon,
         ShowGameButton = DiscordShowGameButton,
+        ShowAccount = DiscordShowAccount,
+        AllowJoin = DiscordAllowJoin,
     };
 
     [JsonIgnore]

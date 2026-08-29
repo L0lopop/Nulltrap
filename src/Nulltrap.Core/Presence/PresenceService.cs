@@ -9,15 +9,21 @@ public sealed class PresenceService : IDisposable
     public const string BuiltInApplicationId = "1542960701226622976";
 
     private const string PlaceUrl = "https://www.roblox.com/games/";
+    private const string JoinUrl = "https://www.roblox.com/games/start?placeId=";
     private const string FallbackImage = "nulltrap";
 
     private readonly DiscordPresenceClient _discord;
     private readonly GameInfoClient _games;
     private readonly SessionTracker _tracker;
+    private readonly AccountInfoClient? _accounts;
 
     private CancellationTokenSource _work = new();
 
-    public PresenceService(DiscordPresenceClient discord, GameInfoClient games, SessionTracker tracker)
+    public PresenceService(
+        DiscordPresenceClient discord,
+        GameInfoClient games,
+        SessionTracker tracker,
+        AccountInfoClient? accounts = null)
     {
         ArgumentNullException.ThrowIfNull(discord);
         ArgumentNullException.ThrowIfNull(games);
@@ -26,6 +32,7 @@ public sealed class PresenceService : IDisposable
         _discord = discord;
         _games = games;
         _tracker = tracker;
+        _accounts = accounts;
     }
 
     public PresenceOptions Options { get; set; } = PresenceOptions.Default;
@@ -59,15 +66,30 @@ public sealed class PresenceService : IDisposable
         GameInfo? game = await _games.DescribeAsync(session.UniverseId, cancellationToken)
             .ConfigureAwait(false);
 
-        return Compose(session, game, Options);
+        AccountInfo? account = Options.ShowAccount && _accounts is not null
+            ? await _accounts.DescribeAsync(session.UserId, cancellationToken).ConfigureAwait(false)
+            : null;
+
+        return Compose(session, game, Options, account);
     }
 
-    public static PresenceActivity Compose(RobloxSession session, GameInfo? game, PresenceOptions options)
+    public static PresenceActivity Compose(
+        RobloxSession session,
+        GameInfo? game,
+        PresenceOptions options,
+        AccountInfo? account = null)
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(options);
 
         var buttons = new List<PresenceButton>();
+
+        if (options.AllowJoin && session.PlaceId > 0 && session.JobId is not null)
+        {
+            buttons.Add(new PresenceButton(
+                Strings.Get("presence.joinServer"),
+                $"{JoinUrl}{session.PlaceId}&gameInstanceId={session.JobId}"));
+        }
 
         if (options.ShowGameButton && session.PlaceId > 0)
         {
@@ -78,6 +100,8 @@ public sealed class PresenceService : IDisposable
             ? Strings.Get("presence.playing")
             : game.Name;
 
+        bool named = options.ShowAccount && account is not null;
+
         return new PresenceActivity
         {
             Details = headline,
@@ -85,15 +109,22 @@ public sealed class PresenceService : IDisposable
             StartedAt = options.ShowElapsed ? session.StartedAt : null,
             LargeImage = options.ShowGameIcon ? game?.IconUrl ?? FallbackImage : null,
             LargeText = game?.Name,
+            SmallImage = named ? account!.AvatarUrl : null,
+            SmallText = named ? account!.Name : null,
             Buttons = buttons,
         };
     }
+
+    private static string Where(RobloxSession session, PresenceOptions options) =>
+        options.AllowJoin && session.JobId is not null
+            ? " | " + Strings.Get("presence.publicServer")
+            : string.Empty;
 
     private static string? Subline(RobloxSession session, GameInfo? game, PresenceOptions options) =>
         options.Subline switch
         {
             PresenceSubline.Creator when game?.CreatorName is not null =>
-                Strings.Get("presence.byCreator", game.CreatorName),
+                Strings.Get("presence.byCreator", game.CreatorName) + Where(session, options),
             PresenceSubline.ServerRegion when session.ServerAddress is not null =>
                 Strings.Get("presence.onServer", session.ServerAddress),
             PresenceSubline.PlayerCount when game is { Playing: > 0 } =>

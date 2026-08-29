@@ -142,7 +142,7 @@
   "presence.playing": "Playing Roblox",
   "presence.byCreator": "by {0}",
   "presence.unknownGame": "In an experience",
-  "presence.viewGame": "View game",
+  "presence.viewGame": "See game page",
   "nav.presence": "Discord",
   "page.presence.title": "Discord",
   "page.presence.subtitle": "What your friends see while you play.",
@@ -312,5 +312,17 @@
   "ready.far": "Far",
   "graphics.qualityLevel1": "Level 1 - cheapest",
   "graphics.qualityLevel10": "Level 10 - middle",
-  "graphics.qualityLevel21": "Level 21 - everything on"
+  "graphics.qualityLevel21": "Level 21 - everything on",
+  "presence.joinServer": "Join server",
+  "presence.publicServer": "Public server",
+  "presence.richPresence": "Discord activity status (Rich Presence)",
+  "presence.richPresenceHint": "The desktop Discord app has to be running. Nulltrap talks to it over a local pipe; nothing is sent anywhere else.",
+  "presence.account": "Show your Roblox account",
+  "presence.accountHint": "Puts your Roblox name and avatar in the corner of the status, read from the user id in Roblox's own log.",
+  "presence.join": "Let people join through the status",
+  "presence.joinHint": "Adds a Join server button that opens the exact server you are on. Anyone who can see your status can use it.",
+  "presence.custom": "Custom RPC",
+  "presence.customHint": "Choose what the two lines say and which parts are shown.",
+  "presence.customOpen": "Open",
+  "presence.previewTag": "Preview"
 }

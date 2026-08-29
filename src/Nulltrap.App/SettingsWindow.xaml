@@ -128,54 +128,114 @@
                         </Border>
 
                         <StackPanel x:Name="PresenceStatus">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabStatus}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.enable}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.enableHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="PresenceEnabledBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnPresenceChanged" />
-                            </Grid>
-                        </Border>
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.richPresence}" />
+                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,14"
+                                       Text="{loc:S presence.richPresenceHint}" />
 
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.preview}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.previewHint}" />
-                                <Border x:Name="PresencePreview" Margin="0,12,0,0" Padding="16,14" CornerRadius="10"
-                                        Background="{StaticResource VoidBrush}"
-                                        BorderBrush="{StaticResource RuleBrush}" BorderThickness="1">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Grid Width="60" Height="60" VerticalAlignment="Top">
-                                            <Border x:Name="PreviewIcon" CornerRadius="8"
-                                                    Background="{StaticResource SurfaceHoverBrush}" />
-                                            <TextBlock x:Name="PreviewIconGlyph" Text="R" FontSize="24" FontWeight="Bold"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                       Foreground="{StaticResource PurpleBrightBrush}" />
-                                        </Grid>
-                                        <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                            <TextBlock Text="Nulltrap" FontSize="12" FontWeight="Bold"
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.enable}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.enableHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PresenceEnabledBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Click="OnPresenceChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.account}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.accountHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PresenceAccountBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Click="OnPresenceChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.join}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.joinHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PresenceJoinBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Click="OnPresenceChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,150,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.custom}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.customHint}" />
+                                    </StackPanel>
+                                    <Button Style="{StaticResource Quiet}" MinWidth="128"
+                                            Content="{loc:S presence.customOpen}"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                                            Click="OnOpenPresenceShape" />
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="PresencePreview" Style="{StaticResource RowCard}" Padding="18,16">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <TextBlock Text="{loc:S presence.playing}" FontSize="12" FontWeight="Bold"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                        <Border HorizontalAlignment="Right" CornerRadius="4" Padding="8,3"
+                                                Background="{StaticResource SurfaceHoverBrush}">
+                                            <TextBlock Text="{loc:S presence.previewTag}" FontSize="11"
                                                        Foreground="{StaticResource TextSoftBrush}" />
-                                            <TextBlock x:Name="PreviewDetails" FontSize="13" FontWeight="SemiBold"
-                                                       Margin="0,4,0,0" Foreground="{StaticResource TextBrush}" />
+                                        </Border>
+                                    </Grid>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <Grid Width="64" Height="64" VerticalAlignment="Top">
+                                            <Border x:Name="PreviewIcon" CornerRadius="8"
+                                                    Background="{StaticResource AccentBrush}" />
+                                            <TextBlock x:Name="PreviewIconGlyph" Text="R" FontSize="26" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <Border x:Name="PreviewAccount" Width="24" Height="24" CornerRadius="12"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                    Margin="0,0,-6,-6"
+                                                    Background="{StaticResource PurpleBrush}"
+                                                    BorderBrush="{StaticResource SurfaceBrush}" BorderThickness="2">
+                                                <TextBlock x:Name="PreviewAccountGlyph" FontSize="11" FontWeight="Bold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           Foreground="{StaticResource TextBrush}" />
+                                            </Border>
+                                        </Grid>
+
+                                        <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="Roblox" FontSize="13" FontWeight="Bold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <TextBlock x:Name="PreviewDetails" FontSize="13" Margin="0,3,0,0"
+                                                       Foreground="{StaticResource TextBrush}" />
                                             <TextBlock x:Name="PreviewState" FontSize="12" Margin="0,2,0,0"
                                                        Foreground="{StaticResource TextSoftBrush}" />
                                             <TextBlock x:Name="PreviewElapsed" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
-                                            <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="14,5"
-                                                    CornerRadius="4" HorizontalAlignment="Left"
-                                                    Background="{StaticResource SurfaceHoverBrush}">
-                                                <TextBlock x:Name="PreviewButtonText" FontSize="12"
-                                                           Foreground="{StaticResource TextBrush}" />
-                                            </Border>
+                                                       Foreground="#FF67D68A" />
                                         </StackPanel>
                                     </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Border>
+
+                                    <Border x:Name="PreviewJoin" Margin="0,14,0,0" Padding="0,9"
+                                            CornerRadius="4" Background="{StaticResource SurfaceHoverBrush}">
+                                        <TextBlock x:Name="PreviewJoinText" FontSize="12" HorizontalAlignment="Center"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                    </Border>
+
+                                    <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="0,9"
+                                            CornerRadius="4" Background="{StaticResource SurfaceHoverBrush}">
+                                        <TextBlock x:Name="PreviewButtonText" FontSize="12" HorizontalAlignment="Center"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
 
                         <StackPanel x:Name="PresenceShown">

@@ -27,4 +27,8 @@ public sealed record PresenceOptions
     public bool ShowGameIcon { get; init; } = true;
 
     public bool ShowGameButton { get; init; } = true;
+
+    public bool ShowAccount { get; init; } = true;
+
+    public bool AllowJoin { get; init; } = true;
 }

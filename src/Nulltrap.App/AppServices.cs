@@ -47,6 +47,7 @@ public sealed class AppServices : IDisposable
         Mods.Enabled = Settings.Load().Mods;
 
         Games = new GameInfoClient(_http);
+        Accounts = new AccountInfoClient(_http);
         Sessions = new SessionTracker();
         History = new SessionHistoryStore(Paths);
         Recorder = new SessionRecorder(Sessions, Games, History);
@@ -95,6 +96,8 @@ public sealed class AppServices : IDisposable
     public ModManager Mods { get; }
 
     public GameInfoClient Games { get; }
+
+    public AccountInfoClient Accounts { get; }
 
     public SessionTracker Sessions { get; }
 
@@ -166,7 +169,7 @@ public sealed class AppServices : IDisposable
         }
 
         var discord = new DiscordPresenceClient(PresenceTransports, applicationId);
-        Presence = new PresenceService(discord, Games, Sessions)
+        Presence = new PresenceService(discord, Games, Sessions, Accounts)
         {
             Options = settings.PresenceOptions,
         };
