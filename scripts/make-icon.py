@@ -94,7 +94,7 @@ def find_cutout_quad(rgba):
             f"The cutout simplified to {len(quad)} corners, not 4. Adjust CUTOUT_SIMPLIFY."
         )
 
-    return quad.astype(float)
+    return quad.astype(float), region
 
 def outward_edges(quad):
     centre = quad.mean(0)
@@ -155,11 +155,14 @@ def remove_edge_highlight(rgba, quad):
 
     return replaced
 
-def cut_hole(rgba, quad):
-    height, width = rgba.shape[:2]
-    hole = np.zeros((height, width), np.uint8)
-    cv2.fillPoly(hole, [quad.astype(np.int32)], 255)
-    hole = cv2.dilate(hole, np.ones((2 * CUTOUT_GROW + 1,) * 2, np.uint8))
+def cut_hole(rgba, region):
+    hole = cv2.dilate(
+        (region * 255).astype(np.uint8),
+        np.ones((2 * CUTOUT_GROW + 1,) * 2, np.uint8),
+    )
+    hole = cv2.morphologyEx(
+        hole, cv2.MORPH_CLOSE, np.ones((2 * CUTOUT_GROW + 5,) * 2, np.uint8)
+    )
     rgba[hole > 0, 3] = 0
     return int((hole > 0).sum())
 
@@ -176,11 +179,11 @@ def prepare(image: Image.Image) -> Image.Image:
     )
     print(f"background {cleared:>10,} px cleared")
 
-    quad = find_cutout_quad(rgba)
+    quad, region = find_cutout_quad(rgba)
     print(f"cutout     corners {[tuple(int(v) for v in p) for p in quad]}")
 
     print(f"highlight  {remove_edge_highlight(rgba, quad):>10,} px recoloured")
-    print(f"cutout     {cut_hole(rgba, quad):>10,} px cleared")
+    print(f"cutout     {cut_hole(rgba, region):>10,} px cleared")
 
     return Image.fromarray(rgba.astype(np.uint8), "RGBA")
 
