@@ -41,7 +41,16 @@ public partial class ProgressWindow : ChromeWindow
     private void Redraw()
     {
         double available = Math.Max(0, ActualWidth - 70);
-        ProgressFill.Width = available * Math.Clamp(_fraction, 0, 1);
+
+        ProgressFill.BeginAnimation(WidthProperty, new System.Windows.Media.Animation.DoubleAnimation
+        {
+            To = available * Math.Clamp(_fraction, 0, 1),
+            Duration = TimeSpan.FromMilliseconds(300),
+            EasingFunction = new System.Windows.Media.Animation.CubicEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+            },
+        });
     }
 
     private void OnCancel(object sender, RoutedEventArgs e)

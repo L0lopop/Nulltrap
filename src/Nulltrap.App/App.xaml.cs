@@ -22,6 +22,7 @@ public partial class App : Application
 
         _services = new AppServices();
         Strings.Use(_services.Settings.Load().Language);
+        _services.KeepHandlersRegistered();
         _services.StartTracking();
         _services.StartPresence();
 

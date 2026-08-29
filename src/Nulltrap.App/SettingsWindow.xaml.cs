@@ -113,7 +113,6 @@ public partial class SettingsWindow : ChromeWindow
 
         CloseAfterLaunchBox.IsChecked = _settings.CloseAfterLaunch;
         ConfirmMultipleInstancesBox.IsChecked = _settings.ConfirmMultipleInstances;
-        RegisterStudioBox.IsChecked = _settings.RegisterStudio;
         DesktopShortcutBox.IsChecked = _settings.DesktopShortcut;
         StartMenuShortcutBox.IsChecked = _settings.StartMenuShortcut;
         KeepDownloadCacheBox.IsChecked = _settings.KeepDownloadCache;
@@ -340,14 +339,6 @@ public partial class SettingsWindow : ChromeWindow
         RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
 
-        bool installed = App.Services.Installer.IsInstalled;
-        string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
-
-        RegisterPlayerBox.IsChecked = installed;
-        RegisterPlayerBox.IsEnabled = installed || handler is null;
-
-        HandlerText.Text = handler ?? Strings.Get("integration.noHandler");
-
         string[] applied = _flags.Keys.Where(FastFlagAllowlist.IsAllowed).ToArray();
         string[] ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).ToArray();
 
@@ -445,14 +436,14 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "About"];
+        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
         ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFlags"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
         ["Presence"] = ["PresenceStatus", "PresenceShown", "PresenceApp"],
-        ["General"] = ["GeneralBehaviour", "GeneralIntegration", "GeneralShortcuts"],
+        ["General"] = ["GeneralBehaviour", "GeneralShortcuts"],
     };
 
     private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
@@ -467,7 +458,6 @@ public partial class SettingsWindow : ChromeWindow
         ["PresenceShown"] = ("Presence", "PresenceShown"),
         ["PresenceApp"] = ("Presence", "PresenceApp"),
         ["GeneralBehaviour"] = ("General", "GeneralBehaviour"),
-        ["GeneralIntegration"] = ("General", "GeneralIntegration"),
         ["GeneralShortcuts"] = ("General", "GeneralShortcuts"),
     };
 
@@ -475,15 +465,52 @@ public partial class SettingsWindow : ChromeWindow
     {
         foreach (string name in Pages)
         {
-            if (FindName("Page" + name) is FrameworkElement panel)
+            if (FindName("Page" + name) is not FrameworkElement panel)
             {
-                panel.Visibility = name == page ? Visibility.Visible : Visibility.Collapsed;
+                continue;
+            }
+
+            bool wanted = name == page;
+            panel.Visibility = wanted ? Visibility.Visible : Visibility.Collapsed;
+
+            if (wanted)
+            {
+                Arrive(panel);
             }
         }
 
         string key = char.ToLowerInvariant(page[0]) + page[1..];
         PageTitle.Text = Strings.Get($"page.{key}.title");
         PageSubtitle.Text = Strings.Get($"page.{key}.subtitle");
+    }
+
+    private static void Arrive(FrameworkElement panel)
+    {
+        var slide = new System.Windows.Media.TranslateTransform();
+        panel.RenderTransform = slide;
+
+        var ease = new System.Windows.Media.Animation.CubicEase
+        {
+            EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+        };
+
+        panel.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = TimeSpan.FromMilliseconds(190),
+            EasingFunction = ease,
+        });
+
+        slide.BeginAnimation(
+            System.Windows.Media.TranslateTransform.YProperty,
+            new System.Windows.Media.Animation.DoubleAnimation
+            {
+                From = 10,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(240),
+                EasingFunction = ease,
+            });
     }
 
     private void ShowGroup(string page, string group)
@@ -495,9 +522,17 @@ public partial class SettingsWindow : ChromeWindow
 
         foreach (string name in groups)
         {
-            if (FindName(name) is FrameworkElement panel)
+            if (FindName(name) is not FrameworkElement panel)
             {
-                panel.Visibility = name == group ? Visibility.Visible : Visibility.Collapsed;
+                continue;
+            }
+
+            bool wanted = name == group;
+            panel.Visibility = wanted ? Visibility.Visible : Visibility.Collapsed;
+
+            if (wanted && _loaded)
+            {
+                Arrive(panel);
             }
         }
     }
@@ -562,49 +597,12 @@ public partial class SettingsWindow : ChromeWindow
             {
                 BuildMods();
             }
-        }
-    }
 
-    private void OnRegistrationChanged(object sender, RoutedEventArgs e)
-    {
-        if (!_loaded)
-        {
-            return;
-        }
-
-        try
-        {
-            string handler = App.Services.Installer.InstalledExecutablePath;
-
-            if (sender == RegisterPlayerBox)
+            if (page == "Flags")
             {
-                if (RegisterPlayerBox.IsChecked == true)
-                {
-                    App.Services.Protocols.Register(LaunchTarget.Player, handler);
-                }
-                else
-                {
-                    App.Services.Protocols.Unregister(LaunchTarget.Player);
-                }
-            }
-            else
-            {
-                if (RegisterStudioBox.IsChecked == true)
-                {
-                    App.Services.Protocols.Register(LaunchTarget.Studio, handler);
-                }
-                else
-                {
-                    App.Services.Protocols.Unregister(LaunchTarget.Studio);
-                }
+                BuildFlags();
             }
         }
-        catch (Exception failure)
-        {
-            MessageBox.Show(failure.Message, "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
-        RefreshFacts();
     }
 
     private void OnShortcutsChanged(object sender, RoutedEventArgs e)
@@ -814,8 +812,20 @@ public partial class SettingsWindow : ChromeWindow
 
     private void OnTransferTrackResized(object sender, SizeChangedEventArgs e) => DrawTransfer();
 
-    private void DrawTransfer() =>
-        TransferFill.Width = Math.Max(0, TransferTrack.ActualWidth) * Math.Clamp(_transfer, 0, 1);
+    private void DrawTransfer()
+    {
+        double wanted = Math.Max(0, TransferTrack.ActualWidth) * Math.Clamp(_transfer, 0, 1);
+
+        TransferFill.BeginAnimation(WidthProperty, new System.Windows.Media.Animation.DoubleAnimation
+        {
+            To = wanted,
+            Duration = TimeSpan.FromMilliseconds(320),
+            EasingFunction = new System.Windows.Media.Animation.CubicEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+            },
+        });
+    }
 
     private void OnDownload(object sender, RoutedEventArgs e)
     {
@@ -1048,11 +1058,161 @@ public partial class SettingsWindow : ChromeWindow
         ShowSaved();
     }
 
+    private static readonly string[] KnownPrefixes =
+        ["FFlag", "DFFlag", "FInt", "DFInt", "FString", "DFString", "FLog", "DFLog", "SFFlag"];
+
+    private void BuildFlags()
+    {
+        FlagsPanel.Children.Clear();
+
+        KeyValuePair<string, string>[] mine = _flags
+            .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        foreach ((string name, string value) in mine)
+        {
+            FlagsPanel.Children.Add(FlagRow(name, value));
+        }
+
+        if (mine.Length == 0)
+        {
+            FlagsPanel.Children.Add(Faint(Strings.Get("flags.none")));
+        }
+
+        int ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).Count();
+
+        FlagCountText.Text = mine.Length == 0
+            ? Strings.Get("flags.noneShort")
+            : Strings.Get("flags.count", mine.Length, ignored);
+    }
+
+    private Grid FlagRow(string name, string value)
+    {
+        var row = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        bool allowed = FastFlagAllowlist.IsAllowed(name);
+
+        var left = new StackPanel();
+        left.Children.Add(new TextBlock
+        {
+            Text = name,
+            FontSize = 13,
+            FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+        });
+        left.Children.Add(new TextBlock
+        {
+            Text = allowed ? Strings.Get("flags.applied") : Strings.Get("flags.ignored"),
+            FontSize = 12,
+            Margin = new Thickness(0, 2, 0, 0),
+            Foreground = (System.Windows.Media.Brush)FindResource(allowed ? "TextSoftBrush" : "DangerBrush"),
+        });
+
+        var shown = new TextBlock
+        {
+            Text = value,
+            FontSize = 13,
+            FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(16, 0, 16, 0),
+            Foreground = (System.Windows.Media.Brush)FindResource("PurpleBrightBrush"),
+        };
+
+        var remove = new System.Windows.Controls.Button
+        {
+            Content = Strings.Get("flags.remove"),
+            Style = (Style)FindResource("Quiet"),
+            MinWidth = 104,
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = name,
+        };
+        remove.Click += OnRemoveFlag;
+
+        Grid.SetColumn(left, 0);
+        Grid.SetColumn(shown, 1);
+        Grid.SetColumn(remove, 2);
+        row.Children.Add(left);
+        row.Children.Add(shown);
+        row.Children.Add(remove);
+
+        return row;
+    }
+
+    private void OnAddFlag(object sender, RoutedEventArgs e)
+    {
+        string name = FlagNameBox.Text.Trim();
+        string value = FlagValueBox.Text.Trim();
+        string? problem = Problem(name, value);
+
+        FlagProblemText.Text = problem ?? string.Empty;
+        FlagProblemText.Visibility = problem is null ? Visibility.Collapsed : Visibility.Visible;
+
+        if (problem is not null)
+        {
+            return;
+        }
+
+        _flags[name] = value;
+        _fastFlags.Save(_flags);
+
+        FlagNameBox.Text = string.Empty;
+        FlagValueBox.Text = string.Empty;
+
+        BuildFlags();
+        RefreshFacts();
+        ShowSaved();
+    }
+
+    private static string? Problem(string name, string value)
+    {
+        if (name.Length == 0)
+        {
+            return Strings.Get("flags.needName");
+        }
+
+        if (value.Length == 0)
+        {
+            return Strings.Get("flags.needValue");
+        }
+
+        if (name.Any(letter => !char.IsLetterOrDigit(letter) && letter != '_'))
+        {
+            return Strings.Get("flags.badName");
+        }
+
+        return KnownPrefixes.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal))
+            ? null
+            : Strings.Get("flags.badPrefix", string.Join(", ", KnownPrefixes));
+    }
+
+    private void OnRemoveFlag(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: string name })
+        {
+            return;
+        }
+
+        _flags.Remove(name);
+        _fastFlags.Save(_flags);
+
+        BuildFlags();
+        RefreshFacts();
+    }
+
+    private void OnOpenFlagFile(object sender, RoutedEventArgs e)
+    {
+        _fastFlags.Save(_flags);
+        Open(Path.GetDirectoryName(_fastFlags.SourcePath)!);
+    }
+
     private void OnSave(object sender, RoutedEventArgs e)
     {
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
         _settings.ConfirmMultipleInstances = ConfirmMultipleInstancesBox.IsChecked == true;
-        _settings.RegisterStudio = RegisterStudioBox.IsChecked == true;
         _settings.DesktopShortcut = DesktopShortcutBox.IsChecked == true;
         _settings.StartMenuShortcut = StartMenuShortcutBox.IsChecked == true;
         _settings.KeepDownloadCache = KeepDownloadCacheBox.IsChecked == true;

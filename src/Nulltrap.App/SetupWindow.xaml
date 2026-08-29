@@ -81,24 +81,10 @@
 
                 <StackPanel x:Name="StepOptions" Visibility="Collapsed">
                     <Border Style="{StaticResource RowCard}">
-                        <Grid>
-                            <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
-                                <TextBlock x:Name="ReplaceHint" Style="{StaticResource RowHint}" />
-                            </StackPanel>
-                            <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" IsChecked="True" HorizontalAlignment="Right" />
-                        </Grid>
-                    </Border>
-
-                    <Border Style="{StaticResource RowCard}">
-                        <Grid>
-                            <StackPanel Margin="0,0,60,0">
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
-                                <TextBlock Style="{StaticResource RowHint}"
-                                           Text="{loc:S setup.studioHint}" />
-                            </StackPanel>
-                            <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                        </Grid>
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.handlers}" />
+                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S setup.handlersHint}" />
+                        </StackPanel>
                     </Border>
 
                     <Border Style="{StaticResource RowCard}">

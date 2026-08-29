@@ -105,6 +105,30 @@ public sealed class AppServices : IDisposable
 
     public PresenceService? Presence { get; private set; }
 
+    public void KeepHandlersRegistered()
+    {
+        if (!Installer.IsInstalled)
+        {
+            return;
+        }
+
+        string handler = Installer.InstalledExecutablePath;
+
+        foreach (LaunchTarget target in (LaunchTarget[])Enum.GetValues(typeof(LaunchTarget)))
+        {
+            try
+            {
+                if (!Protocols.IsRegistered(target, handler))
+                {
+                    Protocols.Register(target, handler);
+                }
+            }
+            catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+            {
+            }
+        }
+    }
+
     public void StartTracking()
     {
         Recorder.Start();

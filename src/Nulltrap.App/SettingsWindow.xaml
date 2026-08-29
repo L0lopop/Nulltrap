@@ -40,15 +40,16 @@
                 </StackPanel>
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
-                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" IsChecked="True" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
-
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
+
+                    <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -80,9 +81,6 @@
                                 <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
                                              x:Name="TabGeneralBehaviour" Tag="GeneralBehaviour"
                                              Content="{loc:S general.tabBehaviour}" IsChecked="True" Checked="OnSubTab" />
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
-                                             x:Name="TabGeneralIntegration" Tag="GeneralIntegration"
-                                             Content="{loc:S nav.integration}" Checked="OnSubTab" />
                                 <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
                                              x:Name="TabGeneralShortcuts" Tag="GeneralShortcuts"
                                              Content="{loc:S nav.shortcuts}" Checked="OnSubTab" />
@@ -122,38 +120,6 @@
                                 </StackPanel>
                                 <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                             </Grid>
-                        </Border>
-                        </StackPanel>
-
-                        <StackPanel x:Name="GeneralIntegration">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S nav.integration}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.player}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S integration.playerHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="RegisterPlayerBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.studio}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S integration.studioHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="RegisterStudioBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" Click="OnRegistrationChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S integration.handler}" />
-                                <TextBlock x:Name="HandlerText" Style="{StaticResource RowHint}" />
-                            </StackPanel>
                         </Border>
                         </StackPanel>
 
@@ -688,6 +654,56 @@
                         </Border>
                     </StackPanel>
 
+                    <StackPanel x:Name="PageFlags" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S flags.yours}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S flags.yoursHint}" />
+                                <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
+                                           Foreground="{StaticResource DangerBrush}"
+                                           Text="{loc:S flags.yourRisk}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S flags.add}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S flags.addHint}" />
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="FlagNameBox" Grid.Column="0" Style="{StaticResource Field}" />
+                                    <TextBox x:Name="FlagValueBox" Grid.Column="2" Style="{StaticResource Field}" />
+                                    <Button x:Name="AddFlagButton" Grid.Column="4" Style="{StaticResource Accent}"
+                                            MinWidth="130" Content="{loc:S flags.addButton}" Click="OnAddFlag" />
+                                </Grid>
+                                <TextBlock x:Name="FlagProblemText" Style="{StaticResource RowHint}" Margin="0,10,0,0"
+                                           Foreground="{StaticResource DangerBrush}" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Margin="0,0,150,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S flags.list}" />
+                                        <TextBlock x:Name="FlagCountText" Style="{StaticResource RowHint}" />
+                                    </StackPanel>
+                                    <Button x:Name="OpenFlagFileButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S flags.openFile}" MinWidth="130"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                                            Click="OnOpenFlagFile" />
+                                </Grid>
+                                <StackPanel x:Name="FlagsPanel" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
                     <StackPanel x:Name="PageActivity" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
@@ -744,6 +760,13 @@
 
 
                     <StackPanel x:Name="PageAbout" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.flagsRisk}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.flagsRiskHint}" />
+                            </StackPanel>
+                        </Border>
+
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Source="Nulltrap.png" Width="52" Height="52"

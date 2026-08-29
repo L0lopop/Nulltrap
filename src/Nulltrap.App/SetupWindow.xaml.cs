@@ -31,11 +31,6 @@ public partial class SetupWindow : ChromeWindow
 
         LocationText.Text = App.Services.Installer.InstalledExecutablePath;
 
-        string? existing = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
-        ReplaceHint.Text = existing is null
-            ? "The Play button on the Roblox website will open Nulltrap."
-            : $"The Play button currently opens {Path.GetFileName(existing)}. Nulltrap will take over.";
-
         Render();
     }
 
@@ -136,7 +131,6 @@ public partial class SetupWindow : ChromeWindow
         try
         {
             NulltrapSettings settings = App.Services.Settings.Load();
-            settings.RegisterStudio = RegisterStudioBox.IsChecked == true;
             settings.DesktopShortcut = DesktopShortcutBox.IsChecked == true;
             settings.StartMenuShortcut = StartMenuShortcutBox.IsChecked == true;
 
@@ -148,7 +142,6 @@ public partial class SetupWindow : ChromeWindow
                 new InstallOptions(
                     settings.DesktopShortcut,
                     settings.StartMenuShortcut,
-                    RegisterPlayerBox.IsChecked == true,
                     settings.RegisterStudio));
 
             summary.Add($"Installed to {App.Services.Paths.Root}");

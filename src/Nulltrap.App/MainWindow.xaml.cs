@@ -45,20 +45,13 @@ public partial class MainWindow : ChromeWindow
             ? string.Empty
             : Strings.Get("home.channel", settings.Channel);
 
-        string? handler = App.Services.Protocols.GetRegisteredHandler(LaunchTarget.Player);
 
         if (installed)
         {
-            HandlerTitle.Text = Strings.Get("home.installed");
-            HandlerHint.Text = App.Services.Paths.Root;
             InstallLink.Visibility = Visibility.Collapsed;
         }
         else
         {
-            HandlerTitle.Text = Strings.Get("home.notInstalled");
-            HandlerHint.Text = handler is null
-                ? Strings.Get("home.ownBootstrapper")
-                : Strings.Get("home.opensWith", Path.GetFileName(handler));
             InstallLink.Visibility = Visibility.Visible;
         }
     }
