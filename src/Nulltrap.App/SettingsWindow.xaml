@@ -42,8 +42,10 @@
                 </StackPanel>
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavHome" Tag="Home" Content="{loc:S nav.home}" IsChecked="True" Checked="OnNavigate" />
+
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
@@ -76,6 +78,76 @@
 
             <ScrollViewer Grid.Row="1" Margin="38,20,26,0" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
                 <Grid>
+
+                    <StackPanel x:Name="PageHome">
+                        <Border x:Name="LastPlayedCard" Style="{StaticResource RowCard}" Padding="0" Visibility="Collapsed">
+                            <StackPanel>
+                                <Border CornerRadius="10,10,0,0" ClipToBounds="True" Height="260">
+                                    <Grid>
+                                        <Image x:Name="LastPlayedArt" Stretch="UniformToFill" />
+                                        <Border>
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                    <GradientStop Color="#0018121F" Offset="0.45" />
+                                                    <GradientStop Color="#E6221C33" Offset="1" />
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock x:Name="LastPlayedName" FontSize="24" FontWeight="SemiBold"
+                                                   VerticalAlignment="Bottom" Margin="20,0,20,16"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
+                                </Border>
+
+                                <StackPanel Margin="20,16,20,20">
+                                    <TextBlock x:Name="LastPlayedCreator" FontSize="13"
+                                               Foreground="{StaticResource TextSoftBrush}" />
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <StackPanel Margin="0,0,34,0">
+                                            <TextBlock x:Name="LastPlayedLikes" FontSize="17" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource PurpleBrightBrush}" />
+                                            <TextBlock Text="{loc:S home.likes}" FontSize="12" Margin="0,2,0,0"
+                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,34,0">
+                                            <TextBlock x:Name="LastPlayedOnline" FontSize="17" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <TextBlock Text="{loc:S home.online}" FontSize="12" Margin="0,2,0,0"
+                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TextBlock x:Name="LastPlayedWhen" FontSize="17" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource TextBrush}" />
+                                            <TextBlock Text="{loc:S home.lastPlayed}" FontSize="12" Margin="0,2,0,0"
+                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Button x:Name="PlayAgainButton" Style="{StaticResource Accent}"
+                                            Height="40" Margin="0,18,0,0"
+                                            HorizontalAlignment="Stretch"
+                                            Content="{loc:S home.play}" Click="OnPlayAgain" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border x:Name="NothingPlayedCard" Style="{StaticResource RowCard}" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S home.nothing}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S home.nothingHint}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S home.before}" />
+                                <StackPanel x:Name="RecentGamesPanel" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
 
                     <StackPanel x:Name="PageGeneral" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">

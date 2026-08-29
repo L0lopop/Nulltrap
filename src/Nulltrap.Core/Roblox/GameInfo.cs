@@ -15,6 +15,10 @@ public sealed record GameInfo
     public int Playing { get; init; }
 
     public string? IconUrl { get; init; }
+
+    public int Likes { get; init; }
+
+    public int Dislikes { get; init; }
 }
 
 internal sealed record GamesResponse
@@ -45,6 +49,24 @@ internal sealed record CreatorRecord
 {
     [JsonPropertyName("name")]
     public string? Name { get; init; }
+}
+
+internal sealed record VotesResponse
+{
+    [JsonPropertyName("data")]
+    public List<VoteRecord> Data { get; init; } = [];
+}
+
+internal sealed record VoteRecord
+{
+    [JsonPropertyName("id")]
+    public long Id { get; init; }
+
+    [JsonPropertyName("upVotes")]
+    public int UpVotes { get; init; }
+
+    [JsonPropertyName("downVotes")]
+    public int DownVotes { get; init; }
 }
 
 internal sealed record ThumbnailsResponse

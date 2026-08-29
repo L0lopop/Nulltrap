@@ -333,5 +333,19 @@
   "news.plannedHint": "Next in line, and honest about the order changing.",
   "news.nothingPlanned": "Nothing announced yet.",
   "news.changes": "What changed",
-  "news.changesHint": "Newest first, in the launcher's own words rather than commit titles."
+  "news.changesHint": "Newest first, in the launcher's own words rather than commit titles.",
+  "nav.home": "Home",
+  "page.home.title": "Home",
+  "page.home.subtitle": "Where you left off.",
+  "home.likes": "likes",
+  "home.online": "playing now",
+  "home.lastPlayed": "last played",
+  "home.play": "Play",
+  "home.nothing": "Nothing played yet",
+  "home.nothingHint": "Launch something and it turns up here, with a button to go straight back to it.",
+  "home.before": "Before that",
+  "home.today": "today",
+  "home.yesterday": "yesterday",
+  "home.daysAgo": "{0} days ago",
+  "home.playedFor": "played for {0}"
 }

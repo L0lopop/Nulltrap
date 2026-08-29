@@ -8,6 +8,7 @@ public sealed class GameInfoClient
     private const string GamesEndpoint = "https://games.roblox.com/v1/games?universeIds=";
     private const string IconsEndpoint =
         "https://thumbnails.roblox.com/v1/games/icons?size=512x512&format=Png&isCircular=false&universeIds=";
+    private const string VotesEndpoint = "https://games.roblox.com/v1/games/votes?universeIds=";
 
     private readonly HttpClient _http;
     private readonly ConcurrentDictionary<long, GameInfo> _cache = new();
@@ -40,6 +41,11 @@ public sealed class GameInfoClient
             return null;
         }
 
+        VoteRecord? votes = await FetchAsync<VotesResponse>(VotesEndpoint + universeId, cancellationToken)
+            .ConfigureAwait(false) is { Data.Count: > 0 } counted
+            ? counted.Data[0]
+            : null;
+
         var info = new GameInfo
         {
             UniverseId = universeId,
@@ -47,6 +53,8 @@ public sealed class GameInfoClient
             CreatorName = game.Creator?.Name,
             RootPlaceId = game.RootPlaceId,
             Playing = game.Playing,
+            Likes = votes?.UpVotes ?? 0,
+            Dislikes = votes?.DownVotes ?? 0,
             IconUrl = await IconAsync(universeId, cancellationToken).ConfigureAwait(false),
         };
 

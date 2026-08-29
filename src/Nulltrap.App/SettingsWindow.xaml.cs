@@ -91,6 +91,7 @@ public partial class SettingsWindow : ChromeWindow
     private BinaryType _target = BinaryType.WindowsPlayer;
     private double _transfer;
     private LauncherRelease? _release;
+    private long _lastPlace;
     private bool _loaded;
 
     public SettingsWindow()
@@ -153,7 +154,7 @@ public partial class SettingsWindow : ChromeWindow
 
         _loaded = true;
 
-        Show("Graphics");
+        Show("Home");
 
         foreach ((string page, string[] groups) in Groups)
         {
@@ -162,6 +163,7 @@ public partial class SettingsWindow : ChromeWindow
 
         RefreshFacts();
         ShowTarget();
+        _ = BuildHomeAsync();
     }
 
     public void GoTo(string page)
@@ -254,6 +256,110 @@ public partial class SettingsWindow : ChromeWindow
         if (_loaded)
         {
             ShowTextureQuality();
+        }
+    }
+
+    private async Task BuildHomeAsync()
+    {
+        SessionHistory history = App.Services.History.Load();
+        PlayedSession? last = history.Sessions.FirstOrDefault(played => played.UniverseId > 0);
+
+        LastPlayedCard.Visibility = last is null ? Visibility.Collapsed : Visibility.Visible;
+        NothingPlayedCard.Visibility = last is null ? Visibility.Visible : Visibility.Collapsed;
+
+        BuildRecentGames(history, last);
+
+        if (last is null)
+        {
+            return;
+        }
+
+        _lastPlace = last.PlaceId;
+        LastPlayedName.Text = last.Name ?? Strings.Get("activity.unknownGame");
+        LastPlayedCreator.Text = last.Creator is null
+            ? string.Empty
+            : Strings.Get("presence.byCreator", last.Creator);
+        LastPlayedWhen.Text = HowLongAgo(last.EndedAt);
+        LastPlayedLikes.Text = "-";
+        LastPlayedOnline.Text = "-";
+
+        GameInfo? game = await App.Services.Games.DescribeAsync(last.UniverseId);
+
+        if (game is null)
+        {
+            return;
+        }
+
+        _lastPlace = game.RootPlaceId;
+        LastPlayedName.Text = game.Name;
+        LastPlayedLikes.Text = game.Likes.ToString("N0");
+        LastPlayedOnline.Text = game.Playing.ToString("N0");
+
+        if (game.CreatorName is not null)
+        {
+            LastPlayedCreator.Text = Strings.Get("presence.byCreator", game.CreatorName);
+        }
+
+        if (game.IconUrl is not null)
+        {
+            LastPlayedArt.Source = Picture(game.IconUrl);
+        }
+
+        Arrive(LastPlayedCard);
+    }
+
+    private void BuildRecentGames(SessionHistory history, PlayedSession? skip)
+    {
+        RecentGamesPanel.Children.Clear();
+
+        PlayedGame[] games = history.ByGame(6)
+            .Where(game => skip is null || game.UniverseId != skip.UniverseId)
+            .Take(4)
+            .ToArray();
+
+        foreach (PlayedGame game in games)
+        {
+            RecentGamesPanel.Children.Add(Line(
+                game.Name,
+                Strings.Get("activity.visits", game.Visits),
+                Clocks.Describe(game.Total)));
+        }
+
+        if (games.Length == 0)
+        {
+            RecentGamesPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
+        }
+    }
+
+    private static string HowLongAgo(DateTimeOffset moment)
+    {
+        int days = (int)(DateTimeOffset.Now.Date - moment.ToLocalTime().Date).TotalDays;
+
+        return days switch
+        {
+            <= 0 => Strings.Get("home.today"),
+            1 => Strings.Get("home.yesterday"),
+            _ => Strings.Get("home.daysAgo", days),
+        };
+    }
+
+    private static System.Windows.Media.Imaging.BitmapImage Picture(string url)
+    {
+        var picture = new System.Windows.Media.Imaging.BitmapImage();
+        picture.BeginInit();
+        picture.UriSource = new Uri(url, UriKind.Absolute);
+        picture.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+        picture.CreateOptions = System.Windows.Media.Imaging.BitmapCreateOptions.IgnoreImageCache;
+        picture.EndInit();
+
+        return picture;
+    }
+
+    private void OnPlayAgain(object sender, RoutedEventArgs e)
+    {
+        if (_lastPlace > 0)
+        {
+            Open($"https://www.roblox.com/games/start?placeId={_lastPlace}");
         }
     }
 
@@ -516,7 +622,7 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "News", "About"];
+        ["Home", "General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
@@ -684,6 +790,11 @@ public partial class SettingsWindow : ChromeWindow
             if (page == "News")
             {
                 _ = CheckUpdateAsync();
+            }
+
+            if (page == "Home")
+            {
+                _ = BuildHomeAsync();
             }
         }
     }
