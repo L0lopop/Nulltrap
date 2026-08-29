@@ -12,6 +12,7 @@ using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
+using Nulltrap.Core.Updating;
 using Nulltrap.Platform.Abstractions;
 using Nulltrap.Platform.Windows;
 
@@ -48,6 +49,7 @@ public sealed class AppServices : IDisposable
 
         Games = new GameInfoClient(_http);
         Accounts = new AccountInfoClient(_http);
+        LauncherUpdates = new LauncherUpdateClient(_http);
         Sessions = new SessionTracker();
         History = new SessionHistoryStore(Paths);
         Recorder = new SessionRecorder(Sessions, Games, History);
@@ -98,6 +100,8 @@ public sealed class AppServices : IDisposable
     public GameInfoClient Games { get; }
 
     public AccountInfoClient Accounts { get; }
+
+    public LauncherUpdateClient LauncherUpdates { get; }
 
     public SessionTracker Sessions { get; }
 

@@ -1,34 +1,46 @@
 [
   {
     "version": "0.0.1",
-    "date": "2026-08-28",
+    "date": "2026-08-29",
     "en": [
       "Installs itself into your user profile without administrator rights",
-      "Downloads and launches Roblox and Roblox Studio",
-      "Takes over the Play button on the Roblox website",
-      "Keeps the client up to date on every launch",
+      "Takes over the Roblox and Studio launches on its own, and puts them back if something else takes them",
+      "Downloads Roblox and Studio from the Versions page before you need them, with the traffic and the speed shown",
+      "Keeps the client current on its own: it checks the channel every four hours and downloads a new build",
+      "Mods: your own files laid over the client, kept there across updates, with the originals put back when you remove yours",
+      "FastFlags in three parts - the frame rate cap, ready made switches Roblox still honours, and an editor for your own",
+      "Frame rate unlock, up to 9999 instead of the 240 Roblox stops at",
       "Graphics settings Roblox still allows, with the ignored ones marked",
-      "Frame rate unlock",
-      "English and Russian interface",
-      "Discord status showing the experience you are in, with no Discord setup and a choice of what it shows",
-      "Session tracking read from Roblox's own log",
-      "A Versions page that downloads Roblox and Studio before you need them",
-      "An Activity page: what you played, for how long, and on which server",
-      "Mods: your own files laid over the client and kept there across updates"
+      "Discord status: the experience, its icon, your Roblox account, and a button that opens the exact server",
+      "Activity: what you played, for how long and on which server, read from Roblox's own log",
+      "English and Russian throughout, numbers included"
     ],
     "ru": [
       "Устанавливается в профиль пользователя без прав администратора",
-      "Скачивает и запускает Roblox и Roblox Studio",
-      "Забирает на себя кнопку «Играть» на сайте Roblox",
-      "Держит клиент в актуальной версии при каждом запуске",
+      "Сам забирает запуски Roblox и Studio и возвращает их себе, если что-то перехватило",
+      "Скачивает Roblox и Studio со страницы «Версии» заранее, показывая трафик и скорость",
+      "Сам держит клиент в актуальной версии: проверяет канал каждые четыре часа и качает новую сборку",
+      "Моды: ваши файлы поверх клиента, переживают обновления, оригиналы возвращаются, когда ваш файл убран",
+      "FastFlags в трёх частях — снятие лимита кадров, готовые переключатели из белого списка и редактор для своих",
+      "Снятие ограничения кадров, до 9999 вместо 240, на которых останавливает Roblox",
       "Настройки графики из тех, что Roblox ещё разрешает, с пометкой игнорируемых",
-      "Снятие ограничения кадров",
-      "Интерфейс на русском и английском",
-      "Статус в Discord с игрой, в которой вы находитесь: без настройки Discord и с выбором того, что показывать",
-      "Отслеживание сессии по логу самого Roblox",
-      "Страница «Версии»: скачивает Roblox и Studio заранее",
-      "Страница «Активность»: во что играли, сколько и на каком сервере",
-      "Моды: ваши файлы поверх клиента, переживающие обновления"
+      "Статус в Discord: игра, её обложка, ваш аккаунт Roblox и кнопка, открывающая именно тот сервер",
+      "Активность: во что играли, сколько и на каком сервере — по логу самого Roblox",
+      "Русский и английский везде, включая запись чисел"
+    ],
+    "nextEn": [
+      "Updating Nulltrap itself, instead of sending you to the releases page",
+      "Profiles: a named set of flags, graphics and mods, switched in one click",
+      "Plugins, on the SDK that is already in the solution",
+      "Several Roblox clients at once",
+      "A second platform - the core has been kept portable for it from the first commit"
+    ],
+    "nextRu": [
+      "Обновление самого Nulltrap вместо отправки на страницу релизов",
+      "Профили: именованный набор флагов, графики и модов, переключаемый одной кнопкой",
+      "Плагины на SDK, который уже лежит в решении",
+      "Несколько клиентов Roblox одновременно",
+      "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
     ]
   }
 ]

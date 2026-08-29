@@ -13,6 +13,7 @@ using Nulltrap.Core.Presence;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
+using Nulltrap.Core.Updating;
 using Nulltrap.Core.State;
 using Nulltrap.Platform.Abstractions;
 
@@ -89,6 +90,7 @@ public partial class SettingsWindow : ChromeWindow
 
     private BinaryType _target = BinaryType.WindowsPlayer;
     private double _transfer;
+    private LauncherRelease? _release;
     private bool _loaded;
 
     public SettingsWindow()
@@ -255,8 +257,65 @@ public partial class SettingsWindow : ChromeWindow
         }
     }
 
+    private async Task CheckUpdateAsync()
+    {
+        CheckUpdateButton.IsEnabled = false;
+        UpdateStateText.Text = Strings.Get("news.checking");
+
+        LauncherRelease? release = await App.Services.LauncherUpdates.LatestAsync(AppServices.Version);
+
+        CheckUpdateButton.IsEnabled = true;
+        _release = release;
+
+        if (release is null)
+        {
+            UpdateStateText.Text = Strings.Get("news.noReleases", AppServices.Version);
+            UpdateBanner.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        UpdateStateText.Text = release.Newer
+            ? Strings.Get("news.behind", AppServices.Version, release.Version)
+            : Strings.Get("news.current", AppServices.Version);
+
+        UpdateBannerTitle.Text = Strings.Get("news.newVersion", release.Version);
+        UpdateBannerHint.Text = Strings.Get("news.newVersionHint", release.PublishedAt.ToLocalTime().ToString("d"));
+        UpdateBanner.Visibility = release.Newer ? Visibility.Visible : Visibility.Collapsed;
+
+        if (release.Newer)
+        {
+            Arrive(UpdateBanner);
+        }
+    }
+
+    private async void OnCheckUpdate(object sender, RoutedEventArgs e) => await CheckUpdateAsync();
+
+    private void OnOpenRelease(object sender, RoutedEventArgs e)
+    {
+        if (_release is not null)
+        {
+            Open(_release.Url);
+        }
+    }
+
+    private void BuildPlanned()
+    {
+        PlannedPanel.Children.Clear();
+
+        foreach (string line in Changelog.Entries.SelectMany(entry => entry.NextFor(_settings.Language)))
+        {
+            PlannedPanel.Children.Add(Faint("·  " + line));
+        }
+
+        if (PlannedPanel.Children.Count == 0)
+        {
+            PlannedPanel.Children.Add(Faint(Strings.Get("news.nothingPlanned")));
+        }
+    }
+
     private void BuildChangelog()
     {
+        BuildPlanned();
         ChangelogPanel.Children.Clear();
 
         foreach (ChangelogEntry entry in Changelog.Entries)
@@ -457,7 +516,7 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "About"];
+        ["General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
@@ -620,6 +679,11 @@ public partial class SettingsWindow : ChromeWindow
             {
                 BuildReady();
                 BuildFlags();
+            }
+
+            if (page == "News")
+            {
+                _ = CheckUpdateAsync();
             }
         }
     }

@@ -18,10 +18,19 @@ public sealed record ChangelogEntry
     [JsonPropertyName("ru")]
     public IReadOnlyList<string> Russian { get; init; } = [];
 
+    [JsonPropertyName("nextEn")]
+    public IReadOnlyList<string> NextEnglish { get; init; } = [];
+
+    [JsonPropertyName("nextRu")]
+    public IReadOnlyList<string> NextRussian { get; init; } = [];
+
     public IReadOnlyList<string> For(string language) =>
-        language.Equals("ru", StringComparison.OrdinalIgnoreCase) && Russian.Count > 0
-            ? Russian
-            : English;
+        Russian.Count > 0 && language.Equals("ru", StringComparison.OrdinalIgnoreCase) ? Russian : English;
+
+    public IReadOnlyList<string> NextFor(string language) =>
+        NextRussian.Count > 0 && language.Equals("ru", StringComparison.OrdinalIgnoreCase)
+            ? NextRussian
+            : NextEnglish;
 }
 
 public static class Changelog

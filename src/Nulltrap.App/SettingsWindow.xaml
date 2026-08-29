@@ -23,8 +23,9 @@
         <Border Grid.Column="0" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,0,1,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,16">
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.settings}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavNews" Tag="News" Content="{loc:S nav.news}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.settings}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
 
                     <Border Height="1" Background="{StaticResource RuleBrush}" Margin="16,12,16,12" />
 
@@ -42,15 +43,15 @@
 
                 <StackPanel x:Name="Nav" Margin="0,14,0,0">
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" IsChecked="True" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -795,6 +796,53 @@
                     </StackPanel>
 
 
+                    <StackPanel x:Name="PageNews" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S news.update}" />
+                                    <TextBlock x:Name="UpdateStateText" Style="{StaticResource RowHint}" />
+                                </StackPanel>
+                                <Button x:Name="CheckUpdateButton" Style="{StaticResource Quiet}"
+                                        Content="{loc:S news.check}" MinWidth="130"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Click="OnCheckUpdate" />
+                            </Grid>
+                        </Border>
+
+                        <Border x:Name="UpdateBanner" Style="{StaticResource RowCard}" Visibility="Collapsed"
+                                Background="{StaticResource AccentBrush}">
+                            <Grid>
+                                <StackPanel Margin="0,0,150,0">
+                                    <TextBlock x:Name="UpdateBannerTitle" Style="{StaticResource RowTitle}" />
+                                    <TextBlock x:Name="UpdateBannerHint" Style="{StaticResource RowHint}"
+                                               Foreground="{StaticResource TextBrush}" />
+                                </StackPanel>
+                                <Button x:Name="OpenReleaseButton" Style="{StaticResource Quiet}"
+                                        Content="{loc:S news.open}" MinWidth="130"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Click="OnOpenRelease" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S news.planned}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S news.plannedHint}" />
+                                <StackPanel x:Name="PlannedPanel" Margin="0,10,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S news.changes}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S news.changesHint}" />
+                                <StackPanel x:Name="ChangelogPanel" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+
                     <StackPanel x:Name="PageAbout" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
@@ -813,13 +861,6 @@
                                     <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
                                                Text="{loc:S about.unofficial}" />
                                 </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.changes}" />
-                                <StackPanel x:Name="ChangelogPanel" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
 
