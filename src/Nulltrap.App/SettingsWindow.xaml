@@ -113,21 +113,6 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PagePresence" Visibility="Collapsed">
-                        <Border Style="{StaticResource SubTabStrip}">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
-                                             x:Name="TabPresenceStatus" Tag="PresenceStatus"
-                                             Content="{loc:S presence.tabStatus}" IsChecked="True" Checked="OnSubTab" />
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
-                                             x:Name="TabPresenceShown" Tag="PresenceShown"
-                                             Content="{loc:S presence.tabShape}" Checked="OnSubTab" />
-                                <RadioButton Style="{StaticResource SubTab}" GroupName="PresenceTabs"
-                                             x:Name="TabPresenceApp" Tag="PresenceApp"
-                                             Content="{loc:S presence.tabApp}" Checked="OnSubTab" />
-                            </StackPanel>
-                        </Border>
-
-                        <StackPanel x:Name="PresenceStatus">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.richPresence}" />
                             <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,14"
                                        Text="{loc:S presence.richPresenceHint}" />
@@ -169,17 +154,61 @@
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,150,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.custom}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.customHint}" />
+                                <StackPanel>
+                                    <ToggleButton x:Name="CustomRpcHeader" Style="{StaticResource Row}"
+                                                  Checked="OnToggleCustomRpc"
+                                                  Unchecked="OnToggleCustomRpc">
+                                        <Grid>
+                                        <StackPanel Margin="0,0,40,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.custom}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.customHint}" />
+                                        </StackPanel>
+                                        <TextBlock x:Name="CustomRpcChevron" Text="&#xE70D;"
+                                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource TextSoftBrush}"
+                                                   RenderTransformOrigin="0.5,0.5">
+                                            <TextBlock.RenderTransform>
+                                                <RotateTransform x:Name="CustomRpcTurn" Angle="0" />
+                                            </TextBlock.RenderTransform>
+                                            </TextBlock>
+                                        </Grid>
+                                    </ToggleButton>
+
+                                    <StackPanel x:Name="CustomRpcBody" Visibility="Collapsed" Margin="0,16,0,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.headline}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.headlineHint}" />
+                                        <StackPanel Margin="0,10,0,0">
+                                    <CheckBox x:Name="HeadGameNameBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.headlineGame}" Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="HeadPlayingBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.headlinePlaying}" Click="OnPresenceChanged" />
+                                        </StackPanel>
+
+                                        <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.subline}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.sublineHint}" />
+                                        <StackPanel Margin="0,10,0,0">
+                                    <CheckBox x:Name="SubCreatorBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.sublineCreator}" Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="SubPlayersBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.sublinePlayers}" Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="SubServerBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.sublineServer}" Click="OnPresenceChanged" />
+                                        </StackPanel>
+
+                                        <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.alsoShow}" />
+                                        <StackPanel Margin="0,10,0,0">
+                                    <CheckBox x:Name="PresenceElapsedBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.elapsed}" Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="PresenceIconBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.icon}" Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="PresenceButtonBox" Style="{StaticResource Tick}"
+                                              Content="{loc:S presence.button}" Click="OnPresenceChanged" />
+                                        </StackPanel>
                                     </StackPanel>
-                                    <Button Style="{StaticResource Quiet}" MinWidth="128"
-                                            Content="{loc:S presence.customOpen}"
-                                            HorizontalAlignment="Right" VerticalAlignment="Center"
-                                            Click="OnOpenPresenceShape" />
-                                </Grid>
+                                </StackPanel>
                             </Border>
+
 
                             <Border x:Name="PresencePreview" Style="{StaticResource RowCard}" Padding="18,16">
                                 <StackPanel>
@@ -236,81 +265,6 @@
                                     </Border>
                                 </StackPanel>
                             </Border>
-                        </StackPanel>
-
-                        <StackPanel x:Name="PresenceShown">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabShape}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,210,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.headline}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.headlineHint}" />
-                                </StackPanel>
-                                <ComboBox x:Name="PresenceHeadlineBox" Style="{StaticResource Dropdown}" Width="190"
-                                          HorizontalAlignment="Right" VerticalAlignment="Center"
-                                          SelectionChanged="OnPresenceShapeChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,210,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.subline}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.sublineHint}" />
-                                </StackPanel>
-                                <ComboBox x:Name="PresenceSublineBox" Style="{StaticResource Dropdown}" Width="190"
-                                          HorizontalAlignment="Right" VerticalAlignment="Center"
-                                          SelectionChanged="OnPresenceShapeChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.elapsed}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.elapsedHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="PresenceElapsedBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnPresenceChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.icon}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.iconHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="PresenceIconBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnPresenceChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.button}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.buttonHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="PresenceButtonBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnPresenceChanged" />
-                            </Grid>
-                        </Border>
-                        </StackPanel>
-
-                        <StackPanel x:Name="PresenceApp">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.tabApp}" />
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.appId}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.appIdHint}" />
-                                <TextBox x:Name="PresenceAppIdBox" Style="{StaticResource Field}"
-                                         Width="260" HorizontalAlignment="Left" Margin="0,10,0,0" />
-                            </StackPanel>
-                        </Border>
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
@@ -318,7 +272,7 @@
                                 <TextBlock x:Name="PresenceStatusText" Style="{StaticResource RowHint}" />
                             </StackPanel>
                         </Border>
-                        </StackPanel>
+
                     </StackPanel>
 
                     <StackPanel x:Name="PageLauncher" Visibility="Collapsed">

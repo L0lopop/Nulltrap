@@ -1,17 +1,20 @@
 namespace Nulltrap.Core.Presence;
 
+[Flags]
 public enum PresenceHeadline
 {
-    GameName,
-    PlayingRoblox,
+    Nothing = 0,
+    GameName = 1,
+    PlayingRoblox = 2,
 }
 
+[Flags]
 public enum PresenceSubline
 {
-    Creator,
-    ServerRegion,
-    PlayerCount,
-    Nothing,
+    Nothing = 0,
+    Creator = 1,
+    PlayerCount = 2,
+    ServerRegion = 4,
 }
 
 public sealed record PresenceOptions

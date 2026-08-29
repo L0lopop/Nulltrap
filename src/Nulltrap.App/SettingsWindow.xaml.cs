@@ -72,20 +72,6 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly AccountInfo SampleAccount = new(2374586903, "Roblox683038", "Roblox683038", null);
 
-    private static readonly (PresenceHeadline Value, string Key)[] Headlines =
-    [
-        (PresenceHeadline.GameName, "presence.headlineGame"),
-        (PresenceHeadline.PlayingRoblox, "presence.headlinePlaying"),
-    ];
-
-    private static readonly (PresenceSubline Value, string Key)[] Sublines =
-    [
-        (PresenceSubline.Creator, "presence.sublineCreator"),
-        (PresenceSubline.PlayerCount, "presence.sublinePlayers"),
-        (PresenceSubline.ServerRegion, "presence.sublineServer"),
-        (PresenceSubline.Nothing, "presence.sublineNothing"),
-    ];
-
     private static readonly (string? Value, string Key)[] MsaaLevels =
     [
         (null, "graphics.automatic"),
@@ -123,14 +109,16 @@ public partial class SettingsWindow : ChromeWindow
         AutomaticClientUpdatesBox.IsChecked = _settings.AutomaticClientUpdates;
         ModsEnabledBox.IsChecked = _settings.Mods;
         PresenceEnabledBox.IsChecked = _settings.DiscordPresence;
+        HeadGameNameBox.IsChecked = _settings.DiscordHeadline.HasFlag(PresenceHeadline.GameName);
+        HeadPlayingBox.IsChecked = _settings.DiscordHeadline.HasFlag(PresenceHeadline.PlayingRoblox);
+        SubCreatorBox.IsChecked = _settings.DiscordSubline.HasFlag(PresenceSubline.Creator);
+        SubPlayersBox.IsChecked = _settings.DiscordSubline.HasFlag(PresenceSubline.PlayerCount);
+        SubServerBox.IsChecked = _settings.DiscordSubline.HasFlag(PresenceSubline.ServerRegion);
         PresenceAccountBox.IsChecked = _settings.DiscordShowAccount;
         PresenceJoinBox.IsChecked = _settings.DiscordAllowJoin;
         PresenceElapsedBox.IsChecked = _settings.DiscordShowElapsed;
         PresenceIconBox.IsChecked = _settings.DiscordShowGameIcon;
         PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
-        PresenceAppIdBox.Text = _settings.DiscordApplicationId;
-        FillChoices(PresenceHeadlineBox, Headlines, _settings.DiscordHeadline);
-        FillChoices(PresenceSublineBox, Sublines, _settings.DiscordSubline);
 
         TextureQualityEnabledBox.IsChecked =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
@@ -372,21 +360,20 @@ public partial class SettingsWindow : ChromeWindow
             return Strings.Get("presence.notConfigured");
         }
 
-        string application = string.IsNullOrWhiteSpace(_settings.DiscordApplicationId)
-            ? Strings.Get("presence.usingBuiltIn")
-            : Strings.Get("presence.usingOwn");
-
         PresenceActivity? showing = App.Services.Presence?.Last;
 
-        return application + " " + (showing?.Details is null
+        return showing?.Details is null
             ? Strings.Get("presence.waiting")
-            : Strings.Get("presence.active", showing.Details));
+            : Strings.Get("presence.active", showing.Details);
     }
 
     private PresenceOptions PresenceShape() => new()
     {
-        Headline = Chosen(PresenceHeadlineBox, PresenceHeadline.GameName),
-        Subline = Chosen(PresenceSublineBox, PresenceSubline.Creator),
+        Headline = (HeadGameNameBox.IsChecked == true ? PresenceHeadline.GameName : PresenceHeadline.Nothing)
+            | (HeadPlayingBox.IsChecked == true ? PresenceHeadline.PlayingRoblox : PresenceHeadline.Nothing),
+        Subline = (SubCreatorBox.IsChecked == true ? PresenceSubline.Creator : PresenceSubline.Nothing)
+            | (SubPlayersBox.IsChecked == true ? PresenceSubline.PlayerCount : PresenceSubline.Nothing)
+            | (SubServerBox.IsChecked == true ? PresenceSubline.ServerRegion : PresenceSubline.Nothing),
         ShowElapsed = PresenceElapsedBox.IsChecked == true,
         ShowGameIcon = PresenceIconBox.IsChecked == true,
         ShowGameButton = PresenceButtonBox.IsChecked == true,
@@ -421,21 +408,33 @@ public partial class SettingsWindow : ChromeWindow
         PreviewButton.Visibility = page is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void OnOpenPresenceShape(object sender, RoutedEventArgs e)
+    private void OnToggleCustomRpc(object sender, RoutedEventArgs e)
     {
-        TabPresenceShown.IsChecked = true;
-        ShowGroup("Presence", "PresenceShown");
+        bool opening = CustomRpcHeader.IsChecked == true;
+
+        CustomRpcTurn.BeginAnimation(
+            System.Windows.Media.RotateTransform.AngleProperty,
+            new System.Windows.Media.Animation.DoubleAnimation
+            {
+                To = opening ? -180 : 0,
+                Duration = TimeSpan.FromMilliseconds(180),
+                EasingFunction = new System.Windows.Media.Animation.CubicEase
+                {
+                    EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+                },
+            });
+
+        if (!opening)
+        {
+            CustomRpcBody.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        CustomRpcBody.Visibility = Visibility.Visible;
+        Arrive(CustomRpcBody);
     }
 
     private void OnPresenceChanged(object sender, RoutedEventArgs e)
-    {
-        if (_loaded)
-        {
-            ShowPresencePreview();
-        }
-    }
-
-    private void OnPresenceShapeChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_loaded)
         {
@@ -464,7 +463,6 @@ public partial class SettingsWindow : ChromeWindow
     {
         ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFlags"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
-        ["Presence"] = ["PresenceStatus", "PresenceShown", "PresenceApp"],
         ["Flags"] = ["FlagsFrames", "FlagsReady", "FlagsEditor"],
     };
 
@@ -476,9 +474,6 @@ public partial class SettingsWindow : ChromeWindow
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
         ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
         ["VersionsStorage"] = ("Versions", "VersionsStorage"),
-        ["PresenceStatus"] = ("Presence", "PresenceStatus"),
-        ["PresenceShown"] = ("Presence", "PresenceShown"),
-        ["PresenceApp"] = ("Presence", "PresenceApp"),
         ["FlagsFrames"] = ("Flags", "FlagsFrames"),
         ["FlagsReady"] = ("Flags", "FlagsReady"),
         ["FlagsEditor"] = ("Flags", "FlagsEditor"),
@@ -1341,7 +1336,6 @@ public partial class SettingsWindow : ChromeWindow
         _settings.DiscordShowGameButton = shape.ShowGameButton;
         _settings.DiscordShowAccount = shape.ShowAccount;
         _settings.DiscordAllowJoin = shape.AllowJoin;
-        _settings.DiscordApplicationId = PresenceAppIdBox.Text.Trim();
 
         _store.Save(_settings);
 

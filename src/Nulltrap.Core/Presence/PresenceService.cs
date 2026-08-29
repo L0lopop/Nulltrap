@@ -96,9 +96,7 @@ public sealed class PresenceService : IDisposable
             buttons.Add(new PresenceButton(Strings.Get("presence.viewGame"), PlaceUrl + session.PlaceId));
         }
 
-        string headline = options.Headline == PresenceHeadline.PlayingRoblox || game is null
-            ? Strings.Get("presence.playing")
-            : game.Name;
+        string headline = Headline(game, options);
 
         bool named = options.ShowAccount && account is not null;
 
@@ -115,23 +113,49 @@ public sealed class PresenceService : IDisposable
         };
     }
 
-    private static string Where(RobloxSession session, PresenceOptions options) =>
-        options.AllowJoin && session.JobId is not null
-            ? " | " + Strings.Get("presence.publicServer")
-            : string.Empty;
+    private static string Headline(GameInfo? game, PresenceOptions options)
+    {
+        var parts = new List<string>();
 
-    private static string? Subline(RobloxSession session, GameInfo? game, PresenceOptions options) =>
-        options.Subline switch
+        if (options.Headline.HasFlag(PresenceHeadline.GameName) && game is not null)
         {
-            PresenceSubline.Creator when game?.CreatorName is not null =>
-                Strings.Get("presence.byCreator", game.CreatorName) + Where(session, options),
-            PresenceSubline.ServerRegion when session.ServerAddress is not null =>
-                Strings.Get("presence.onServer", session.ServerAddress),
-            PresenceSubline.PlayerCount when game is { Playing: > 0 } =>
-                Strings.Get("presence.playerCount", game.Playing.ToString("N0")),
-            PresenceSubline.Nothing => null,
-            _ => game is null ? null : Strings.Get("presence.unknownGame"),
-        };
+            parts.Add(game.Name);
+        }
+
+        if (options.Headline.HasFlag(PresenceHeadline.PlayingRoblox) || parts.Count == 0)
+        {
+            parts.Add(Strings.Get("presence.playing"));
+        }
+
+        return string.Join(" · ", parts);
+    }
+
+    private static string? Subline(RobloxSession session, GameInfo? game, PresenceOptions options)
+    {
+        var parts = new List<string>();
+
+        if (options.Subline.HasFlag(PresenceSubline.Creator) && game?.CreatorName is not null)
+        {
+            parts.Add(Strings.Get("presence.byCreator", game.CreatorName));
+        }
+
+        if (options.Subline.HasFlag(PresenceSubline.PlayerCount) && game is { Playing: > 0 })
+        {
+            parts.Add(Strings.Get("presence.playerCount", game.Playing.ToString("N0")));
+        }
+
+        if (options.Subline.HasFlag(PresenceSubline.ServerRegion) && session.ServerAddress is not null)
+        {
+            parts.Add(Strings.Get("presence.onServer", session.ServerAddress));
+        }
+
+        if (options.AllowJoin && session.JobId is not null)
+        {
+            parts.Add(Strings.Get("presence.publicServer"));
+        }
+
+        return parts.Count == 0 ? null : string.Join(" | ", parts);
+    }
 
     private void OnJoining(object? sender, RobloxSession session) => Push(new PresenceActivity
     {
