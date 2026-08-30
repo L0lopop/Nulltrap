@@ -749,6 +749,38 @@
             </Setter>
         </Style>
 
+        <Style x:Key="Pill" TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Face"
+                                Background="Transparent"
+                                BorderBrush="{StaticResource RuleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="15"
+                                Padding="16,0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Face" Property="Background" Value="{StaticResource SurfaceBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Face" Property="Background" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource PurpleBrightBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="Accent" TargetType="Button" BasedOn="{StaticResource Quiet}">
             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
             <Setter Property="Template">

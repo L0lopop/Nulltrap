@@ -104,6 +104,17 @@ public partial class SettingsWindow : ChromeWindow
     private int _homeShownFor = -1;
     private DateTimeOffset _homeShownAt = DateTimeOffset.MinValue;
 
+    private readonly HashSet<string> _chosen = new(StringComparer.Ordinal);
+
+    private static readonly GridLength[] FlagColumns =
+    [
+        new(34),
+        new(132),
+        new(86),
+        new(1, GridUnitType.Star),
+        new(200),
+    ];
+
     public SettingsWindow()
     {
         InitializeComponent();
@@ -701,16 +712,6 @@ public partial class SettingsWindow : ChromeWindow
         RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
 
-        string[] applied = _flags.Keys.Where(FastFlagAllowlist.IsAllowed).ToArray();
-        string[] ignored = FastFlagAllowlist.RejectedIn(_flags.Keys).ToArray();
-
-        FlagSummaryText.Text = _flags.Count == 0
-            ? Strings.Get("graphics.noFlags")
-            : Strings.Get("graphics.flagsApplied", applied.Length, _flags.Count)
-              + (ignored.Length == 0
-                  ? string.Empty
-                  : Strings.Get("graphics.flagsIgnored", string.Join(", ", ignored)));
-
         CacheSizeText.Text = Describe(App.Services.Paths.Downloads, Strings.Get("storage.packages"));
         VersionsSizeText.Text = Describe(App.Services.Paths.Versions, Strings.Get("storage.files"));
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
@@ -830,22 +831,19 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
-        ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFlags"],
+        ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFrames", "GraphicsReady"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
-        ["Flags"] = ["FlagsFrames", "FlagsReady", "FlagsEditor"],
     };
 
     private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
     {
         ["GraphicsQuality"] = ("Graphics", "GraphicsQuality"),
         ["GraphicsSpeed"] = ("Graphics", "GraphicsSpeed"),
-        ["GraphicsFlags"] = ("Graphics", "GraphicsFlags"),
+        ["GraphicsFrames"] = ("Graphics", "GraphicsFrames"),
+        ["GraphicsReady"] = ("Graphics", "GraphicsReady"),
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
         ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
         ["VersionsStorage"] = ("Versions", "VersionsStorage"),
-        ["FlagsFrames"] = ("Flags", "FlagsFrames"),
-        ["FlagsReady"] = ("Flags", "FlagsReady"),
-        ["FlagsEditor"] = ("Flags", "FlagsEditor"),
     };
 
     private void Show(string page)
@@ -985,9 +983,13 @@ public partial class SettingsWindow : ChromeWindow
                 BuildMods();
             }
 
-            if (page == "Flags")
+            if (page == "Graphics")
             {
                 BuildReady();
+            }
+
+            if (page == "Flags")
+            {
                 BuildFlags();
             }
 
@@ -1546,83 +1548,310 @@ public partial class SettingsWindow : ChromeWindow
     private void BuildFlags()
     {
         FlagsPanel.Children.Clear();
+        _chosen.Clear();
 
-        KeyValuePair<string, string>[] mine = _flags
-            .Where(pair => !OwnedElsewhere.Contains(pair.Key, StringComparer.Ordinal))
+        bool withPreset = ShowPresetBox.IsChecked == true;
+        string wanted = FlagSearchBox.Text.Trim();
+
+        FlagSearchHint.Visibility = wanted.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        KeyValuePair<string, string>[] shown = _flags
+            .Where(pair => withPreset || !OwnedElsewhere.Contains(pair.Key, StringComparer.Ordinal))
+            .Where(pair => wanted.Length == 0
+                || pair.Key.Contains(wanted, StringComparison.OrdinalIgnoreCase)
+                || pair.Value.Contains(wanted, StringComparison.OrdinalIgnoreCase))
             .OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        foreach ((string name, string value) in mine)
+        foreach ((string name, string value) in shown)
         {
             FlagsPanel.Children.Add(FlagRow(name, value));
         }
 
-        if (mine.Length == 0)
-        {
-            FlagsPanel.Children.Add(Faint(Strings.Get("flags.none")));
-        }
+        FlagsEmpty.Visibility = shown.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        FlagsEmptyText.Text = wanted.Length > 0
+            ? Strings.Get("flags.emptyFiltered")
+            : _flags.Count > 0 && !withPreset
+                ? Strings.Get("flags.emptyPresetOnly")
+                : Strings.Get("flags.emptyNone");
 
-        int ignored = FastFlagAllowlist.RejectedIn(mine.Select(pair => pair.Key)).Count;
-
-        FlagCountText.Text = mine.Length == 0
-            ? Strings.Get("flags.editorOnlyYours")
-            : Strings.Get("flags.count", mine.Length, ignored);
+        ShowFlagFacts();
     }
 
-    private Grid FlagRow(string name, string value)
+    private void ShowFlagFacts()
     {
-        var row = new Grid { Margin = new Thickness(0, 0, 0, 10) };
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        string[] mine = _flags.Keys
+            .Where(name => !OwnedElsewhere.Contains(name, StringComparer.Ordinal))
+            .ToArray();
 
+        int wasted = mine.Count(name => !FastFlagAllowlist.IsAllowed(name));
+        int share = mine.Length == 0 ? 0 : (int)Math.Round(wasted * 100.0 / mine.Length);
+
+        FlagFactsText.Text = Strings.Get("flags.facts", _flags.Count, mine.Length, share);
+        RemoveChosenButton.IsEnabled = _chosen.Count > 0;
+        RemoveAllButton.IsEnabled = mine.Length > 0;
+    }
+
+    private Border FlagRow(string name, string value)
+    {
+        bool preset = OwnedElsewhere.Contains(name, StringComparer.Ordinal);
         bool allowed = FastFlagAllowlist.IsAllowed(name);
 
-        var left = new StackPanel();
-        left.Children.Add(new TextBlock
+        var row = new Grid();
+        foreach (GridLength width in FlagColumns)
+        {
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = width });
+        }
+
+        var tick = new CheckBox
+        {
+            Style = (Style)FindResource("Tick"),
+            VerticalAlignment = VerticalAlignment.Center,
+            IsEnabled = !preset,
+            Tag = name,
+        };
+
+        tick.Checked += OnChooseFlag;
+        tick.Unchecked += OnChooseFlag;
+
+        var tag = new Border
+        {
+            Background = (System.Windows.Media.Brush)FindResource("SurfaceHoverBrush"),
+            CornerRadius = new CornerRadius(4),
+            Padding = new Thickness(8, 3, 8, 3),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = new TextBlock
+            {
+                Text = Strings.Get(allowed ? TagOf(name) : "flags.tagUnknown"),
+                FontSize = 11,
+                Foreground = (System.Windows.Media.Brush)FindResource(allowed ? "TextSoftBrush" : "DangerBrush"),
+            },
+        };
+
+        var mark = new TextBlock
+        {
+            Text = preset ? "\uE73E" : "\uE711",
+            FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
+            FontSize = 13,
+            VerticalAlignment = VerticalAlignment.Center,
+            Foreground = (System.Windows.Media.Brush)FindResource(preset ? "PurpleBrightBrush" : "RuleBrush"),
+        };
+
+        var title = new TextBlock
         {
             Text = name,
             FontSize = 13,
             FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 14, 0),
             TextTrimming = TextTrimming.CharacterEllipsis,
+            ToolTip = name,
             Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
-        });
-        left.Children.Add(new TextBlock
-        {
-            Text = allowed ? Strings.Get("flags.applied") : Strings.Get("flags.ignored"),
-            FontSize = 12,
-            Margin = new Thickness(0, 2, 0, 0),
-            Foreground = (System.Windows.Media.Brush)FindResource(allowed ? "TextSoftBrush" : "DangerBrush"),
-        });
+        };
 
-        var shown = new TextBlock
+        var field = new TextBox
         {
             Text = value,
-            FontSize = 13,
+            Style = (Style)FindResource("Field"),
             FontFamily = new System.Windows.Media.FontFamily("Consolas"),
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(16, 0, 16, 0),
-            Foreground = (System.Windows.Media.Brush)FindResource("PurpleBrightBrush"),
-        };
-
-        var remove = new System.Windows.Controls.Button
-        {
-            Content = Strings.Get("flags.remove"),
-            Style = (Style)FindResource("Quiet"),
-            MinWidth = 104,
-            VerticalAlignment = VerticalAlignment.Center,
+            IsReadOnly = preset,
             Tag = name,
         };
-        remove.Click += OnRemoveFlag;
 
-        Grid.SetColumn(left, 0);
-        Grid.SetColumn(shown, 1);
-        Grid.SetColumn(remove, 2);
-        row.Children.Add(left);
-        row.Children.Add(shown);
-        row.Children.Add(remove);
+        field.LostFocus += OnFlagValueEdited;
 
-        return row;
+        Grid.SetColumn(tick, 0);
+        Grid.SetColumn(tag, 1);
+        Grid.SetColumn(mark, 2);
+        Grid.SetColumn(title, 3);
+        Grid.SetColumn(field, 4);
+        row.Children.Add(tick);
+        row.Children.Add(tag);
+        row.Children.Add(mark);
+        row.Children.Add(title);
+        row.Children.Add(field);
+
+        return new Border
+        {
+            Padding = new Thickness(14, 7, 14, 7),
+            BorderBrush = (System.Windows.Media.Brush)FindResource("RuleBrush"),
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Child = row,
+        };
+    }
+
+    private static string TagOf(string name) =>
+        FastFlagAllowlist.Definitions.FirstOrDefault(definition => definition.Name == name)?.Category switch
+        {
+            FastFlagCategory.Geometry => "flags.tagGeometry",
+            FastFlagCategory.Rendering => "flags.tagRendering",
+            FastFlagCategory.UserInterface => "flags.tagInterface",
+            _ => "flags.tagUnknown",
+        };
+
+    private void OnChooseFlag(object sender, RoutedEventArgs e)
+    {
+        if (sender is not CheckBox { Tag: string name } tick)
+        {
+            return;
+        }
+
+        if (tick.IsChecked == true)
+        {
+            _chosen.Add(name);
+        }
+        else
+        {
+            _chosen.Remove(name);
+        }
+
+        RemoveChosenButton.IsEnabled = _chosen.Count > 0;
+    }
+
+    private void OnFlagValueEdited(object sender, RoutedEventArgs e)
+    {
+        if (sender is not TextBox { Tag: string name } field || !_flags.TryGetValue(name, out string? stored))
+        {
+            return;
+        }
+
+        string value = field.Text.Trim();
+
+        if (value.Length == 0 || value == stored)
+        {
+            field.Text = stored;
+            return;
+        }
+
+        _flags[name] = value;
+        _fastFlags.Save(_flags);
+        ShowFlagFacts();
+        ShowSaved();
+    }
+
+    private void OnFlagSearch(object sender, TextChangedEventArgs e)
+    {
+        if (_loaded)
+        {
+            BuildFlags();
+        }
+    }
+
+    private void OnFlagFilterChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loaded)
+        {
+            BuildFlags();
+        }
+    }
+
+    private void OnToggleAddFlag(object sender, RoutedEventArgs e)
+    {
+        bool opening = AddFlagCard.Visibility != Visibility.Visible;
+
+        AddFlagCard.Visibility = opening ? Visibility.Visible : Visibility.Collapsed;
+
+        if (opening)
+        {
+            Arrive(AddFlagCard);
+            FlagNameBox.Focus();
+        }
+    }
+
+    private void OnRemoveChosenFlags(object sender, RoutedEventArgs e)
+    {
+        foreach (string name in _chosen)
+        {
+            _flags.Remove(name);
+        }
+
+        _fastFlags.Save(_flags);
+        BuildFlags();
+        ShowSaved();
+    }
+
+    private void OnRemoveAllFlags(object sender, RoutedEventArgs e)
+    {
+        if (MessageBox.Show(
+                Strings.Get("flags.confirmRemoveAll"),
+                "Nulltrap",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        foreach (string name in _flags.Keys
+            .Where(name => !OwnedElsewhere.Contains(name, StringComparer.Ordinal))
+            .ToArray())
+        {
+            _flags.Remove(name);
+        }
+
+        _fastFlags.Save(_flags);
+        BuildFlags();
+        ShowSaved();
+    }
+
+    private void OnCopyFlags(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Clipboard.SetText(FlagsAsJson());
+            ShowFlagNotice(Strings.Get("flags.copied"));
+        }
+        catch (System.Runtime.InteropServices.ExternalException)
+        {
+            ShowFlagNotice(Strings.Get("flags.copyFailed"));
+        }
+    }
+
+    private void OnExportFlags(object sender, RoutedEventArgs e)
+    {
+        var save = new Microsoft.Win32.SaveFileDialog
+        {
+            FileName = FastFlagManager.SettingsFile,
+            DefaultExt = ".json",
+            Filter = Strings.Get("flags.jsonFiles"),
+        };
+
+        if (save.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        try
+        {
+            File.WriteAllText(save.FileName, FlagsAsJson());
+            ShowFlagNotice(Strings.Get("flags.exported"));
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        {
+            ShowFlagNotice(failure.Message);
+        }
+    }
+
+    private static readonly System.Text.Json.JsonSerializerOptions Readable = new() { WriteIndented = true };
+
+    private string FlagsAsJson() =>
+        System.Text.Json.JsonSerializer.Serialize(
+            _flags.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal),
+            Readable);
+
+    private void ShowFlagNotice(string message)
+    {
+        FlagNoticeText.Text = message;
+
+        FlagNoticeText.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            BeginTime = TimeSpan.FromSeconds(2),
+            Duration = TimeSpan.FromMilliseconds(500),
+        });
     }
 
     private void OnAddFlag(object sender, RoutedEventArgs e)
@@ -1646,9 +1875,9 @@ public partial class SettingsWindow : ChromeWindow
 
         FlagNameBox.Text = string.Empty;
         FlagValueBox.Text = string.Empty;
+        AddFlagCard.Visibility = Visibility.Collapsed;
 
         BuildFlags();
-        RefreshFacts();
         ShowSaved();
     }
 
@@ -1672,20 +1901,6 @@ public partial class SettingsWindow : ChromeWindow
         return KnownPrefixes.Any(prefix => name.StartsWith(prefix, StringComparison.Ordinal))
             ? null
             : Strings.Get("flags.badPrefix", string.Join(", ", KnownPrefixes));
-    }
-
-    private void OnRemoveFlag(object sender, RoutedEventArgs e)
-    {
-        if (sender is not System.Windows.Controls.Button { Tag: string name })
-        {
-            return;
-        }
-
-        _flags.Remove(name);
-        _fastFlags.Save(_flags);
-
-        BuildFlags();
-        RefreshFacts();
     }
 
     private void OnOpenFlagFile(object sender, RoutedEventArgs e)
