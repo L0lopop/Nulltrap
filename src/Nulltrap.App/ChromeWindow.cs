@@ -29,7 +29,7 @@ public class ChromeWindow : Window
     {
         CommandBindings.Add(new CommandBinding(
             SystemCommands.MinimizeWindowCommand,
-            (_, _) => SystemCommands.MinimizeWindow(this),
+            (_, _) => Collapse(),
             (_, e) => e.CanExecute = ResizeMode != ResizeMode.NoResize));
 
         CommandBindings.Add(new CommandBinding(
@@ -51,6 +51,46 @@ public class ChromeWindow : Window
     {
         get => (bool)GetValue(ShowCaptionProperty);
         set => SetValue(ShowCaptionProperty, value);
+    }
+
+    protected override void OnStateChanged(EventArgs e)
+    {
+        if (WindowState == WindowState.Minimized && Perch() is { } owner)
+        {
+            WindowState = WindowState.Normal;
+            owner.WindowState = WindowState.Minimized;
+            return;
+        }
+
+        base.OnStateChanged(e);
+    }
+
+    private void Collapse()
+    {
+        if (Perch() is { } owner)
+        {
+            owner.WindowState = WindowState.Minimized;
+            return;
+        }
+
+        SystemCommands.MinimizeWindow(this);
+    }
+
+    private Window? Perch()
+    {
+        if (ShowInTaskbar)
+        {
+            return null;
+        }
+
+        Window? owner = Owner;
+
+        while (owner is not null && !owner.ShowInTaskbar)
+        {
+            owner = owner.Owner;
+        }
+
+        return owner;
     }
 
     private void OnSourceInitialized(object? sender, EventArgs e)

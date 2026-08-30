@@ -5,6 +5,7 @@ using System.Windows;
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Launching;
 using Nulltrap.Core.Localization;
 using Nulltrap.Core.Settings;
 using Nulltrap.Core.State;
@@ -15,6 +16,8 @@ namespace Nulltrap.App;
 public partial class MainWindow : ChromeWindow
 {
     private const string RepositoryUrl = "https://github.com/L0lopop/Nulltrap";
+
+    private static readonly TimeSpan ClientWindowTimeout = TimeSpan.FromMinutes(3);
 
     public MainWindow()
     {
@@ -58,6 +61,8 @@ public partial class MainWindow : ChromeWindow
 
     public void LaunchPlayer() => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
+    public void LaunchGame(long placeId) => _ = LaunchAsync(BinaryType.WindowsPlayer, placeId);
+
     public void OpenSettings() => OpenSettings("Graphics");
 
     private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
@@ -100,7 +105,7 @@ public partial class MainWindow : ChromeWindow
         }
     }
 
-    private async Task LaunchAsync(BinaryType binaryType)
+    private async Task LaunchAsync(BinaryType binaryType, long placeId = 0)
     {
         PlayButton.IsEnabled = false;
         StudioButton.IsEnabled = false;
@@ -118,7 +123,17 @@ public partial class MainWindow : ChromeWindow
                 window.Progress,
                 window.CancellationToken);
 
-            App.Services.ProcessLauncher.Start(result.ExecutablePath, string.Empty, result.VersionDirectory);
+            int client = App.Services.ProcessLauncher.Start(
+                result.ExecutablePath,
+                placeId > 0 ? ClientArguments.ForGame(placeId) : ClientArguments.ForMenu(binaryType),
+                result.VersionDirectory);
+
+            window.ShowWaiting(Strings.Get("progress.waitingForRoblox"));
+
+            await App.Services.ProcessLauncher
+                .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
+                .ConfigureAwait(true);
+
             window.Close();
 
             if (settings.CloseAfterLaunch)

@@ -31,7 +31,7 @@ public sealed record PlayedSession
     public TimeSpan Duration => EndedAt > StartedAt ? EndedAt - StartedAt : TimeSpan.Zero;
 }
 
-public sealed record PlayedGame(long UniverseId, string Name, TimeSpan Total, int Visits);
+public sealed record PlayedGame(long UniverseId, string Name, TimeSpan Total, int Visits, DateTimeOffset LastPlayed);
 
 public sealed class SessionHistory
 {
@@ -66,7 +66,8 @@ public sealed class SessionHistory
             group.Select(played => played.Name).FirstOrDefault(name => name is not null)
                 ?? Strings.Get("activity.unknownGame"),
             group.Aggregate(TimeSpan.Zero, (sum, played) => sum + played.Duration),
-            group.Count()))
+            group.Count(),
+            group.Max(played => played.EndedAt)))
         .OrderByDescending(game => game.Total)
         .Take(take)
         .ToList();

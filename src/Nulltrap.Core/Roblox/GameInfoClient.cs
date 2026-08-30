@@ -55,6 +55,7 @@ public sealed class GameInfoClient
             Playing = game.Playing,
             Likes = votes?.UpVotes ?? 0,
             Dislikes = votes?.DownVotes ?? 0,
+            Genre = string.IsNullOrWhiteSpace(game.Genre) ? null : game.Genre,
             IconUrl = await IconAsync(universeId, cancellationToken).ConfigureAwait(false),
         };
 

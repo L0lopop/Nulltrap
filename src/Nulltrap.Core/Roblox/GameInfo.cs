@@ -19,6 +19,8 @@ public sealed record GameInfo
     public int Likes { get; init; }
 
     public int Dislikes { get; init; }
+
+    public string? Genre { get; init; }
 }
 
 internal sealed record GamesResponse
@@ -43,6 +45,9 @@ internal sealed record GameRecord
 
     [JsonPropertyName("creator")]
     public CreatorRecord? Creator { get; init; }
+
+    [JsonPropertyName("genre_l1")]
+    public string? Genre { get; init; }
 }
 
 internal sealed record CreatorRecord

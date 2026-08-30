@@ -10,6 +10,8 @@ namespace Nulltrap.App;
 
 public partial class App : Application
 {
+    private static readonly TimeSpan ClientWindowTimeout = TimeSpan.FromMinutes(3);
+
     private AppServices? _services;
 
     public static AppServices Services =>
@@ -171,10 +173,16 @@ public partial class App : Application
                 window.Progress,
                 window.CancellationToken);
 
-            Services.ProcessLauncher.Start(
+            int client = Services.ProcessLauncher.Start(
                 result.ExecutablePath,
-                arguments.RobloxUri ?? string.Empty,
+                ClientArguments.ForUri(arguments.BinaryType, arguments.RobloxUri),
                 result.VersionDirectory);
+
+            window.ShowWaiting(Strings.Get("progress.waitingForRoblox"));
+
+            await Services.ProcessLauncher
+                .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
+                .ConfigureAwait(true);
 
             window.Close();
             Shutdown();

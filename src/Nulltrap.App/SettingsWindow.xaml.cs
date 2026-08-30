@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -91,9 +92,9 @@ public partial class SettingsWindow : ChromeWindow
     private BinaryType _target = BinaryType.WindowsPlayer;
     private double _transfer;
     private LauncherRelease? _release;
-    private const double TileSize = 148;
+    private const int TilesInARow = 5;
+    private const double TileGap = 12;
 
-    private long _lastPlace;
     private bool _loaded;
 
     public SettingsWindow()
@@ -264,102 +265,153 @@ public partial class SettingsWindow : ChromeWindow
     private async Task BuildHomeAsync()
     {
         SessionHistory history = App.Services.History.Load();
-        PlayedSession? last = history.Sessions.FirstOrDefault(played => played.UniverseId > 0);
 
-        LastPlayedCard.Visibility = last is null ? Visibility.Collapsed : Visibility.Visible;
-        NothingPlayedCard.Visibility = last is null ? Visibility.Visible : Visibility.Collapsed;
+        ShowPlaytime(history);
+        BuildRecentGames(history);
 
-        BuildRecentGames(history, last);
-
-        if (last is null)
-        {
-            return;
-        }
-
-        _lastPlace = last.PlaceId;
-        LastPlayedName.Text = last.Name ?? Strings.Get("activity.unknownGame");
-        LastPlayedCreator.Text = last.Creator is null
-            ? string.Empty
-            : Strings.Get("presence.byCreator", last.Creator);
-        LastPlayedWhen.Text = HowLongAgo(last.EndedAt);
-        LastPlayedLikes.Text = "-";
-        LastPlayedOnline.Text = "-";
-
-        GameInfo? game = await App.Services.Games.DescribeAsync(last.UniverseId);
-
-        if (game is null)
-        {
-            return;
-        }
-
-        _lastPlace = game.RootPlaceId;
-        LastPlayedName.Text = game.Name;
-        LastPlayedLikes.Text = game.Likes.ToString("N0");
-        LastPlayedOnline.Text = game.Playing.ToString("N0");
-
-        if (game.CreatorName is not null)
-        {
-            LastPlayedCreator.Text = Strings.Get("presence.byCreator", game.CreatorName);
-        }
-
-        if (game.IconUrl is not null)
-        {
-            LastPlayedArt.Source = Picture(game.IconUrl);
-        }
-
-        Arrive(LastPlayedCard);
+        await Task.WhenAll(BuildProfileAsync(), BuildRecommendedAsync(history)).ConfigureAwait(true);
     }
 
-    private void BuildRecentGames(SessionHistory history, PlayedSession? skip)
+    private void ShowPlaytime(SessionHistory history)
+    {
+        ProfileTotal.Text = Clocks.Describe(history.Total());
+        ProfileToday.Text = Clocks.Describe(history.Since(DateTimeOffset.Now.Date));
+        ProfileGames.Text = history.Sessions
+            .Where(played => played.UniverseId > 0)
+            .Select(played => played.UniverseId)
+            .Distinct()
+            .Count()
+            .ToString("N0", CultureInfo.CurrentCulture);
+    }
+
+    private async Task BuildProfileAsync()
+    {
+        long userId = App.Services.Sessions.Current?.UserId ?? 0;
+
+        if (userId <= 0)
+        {
+            userId = RobloxIdentity.FromLogs(RobloxLogWatcher.DefaultDirectory);
+        }
+
+        if (userId <= 0)
+        {
+            ProfileName.Text = Strings.Get("home.noAccount");
+            ProfileHandle.Text = Strings.Get("home.noAccountHint");
+            ProfileStats.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        ProfileStats.Visibility = Visibility.Visible;
+        ProfileName.Text = Strings.Get("home.loadingAccount");
+        ProfileHandle.Text = string.Empty;
+
+        AccountInfo? account = await App.Services.Accounts.DescribeAsync(userId);
+
+        if (account is null)
+        {
+            ProfileName.Text = Strings.Get("home.noAccount");
+            ProfileHandle.Text = Strings.Get("home.noAccountHint");
+            return;
+        }
+
+        ProfileName.Text = account.DisplayName;
+        ProfileHandle.Text = "@" + account.Name;
+
+        if (account.AvatarUrl is not null)
+        {
+            ProfileAvatar.Source = Picture(account.AvatarUrl);
+        }
+    }
+
+    private async Task BuildRecommendedAsync(SessionHistory history)
+    {
+        long[] played = history.Sessions
+            .Where(session => session.UniverseId > 0)
+            .Select(session => session.UniverseId)
+            .Distinct()
+            .ToArray();
+
+        IReadOnlyList<DiscoveredGame> pool = await App.Services.Discover.PopularAsync();
+
+        if (pool.Count == 0)
+        {
+            RecommendedEmpty.Visibility = Visibility.Visible;
+            return;
+        }
+
+        string[] genres = (await Task.WhenAll(
+                played.Take(6).Select(universe => App.Services.Games.DescribeAsync(universe))))
+            .Where(game => game?.Genre is not null)
+            .Select(game => game!.Genre!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        IReadOnlyList<DiscoveredGame> picked = Recommendations.Pick(pool, played, genres, TilesInARow);
+
+        RecommendedEmpty.Visibility = picked.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        RecommendedPanel.Children.Clear();
+
+        foreach (DiscoveredGame game in picked)
+        {
+            RecommendedPanel.Children.Add(Tile(
+                game.Name,
+                Strings.Get("home.playingNow", game.Playing.ToString("N0", CultureInfo.CurrentCulture)),
+                game.UniverseId,
+                game.RootPlaceId));
+        }
+
+        Arrive(RecommendedPanel);
+    }
+
+    private void BuildRecentGames(SessionHistory history)
     {
         RecentGamesPanel.Children.Clear();
 
-        PlayedGame[] games = history.ByGame(8)
-            .Where(game => skip is null || game.UniverseId != skip.UniverseId)
-            .Take(6)
-            .ToArray();
+        IReadOnlyList<PlayedGame> games = history.ByGame(TilesInARow);
 
         foreach (PlayedGame game in games)
         {
-            RecentGamesPanel.Children.Add(Tile(game));
+            RecentGamesPanel.Children.Add(Tile(
+                game.Name,
+                Strings.Get("home.playedFor", Clocks.Describe(game.Total)) + " · " + HowLongAgo(game.LastPlayed),
+                game.UniverseId,
+                0));
         }
 
-        if (games.Length == 0)
-        {
-            RecentGamesPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
-        }
+        RecentEmpty.Visibility = games.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private Button Tile(PlayedGame game)
+    private Button Tile(string title, string caption, long universeId, long placeId)
     {
+        var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
+
         var art = new Border
         {
-            Width = TileSize,
-            Height = TileSize,
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(10),
             Background = (System.Windows.Media.Brush)FindResource("SurfaceHoverBrush"),
             ClipToBounds = true,
+            Child = picture,
         };
 
-        var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
-        art.Child = picture;
+        art.SetBinding(HeightProperty, new System.Windows.Data.Binding(nameof(ActualWidth))
+        {
+            RelativeSource = new System.Windows.Data.RelativeSource(System.Windows.Data.RelativeSourceMode.Self),
+        });
 
         var name = new TextBlock
         {
-            Text = game.Name,
+            Text = title,
             FontSize = 13,
             Margin = new Thickness(0, 10, 0, 0),
-            MaxWidth = TileSize,
             TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
         };
 
-        var spent = new TextBlock
+        var note = new TextBlock
         {
-            Text = Strings.Get("home.playedFor", Clocks.Describe(game.Total)),
+            Text = caption,
             FontSize = 12,
             Margin = new Thickness(0, 2, 0, 0),
-            MaxWidth = TileSize,
             TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
         };
@@ -367,23 +419,24 @@ public partial class SettingsWindow : ChromeWindow
         var stack = new StackPanel();
         stack.Children.Add(art);
         stack.Children.Add(name);
-        stack.Children.Add(spent);
+        stack.Children.Add(note);
 
         var tile = new Button
         {
             Style = (Style)FindResource("Tile"),
-            Margin = new Thickness(0, 0, 14, 0),
+            Margin = new Thickness(0, 0, TileGap, 0),
             Content = stack,
-            Tag = game.UniverseId,
+            Tag = placeId,
         };
+
         tile.Click += OnPlayTile;
 
-        _ = FillTileAsync(picture, tile, game.UniverseId);
+        _ = FillTileAsync(picture, tile, universeId, placeId);
 
         return tile;
     }
 
-    private async Task FillTileAsync(Image picture, Button tile, long universeId)
+    private async Task FillTileAsync(Image picture, Button tile, long universeId, long placeId)
     {
         GameInfo? game = await App.Services.Games.DescribeAsync(universeId);
 
@@ -392,7 +445,10 @@ public partial class SettingsWindow : ChromeWindow
             return;
         }
 
-        tile.Tag = game.RootPlaceId;
+        if (placeId <= 0)
+        {
+            tile.Tag = game.RootPlaceId;
+        }
 
         if (game.IconUrl is not null)
         {
@@ -404,8 +460,20 @@ public partial class SettingsWindow : ChromeWindow
     {
         if (sender is Button { Tag: long place } && place > 0)
         {
-            Open($"https://www.roblox.com/games/start?placeId={place}");
+            Play(place);
         }
+    }
+
+    private void Play(long placeId)
+    {
+        if (Owner is MainWindow home)
+        {
+            Close();
+            home.LaunchGame(placeId);
+            return;
+        }
+
+        Open($"https://www.roblox.com/games/{placeId}");
     }
 
     private static string HowLongAgo(DateTimeOffset moment)
@@ -430,14 +498,6 @@ public partial class SettingsWindow : ChromeWindow
         picture.EndInit();
 
         return picture;
-    }
-
-    private void OnPlayAgain(object sender, RoutedEventArgs e)
-    {
-        if (_lastPlace > 0)
-        {
-            Open($"https://www.roblox.com/games/start?placeId={_lastPlace}");
-        }
     }
 
     private async Task CheckUpdateAsync()

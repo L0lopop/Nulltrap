@@ -48,6 +48,7 @@ public sealed class AppServices : IDisposable
         Mods.Enabled = Settings.Load().Mods;
 
         Games = new GameInfoClient(_http);
+        Discover = new DiscoverClient(_http);
         Accounts = new AccountInfoClient(_http);
         LauncherUpdates = new LauncherUpdateClient(_http);
         Sessions = new SessionTracker();
@@ -98,6 +99,8 @@ public sealed class AppServices : IDisposable
     public ModManager Mods { get; }
 
     public GameInfoClient Games { get; }
+
+    public DiscoverClient Discover { get; }
 
     public AccountInfoClient Accounts { get; }
 
