@@ -93,9 +93,16 @@ public partial class SettingsWindow : ChromeWindow
     private double _transfer;
     private LauncherRelease? _release;
     private const int TilesInARow = 5;
+    private const int GenreSample = 12;
+    private const int TilePixels = 360;
+    private const int AvatarPixels = 132;
     private const double TileGap = 12;
 
+    private static readonly TimeSpan HomeFreshness = TimeSpan.FromMinutes(10);
+
     private bool _loaded;
+    private int _homeShownFor = -1;
+    private DateTimeOffset _homeShownAt = DateTimeOffset.MinValue;
 
     public SettingsWindow()
     {
@@ -262,14 +269,30 @@ public partial class SettingsWindow : ChromeWindow
         }
     }
 
-    private async Task BuildHomeAsync()
+    private async Task BuildHomeAsync(bool force = false)
     {
         SessionHistory history = App.Services.History.Load();
 
-        ShowPlaytime(history);
-        BuildRecentGames(history);
+        if (!force && _homeShownFor == history.Sessions.Count && DateTimeOffset.UtcNow - _homeShownAt < HomeFreshness)
+        {
+            return;
+        }
 
-        await Task.WhenAll(BuildProfileAsync(), BuildRecommendedAsync(history)).ConfigureAwait(true);
+        _homeShownFor = history.Sessions.Count;
+        _homeShownAt = DateTimeOffset.UtcNow;
+
+        ShowPlaytime(history);
+
+        Task profile = BuildProfileAsync();
+
+        try
+        {
+            await BuildGamesAsync(history).ConfigureAwait(true);
+        }
+        finally
+        {
+            await profile.ConfigureAwait(true);
+        }
     }
 
     private void ShowPlaytime(SessionHistory history)
@@ -302,8 +325,12 @@ public partial class SettingsWindow : ChromeWindow
         }
 
         ProfileStats.Visibility = Visibility.Visible;
-        ProfileName.Text = Strings.Get("home.loadingAccount");
-        ProfileHandle.Text = string.Empty;
+
+        if (ProfileAvatar.Source is null)
+        {
+            ProfileName.Text = Strings.Get("home.loadingAccount");
+            ProfileHandle.Text = string.Empty;
+        }
 
         AccountInfo? account = await App.Services.Accounts.DescribeAsync(userId);
 
@@ -319,11 +346,11 @@ public partial class SettingsWindow : ChromeWindow
 
         if (account.AvatarUrl is not null)
         {
-            ProfileAvatar.Source = Picture(account.AvatarUrl);
+            ProfileAvatar.Source = Picture(account.AvatarUrl, AvatarPixels);
         }
     }
 
-    private async Task BuildRecommendedAsync(SessionHistory history)
+    private async Task BuildGamesAsync(SessionHistory history)
     {
         long[] played = history.Sessions
             .Where(session => session.UniverseId > 0)
@@ -331,66 +358,115 @@ public partial class SettingsWindow : ChromeWindow
             .Distinct()
             .ToArray();
 
-        IReadOnlyList<DiscoveredGame> pool = await App.Services.Discover.PopularAsync();
+        IReadOnlyList<PlayedGame> recent = history.ByGame(TilesInARow);
+        Task<IReadOnlyList<DiscoveredGame>> charts = App.Services.Discover.PopularAsync();
 
-        if (pool.Count == 0)
-        {
-            RecommendedEmpty.Visibility = Visibility.Visible;
-            return;
-        }
+        IReadOnlyDictionary<long, GameInfo> known = await App.Services.Games
+            .DescribeManyAsync([.. played.Take(GenreSample), .. recent.Select(game => game.UniverseId)]);
 
-        string[] genres = (await Task.WhenAll(
-                played.Take(6).Select(universe => App.Services.Games.DescribeAsync(universe))))
-            .Where(game => game?.Genre is not null)
-            .Select(game => game!.Genre!)
+        BuildRecentGames(recent, known);
+
+        string[] genres = played
+            .Take(GenreSample)
+            .Select(known.GetValueOrDefault)
+            .Select(game => game?.Genre)
+            .OfType<string>()
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
+        IReadOnlyList<DiscoveredGame> pool = await charts;
         IReadOnlyList<DiscoveredGame> picked = Recommendations.Pick(pool, played, genres, TilesInARow);
 
         RecommendedEmpty.Visibility = picked.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         RecommendedPanel.Children.Clear();
+
+        if (picked.Count == 0)
+        {
+            return;
+        }
+
+        IReadOnlyDictionary<long, GameInfo> art = await App.Services.Games
+            .DescribeManyAsync([.. picked.Select(game => game.UniverseId)]);
 
         foreach (DiscoveredGame game in picked)
         {
             RecommendedPanel.Children.Add(Tile(
                 game.Name,
                 Strings.Get("home.playingNow", game.Playing.ToString("N0", CultureInfo.CurrentCulture)),
-                game.UniverseId,
+                art.GetValueOrDefault(game.UniverseId)?.IconUrl,
                 game.RootPlaceId));
         }
 
         Arrive(RecommendedPanel);
     }
 
-    private void BuildRecentGames(SessionHistory history)
+    private void BuildRecentGames(IReadOnlyList<PlayedGame> recent, IReadOnlyDictionary<long, GameInfo> known)
     {
         RecentGamesPanel.Children.Clear();
+        RecentEmpty.Visibility = recent.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
-        IReadOnlyList<PlayedGame> games = history.ByGame(TilesInARow);
-
-        foreach (PlayedGame game in games)
+        foreach (PlayedGame game in recent)
         {
-            RecentGamesPanel.Children.Add(Tile(
-                game.Name,
-                Strings.Get("home.playedFor", Clocks.Describe(game.Total)) + " · " + HowLongAgo(game.LastPlayed),
-                game.UniverseId,
-                0));
-        }
+            GameInfo? info = known.GetValueOrDefault(game.UniverseId);
 
-        RecentEmpty.Visibility = games.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            RecentGamesPanel.Children.Add(Tile(
+                info?.Name ?? game.Name,
+                Strings.Get("home.playedFor", Clocks.Describe(game.Total)) + " \u00b7 " + HowLongAgo(game.LastPlayed),
+                info?.IconUrl,
+                info?.RootPlaceId ?? 0));
+        }
     }
 
-    private Button Tile(string title, string caption, long universeId, long placeId)
+    private Button Tile(string title, string caption, string? iconUrl, long placeId)
     {
         var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
+
+        if (iconUrl is not null)
+        {
+            picture.Source = Picture(iconUrl, TilePixels);
+        }
+
+        var glyph = new TextBlock
+        {
+            Text = "\uE768",
+            FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
+            FontSize = 20,
+            Margin = new Thickness(3, 0, 0, 0),
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+
+        var disc = new Border
+        {
+            Width = 54,
+            Height = 54,
+            CornerRadius = new CornerRadius(27),
+            Background = (System.Windows.Media.Brush)FindResource("AccentBrush"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = glyph,
+        };
+
+        var overlay = new Border
+        {
+            Background = (System.Windows.Media.Brush)FindResource("ScrimBrush"),
+            CornerRadius = new CornerRadius(10),
+            Opacity = 0,
+            IsHitTestVisible = false,
+            Child = disc,
+        };
+
+        var layers = new Grid();
+        layers.Children.Add(picture);
+        layers.Children.Add(overlay);
 
         var art = new Border
         {
             CornerRadius = new CornerRadius(10),
             Background = (System.Windows.Media.Brush)FindResource("SurfaceHoverBrush"),
             ClipToBounds = true,
-            Child = picture,
+            Child = layers,
         };
 
         art.SetBinding(HeightProperty, new System.Windows.Data.Binding(nameof(ActualWidth))
@@ -429,32 +505,23 @@ public partial class SettingsWindow : ChromeWindow
             Tag = placeId,
         };
 
+        tile.MouseEnter += (_, _) => Reveal(overlay, 1);
+        tile.MouseLeave += (_, _) => Reveal(overlay, 0);
         tile.Click += OnPlayTile;
-
-        _ = FillTileAsync(picture, tile, universeId, placeId);
 
         return tile;
     }
 
-    private async Task FillTileAsync(Image picture, Button tile, long universeId, long placeId)
-    {
-        GameInfo? game = await App.Services.Games.DescribeAsync(universeId);
-
-        if (game is null)
+    private static void Reveal(UIElement overlay, double to) =>
+        overlay.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation
         {
-            return;
-        }
-
-        if (placeId <= 0)
-        {
-            tile.Tag = game.RootPlaceId;
-        }
-
-        if (game.IconUrl is not null)
-        {
-            picture.Source = Picture(game.IconUrl);
-        }
-    }
+            To = to,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = new System.Windows.Media.Animation.CubicEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+            },
+        });
 
     private void OnPlayTile(object sender, RoutedEventArgs e)
     {
@@ -488,13 +555,13 @@ public partial class SettingsWindow : ChromeWindow
         };
     }
 
-    private static System.Windows.Media.Imaging.BitmapImage Picture(string url)
+    private static System.Windows.Media.Imaging.BitmapImage Picture(string url, int pixels)
     {
         var picture = new System.Windows.Media.Imaging.BitmapImage();
         picture.BeginInit();
         picture.UriSource = new Uri(url, UriKind.Absolute);
         picture.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-        picture.CreateOptions = System.Windows.Media.Imaging.BitmapCreateOptions.IgnoreImageCache;
+        picture.DecodePixelWidth = pixels;
         picture.EndInit();
 
         return picture;

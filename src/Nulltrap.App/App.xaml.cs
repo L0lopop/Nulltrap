@@ -180,9 +180,17 @@ public partial class App : Application
 
             window.ShowWaiting(Strings.Get("progress.waitingForRoblox"));
 
-            await Services.ProcessLauncher
-                .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
-                .ConfigureAwait(true);
+            try
+            {
+                await Services.ProcessLauncher
+                    .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
+                    .ConfigureAwait(true);
+            }
+            catch (OperationCanceledException)
+            {
+                Services.ProcessLauncher.Stop(client);
+                throw;
+            }
 
             window.Close();
             Shutdown();

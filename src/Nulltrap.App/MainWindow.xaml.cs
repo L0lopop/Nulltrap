@@ -63,13 +63,13 @@ public partial class MainWindow : ChromeWindow
 
     public void LaunchGame(long placeId) => _ = LaunchAsync(BinaryType.WindowsPlayer, placeId);
 
-    public void OpenSettings() => OpenSettings("Graphics");
+    public void OpenSettings() => OpenSettings("Home");
 
     private void OnLaunchPlayer(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
     private void OnLaunchStudio(object sender, RoutedEventArgs e) => _ = LaunchAsync(BinaryType.WindowsStudio64);
 
-    private void OnSettings(object sender, RoutedEventArgs e) => OpenSettings("Graphics");
+    private void OnSettings(object sender, RoutedEventArgs e) => OpenSettings("Home");
 
     private void OnAbout(object sender, RoutedEventArgs e) => OpenSettings("About");
 
@@ -130,9 +130,17 @@ public partial class MainWindow : ChromeWindow
 
             window.ShowWaiting(Strings.Get("progress.waitingForRoblox"));
 
-            await App.Services.ProcessLauncher
-                .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
-                .ConfigureAwait(true);
+            try
+            {
+                await App.Services.ProcessLauncher
+                    .WaitForWindowAsync(client, ClientWindowTimeout, window.CancellationToken)
+                    .ConfigureAwait(true);
+            }
+            catch (OperationCanceledException)
+            {
+                App.Services.ProcessLauncher.Stop(client);
+                throw;
+            }
 
             window.Close();
 

@@ -29,7 +29,7 @@ public partial class ProgressWindow : ChromeWindow
         _waiting = true;
         _fraction = 1;
         StatusText.Text = message;
-        CancelButton.Visibility = Visibility.Collapsed;
+        CancelButton.Content = Strings.Get("action.cancel");
         Redraw();
     }
 

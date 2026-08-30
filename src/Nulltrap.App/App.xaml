@@ -18,7 +18,9 @@
         <Color x:Key="DangerColor">#FFFF7E74</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
+        <SolidColorBrush x:Key="VeilBrush" Color="{StaticResource VoidColor}" Opacity="0.75" />
         <SolidColorBrush x:Key="CaptionBrush" Color="{StaticResource CaptionColor}" />
+        <SolidColorBrush x:Key="CaptionVeilBrush" Color="{StaticResource CaptionColor}" Opacity="0.55" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
         <SolidColorBrush x:Key="SurfaceHoverBrush" Color="{StaticResource SurfaceHoverColor}" />
         <SolidColorBrush x:Key="RuleBrush" Color="{StaticResource RuleColor}" />
@@ -28,6 +30,7 @@
         <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}" />
         <SolidColorBrush x:Key="TextSoftBrush" Color="{StaticResource TextSoftColor}" />
         <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
+        <SolidColorBrush x:Key="ScrimBrush" Color="{StaticResource VoidColor}" Opacity="0.62" />
 
         <LinearGradientBrush x:Key="AccentBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="{StaticResource PurpleColor}" Offset="0" />
@@ -66,7 +69,7 @@
         </Style>
 
         <Style x:Key="ChromeWindowStyle" TargetType="{x:Type local:ChromeWindow}">
-            <Setter Property="Background" Value="{StaticResource VoidBrush}" />
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="AllowsTransparency" Value="False" />
@@ -76,7 +79,7 @@
             <Setter Property="shell:WindowChrome.WindowChrome">
                 <Setter.Value>
                     <shell:WindowChrome CaptionHeight="34"
-                                        GlassFrameThickness="0"
+                                        GlassFrameThickness="-1"
                                         CornerRadius="0"
                                         ResizeBorderThickness="5"
                                         UseAeroCaptionButtons="False" />
@@ -85,7 +88,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type local:ChromeWindow}">
-                        <Border Background="{StaticResource VoidBrush}"
+                        <Border x:Name="Shell"
+                                Background="{StaticResource VoidBrush}"
                                 BorderBrush="{StaticResource RuleBrush}"
                                 BorderThickness="1">
                             <Grid>
@@ -117,6 +121,16 @@
                                                 Style="{StaticResource CaptionButton}"
                                                 Content="&#xE921;"
                                                 Command="{x:Static SystemCommands.MinimizeWindowCommand}" />
+                                        <Button x:Name="MaximiseButton"
+                                                Style="{StaticResource CaptionButton}"
+                                                Visibility="Collapsed"
+                                                Content="&#xE922;"
+                                                Command="{x:Static SystemCommands.MaximizeWindowCommand}" />
+                                        <Button x:Name="RestoreButton"
+                                                Style="{StaticResource CaptionButton}"
+                                                Visibility="Collapsed"
+                                                Content="&#xE923;"
+                                                Command="{x:Static SystemCommands.RestoreWindowCommand}" />
                                         <Button Style="{StaticResource CloseCaptionButton}"
                                                 Content="&#xE8BB;"
                                                 Command="{x:Static SystemCommands.CloseWindowCommand}" />
@@ -130,6 +144,25 @@
                             <Trigger Property="ShowMinimize" Value="False">
                                 <Setter TargetName="MinimiseButton" Property="Visibility" Value="Collapsed" />
                             </Trigger>
+                            <Trigger Property="HasBackdrop" Value="True">
+                                <Setter TargetName="Shell" Property="Background" Value="{StaticResource VeilBrush}" />
+                                <Setter TargetName="Caption" Property="Background" Value="{StaticResource CaptionVeilBrush}" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="ShowMaximize" Value="True" />
+                                    <Condition Property="WindowState" Value="Normal" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="MaximiseButton" Property="Visibility" Value="Visible" />
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="ShowMaximize" Value="True" />
+                                    <Condition Property="WindowState" Value="Maximized" />
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="RestoreButton" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Shell" Property="BorderThickness" Value="0" />
+                            </MultiTrigger>
                             <Trigger Property="ShowCaption" Value="False">
                                 <Setter TargetName="Caption" Property="Visibility" Value="Collapsed" />
                                 <Setter TargetName="CaptionRow" Property="Height" Value="0" />
