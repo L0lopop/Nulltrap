@@ -1747,19 +1747,6 @@ public partial class SettingsWindow : ChromeWindow
         }
     }
 
-    private void OnToggleAddFlag(object sender, RoutedEventArgs e)
-    {
-        bool opening = AddFlagCard.Visibility != Visibility.Visible;
-
-        AddFlagCard.Visibility = opening ? Visibility.Visible : Visibility.Collapsed;
-
-        if (opening)
-        {
-            Arrive(AddFlagCard);
-            FlagNameBox.Focus();
-        }
-    }
-
     private void OnRemoveChosenFlags(object sender, RoutedEventArgs e)
     {
         foreach (string name in _chosen)
@@ -1856,30 +1843,32 @@ public partial class SettingsWindow : ChromeWindow
 
     private void OnAddFlag(object sender, RoutedEventArgs e)
     {
-        string name = FlagNameBox.Text.Trim();
-        string value = FlagValueBox.Text.Trim();
-        string? problem = OwnedElsewhere.Contains(name, StringComparer.Ordinal)
-            ? Strings.Get("flags.systemOwned")
-            : Problem(name, value);
+        var dialog = new FlagDialog(Vet) { Owner = this };
 
-        FlagProblemText.Text = problem ?? string.Empty;
-        FlagProblemText.Visibility = problem is null ? Visibility.Collapsed : Visibility.Visible;
-
-        if (problem is not null)
+        if (dialog.ShowDialog() != true || dialog.Chosen.Count == 0)
         {
             return;
         }
 
-        _flags[name] = value;
+        foreach ((string name, string value) in dialog.Chosen)
+        {
+            _flags[name] = value;
+        }
+
         _fastFlags.Save(_flags);
 
-        FlagNameBox.Text = string.Empty;
-        FlagValueBox.Text = string.Empty;
-        AddFlagCard.Visibility = Visibility.Collapsed;
+        ShowPresetBox.IsChecked = false;
+        FlagSearchBox.Text = string.Empty;
 
         BuildFlags();
+        ShowFlagNotice(Strings.Get("flags.added", dialog.Chosen.Count));
         ShowSaved();
     }
+
+    private static string? Vet(string name, string value) =>
+        OwnedElsewhere.Contains(name, StringComparer.Ordinal)
+            ? Strings.Get("flags.systemOwned")
+            : Problem(name, value);
 
     private static string? Problem(string name, string value)
     {

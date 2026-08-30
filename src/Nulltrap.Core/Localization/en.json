@@ -227,7 +227,6 @@
   "flags.yourRisk": "These are yours, and so is what they do. A wrong switch can break rendering, stop the client starting, or be treated by Roblox as something you did to their client - Nulltrap does not check what a flag means and does not answer for it.",
   "flags.add": "Add one",
   "flags.addHint": "The name as Roblox spells it, then the value. True and False for switches, a number for the rest.",
-  "flags.addButton": "Add",
   "flags.openFile": "Open the file",
   "flags.needName": "Give it a name.",
   "flags.needValue": "Give it a value.",
@@ -333,5 +332,17 @@
   "flags.copyFailed": "Windows would not give up the clipboard",
   "flags.jsonFiles": "JSON files|*.json|All files|*.*",
   "flags.confirmRemoveAll": "Delete every flag you added by hand?",
-  "flags.emptyPresetOnly": "Only preset flags are set. Switch them on above to see them."
+  "flags.emptyPresetOnly": "Only preset flags are set. Switch them on above to see them.",
+  "flags.dialogTitle": "Add a FastFlag",
+  "flags.tabOne": "Add one",
+  "flags.tabJson": "Import JSON",
+  "flags.name": "Name",
+  "flags.value": "Value",
+  "flags.importFile": "Import from a file",
+  "flags.base64": "The text is Base64",
+  "flags.jsonHint": "An object of name and value, the way the client settings file keeps them.",
+  "flags.badJson": "This is not an object of flags and values.",
+  "flags.badBase64": "Base64 did not decode.",
+  "flags.added": "Added: {0}",
+  "action.ok": "OK"
 }

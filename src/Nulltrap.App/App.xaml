@@ -798,6 +798,12 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Face" Property="Background" Value="{StaticResource PurpleBrightBrush}" />
                             </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Face" Property="Background" Value="{StaticResource SurfaceBrush}" />
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource RuleBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource TextSoftBrush}" />
+                                <Setter TargetName="Face" Property="Opacity" Value="0.5" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
