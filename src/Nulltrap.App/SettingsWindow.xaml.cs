@@ -74,6 +74,15 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly AccountInfo SampleAccount = new(2374586903, "Roblox683038", "Roblox683038", null);
 
+    private static readonly (string? Value, string Key)[] TextureLevels =
+    [
+        (null, "graphics.automatic"),
+        ("0", "graphics.texture0"),
+        ("1", "graphics.texture1"),
+        ("2", "graphics.texture2"),
+        ("3", "graphics.texture3"),
+    ];
+
     private static readonly (string? Value, string Key)[] MsaaLevels =
     [
         (null, "graphics.automatic"),
@@ -105,6 +114,8 @@ public partial class SettingsWindow : ChromeWindow
     private DateTimeOffset _homeShownAt = DateTimeOffset.MinValue;
 
     private readonly HashSet<string> _chosen = new(StringComparer.Ordinal);
+
+    private readonly UserGameSettings _roblox = new(UserGameSettings.DefaultPath);
 
     private static readonly GridLength[] FlagColumns =
     [
@@ -144,8 +155,7 @@ public partial class SettingsWindow : ChromeWindow
         PresenceIconBox.IsChecked = _settings.DiscordShowGameIcon;
         PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
 
-        TextureQualityEnabledBox.IsChecked =
-            _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
+
 
         bool unlocked = _flags.ContainsKey(FpsFlag);
         UnlockFpsBox.IsChecked = unlocked;
@@ -154,13 +164,11 @@ public partial class SettingsWindow : ChromeWindow
         FillChoices(MsaaBox, MsaaLevels, _flags.GetValueOrDefault(MsaaFlag));
         FillChoices(GrassBox, GrassDistances, _flags.GetValueOrDefault(MaxGrassFlag));
         FillChoices(GraphicsApis_Box(), GraphicsApis, ChosenGraphicsApi());
+        ShowRobloxSettings();
 
         bool overridingTexture =
             _flags.GetValueOrDefault(TextureQualityEnabledFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
-        TextureQualitySlider.Value =
-            int.TryParse(_flags.GetValueOrDefault(TextureQualityFlag), out int level) ? Math.Clamp(level, 0, 9) : 3;
-        TextureQualitySlider.IsEnabled = overridingTexture;
-        ShowTextureQuality();
+        FillChoices(TextureQualityBox, TextureLevels, overridingTexture ? _flags.GetValueOrDefault(TextureQualityFlag) : null);
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
@@ -259,26 +267,91 @@ public partial class SettingsWindow : ChromeWindow
         return null;
     }
 
-    private void ShowTextureQuality()
+    private void ShowRobloxSettings()
     {
-        TextureQualityValue.Text = TextureQualitySlider.IsEnabled
-            ? Strings.Get("graphics.qualityLevel", (int)TextureQualitySlider.Value)
-            : Strings.Get("graphics.qualityAuto");
-    }
+        bool found = _roblox.Load();
 
-    private void OnTextureQualityToggled(object sender, RoutedEventArgs e)
-    {
-        TextureQualitySlider.IsEnabled = TextureQualityEnabledBox.IsChecked == true;
-        ShowTextureQuality();
-    }
+        QualityLevelSlider.Value = _roblox.Number("GraphicsQualityLevel") ?? 21;
+        MaxQualityBox.IsChecked = _roblox.Flag("MaxQualityEnabled") == true;
+        VignetteBox.IsChecked = _roblox.Flag("VignetteEnabled") != false;
+        ReducedMotionBox.IsChecked = _roblox.Flag("ReducedMotion") == true;
+        CapBox.Text = ((int)(_roblox.Number("FramerateCap") ?? 240)).ToString(CultureInfo.CurrentCulture);
+        FullscreenBox.IsChecked = _roblox.Flag("Fullscreen") == true;
+        StartMaximisedBox.IsChecked = _roblox.Flag("StartMaximized") != false;
+        MasterVolumeSlider.Value = Math.Round((_roblox.Number("MasterVolume") ?? 0.5) * 100);
+        VoiceVolumeSlider.Value = Math.Round((_roblox.Number("VoiceChatVolume") ?? 1) * 100);
+        PartyVolumeSlider.Value = Math.Round((_roblox.Number("PartyVoiceVolume") ?? 1) * 100);
 
-    private void OnTextureQualityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (_loaded)
+        ShowQualityLevel();
+        ShowVolumes();
+
+        foreach (Control control in RobloxControls())
         {
-            ShowTextureQuality();
+            control.IsEnabled = found;
         }
     }
+
+    private Control[] RobloxControls() =>
+    [
+        QualityLevelSlider, MaxQualityBox, VignetteBox, ReducedMotionBox,
+        CapBox, FullscreenBox, StartMaximisedBox,
+        MasterVolumeSlider, VoiceVolumeSlider, PartyVolumeSlider,
+    ];
+
+    private void SaveRobloxSettings()
+    {
+        if (!_roblox.Loaded)
+        {
+            return;
+        }
+
+        _roblox.SetNumber("GraphicsQualityLevel", QualityLevelSlider.Value);
+        _roblox.SetFlag("MaxQualityEnabled", MaxQualityBox.IsChecked == true);
+        _roblox.SetFlag("VignetteEnabled", VignetteBox.IsChecked == true);
+        _roblox.SetFlag("ReducedMotion", ReducedMotionBox.IsChecked == true);
+        _roblox.SetFlag("Fullscreen", FullscreenBox.IsChecked == true);
+        _roblox.SetFlag("StartMaximized", StartMaximisedBox.IsChecked == true);
+
+        if (int.TryParse(CapBox.Text.Trim(), NumberStyles.None, CultureInfo.CurrentCulture, out int cap) && cap > 0)
+        {
+            _roblox.SetNumber("FramerateCap", Math.Clamp(cap, 1, 9999));
+        }
+
+        _roblox.SetNumber("MasterVolume", MasterVolumeSlider.Value / 100, decimals: 3);
+        _roblox.SetNumber("VoiceChatVolume", VoiceVolumeSlider.Value / 100, decimals: 3);
+        _roblox.SetNumber("PartyVoiceVolume", PartyVolumeSlider.Value / 100, decimals: 3);
+
+        _roblox.Save();
+    }
+
+    private void ShowQualityLevel()
+    {
+        if (QualityLevelValue is null)
+        {
+            return;
+        }
+
+        QualityLevelValue.Text = Strings.Get("graphics.levelValue", (int)QualityLevelSlider.Value);
+    }
+
+    private void ShowVolumes()
+    {
+        if (MasterVolumeValue is null || VoiceVolumeValue is null || PartyVolumeValue is null)
+        {
+            return;
+        }
+
+        MasterVolumeValue.Text = Percent(MasterVolumeSlider.Value);
+        VoiceVolumeValue.Text = Percent(VoiceVolumeSlider.Value);
+        PartyVolumeValue.Text = Percent(PartyVolumeSlider.Value);
+    }
+
+    private static string Percent(double value) =>
+        ((int)Math.Round(value)).ToString(CultureInfo.CurrentCulture) + "%";
+
+    private void OnQualityLevelChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowQualityLevel();
+
+    private void OnVolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowVolumes();
 
     private async Task BuildHomeAsync(bool force = false)
     {
@@ -831,14 +904,14 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
-        ["Graphics"] = ["GraphicsQuality", "GraphicsSpeed", "GraphicsFrames", "GraphicsReady"],
+        ["Graphics"] = ["GraphicsQuality", "GraphicsFrames", "GraphicsSound", "GraphicsReady"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
     };
 
     private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
     {
         ["GraphicsQuality"] = ("Graphics", "GraphicsQuality"),
-        ["GraphicsSpeed"] = ("Graphics", "GraphicsSpeed"),
+        ["GraphicsSound"] = ("Graphics", "GraphicsSound"),
         ["GraphicsFrames"] = ("Graphics", "GraphicsFrames"),
         ["GraphicsReady"] = ("Graphics", "GraphicsReady"),
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
@@ -1923,9 +1996,9 @@ public partial class SettingsWindow : ChromeWindow
         _store.Save(_settings);
 
         ApplyFrameRate();
-        bool overridingTexture = TextureQualityEnabledBox.IsChecked == true;
-        SetFlag(TextureQualityEnabledFlag, overridingTexture ? "True" : string.Empty);
-        SetFlag(TextureQualityFlag, overridingTexture ? ((int)TextureQualitySlider.Value).ToString() : string.Empty);
+        string? texture = ChosenValue(TextureQualityBox);
+        SetFlag(TextureQualityEnabledFlag, texture is null ? string.Empty : "True");
+        SetFlag(TextureQualityFlag, texture ?? string.Empty);
         SetFlag(MsaaFlag, ChosenValue(MsaaBox) ?? string.Empty);
 
         string? api = ChosenValue(GraphicsApiBox);
@@ -1943,6 +2016,7 @@ public partial class SettingsWindow : ChromeWindow
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);
+        SaveRobloxSettings();
         App.Services.Mods.Enabled = _settings.Mods;
         App.Services.StartPresence();
 
