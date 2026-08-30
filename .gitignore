@@ -38,3 +38,6 @@ Nulltrap.Local.slnx
 
 /Скриншоты/
 /TestResults/
+
+__pycache__/
+*.pyc
