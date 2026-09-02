@@ -16,6 +16,8 @@
         <Color x:Key="TextColor">#FFF3EFFA</Color>
         <Color x:Key="TextSoftColor">#FFC8C1D8</Color>
         <Color x:Key="DangerColor">#FFFF7E74</Color>
+        <Color x:Key="RobloxColor">#FF00B06F</Color>
+        <Color x:Key="RobloxBrightColor">#FF13CE8A</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
         <SolidColorBrush x:Key="VeilBrush" Color="{StaticResource VoidColor}" Opacity="0.75" />
@@ -31,6 +33,8 @@
         <SolidColorBrush x:Key="TextSoftBrush" Color="{StaticResource TextSoftColor}" />
         <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}" />
         <SolidColorBrush x:Key="ScrimBrush" Color="{StaticResource VoidColor}" Opacity="0.62" />
+        <SolidColorBrush x:Key="RobloxBrush" Color="{StaticResource RobloxColor}" />
+        <SolidColorBrush x:Key="RobloxBrightBrush" Color="{StaticResource RobloxBrightColor}" />
 
         <LinearGradientBrush x:Key="AccentBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="{StaticResource PurpleColor}" Offset="0" />
@@ -662,6 +666,57 @@
                                 </Track.IncreaseRepeatButton>
                             </Track>
                         </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PlayCard" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Face"
+                                Background="{StaticResource RobloxBrush}"
+                                BorderBrush="{StaticResource RobloxBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <Grid>
+                                <Border x:Name="Lit" Margin="-16,-12"
+                                        CornerRadius="8" Opacity="0"
+                                        Background="{StaticResource RobloxBrightBrush}" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Face" Property="BorderBrush" Value="{StaticResource RobloxBrightBrush}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Lit"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Lit"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

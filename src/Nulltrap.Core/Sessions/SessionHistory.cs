@@ -75,25 +75,31 @@ public sealed class SessionHistory
 
 public static class Clocks
 {
-    public static string Describe(TimeSpan span)
+    public static string Describe(TimeSpan span) => Spell(span, int.MaxValue);
+
+    public static string Short(TimeSpan span) => Spell(span, 2);
+
+    private static string Spell(TimeSpan span, int units)
     {
         if (span < TimeSpan.Zero)
         {
             span = TimeSpan.Zero;
         }
 
-        if (span.TotalDays >= 1)
-        {
-            return Strings.Get("time.daysHours", (int)span.TotalDays, span.Hours);
-        }
+        (int Amount, string Key)[] parts =
+        [
+            ((int)span.TotalDays, "time.days"),
+            (span.Hours, "time.hours"),
+            (span.Minutes, "time.minutes"),
+            (span.Seconds, "time.seconds"),
+        ];
 
-        if (span.TotalHours >= 1)
-        {
-            return Strings.Get("time.hoursMinutes", (int)span.TotalHours, span.Minutes);
-        }
+        string[] said = parts
+            .Where(part => part.Amount > 0)
+            .Take(units)
+            .Select(part => Strings.Get(part.Key, part.Amount))
+            .ToArray();
 
-        return span.TotalMinutes >= 1
-            ? Strings.Get("time.minutes", (int)span.TotalMinutes)
-            : Strings.Get("time.seconds", span.Seconds);
+        return said.Length == 0 ? Strings.Get("time.seconds", 0) : string.Join(' ', said);
     }
 }

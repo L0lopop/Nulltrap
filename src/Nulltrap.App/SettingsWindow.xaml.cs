@@ -635,8 +635,8 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowPlaytime(SessionHistory history)
     {
-        ProfileTotal.Text = Clocks.Describe(history.Total());
-        ProfileToday.Text = Clocks.Describe(history.Since(DateTimeOffset.Now.Date));
+        ProfileTotal.Text = Clocks.Short(history.Total());
+        ProfileToday.Text = Clocks.Short(history.Since(DateTimeOffset.Now.Date));
         ProfileGames.Text = history.Sessions
             .Where(played => played.UniverseId > 0)
             .Select(played => played.UniverseId)
@@ -749,7 +749,7 @@ public partial class SettingsWindow : ChromeWindow
 
             RecentGamesPanel.Children.Add(Tile(
                 info?.Name ?? game.Name,
-                Strings.Get("home.playedFor", Clocks.Describe(game.Total)) + " \u00b7 " + HowLongAgo(game.LastPlayed),
+                Strings.Get("home.playedFor", Clocks.Short(game.Total)) + " \u00b7 " + HowLongAgo(game.LastPlayed),
                 info?.IconUrl,
                 info?.RootPlaceId ?? 0));
         }
@@ -1630,6 +1630,16 @@ public partial class SettingsWindow : ChromeWindow
         PlayedTodayText.Text = Clocks.Describe(history.Since(now.Date));
         PlayedWeekText.Text = Clocks.Describe(history.Since(now.Date.AddDays(-6)));
         PlayedTotalText.Text = Clocks.Describe(history.Total());
+
+        PlayedSession[] counted = history.Sessions.Where(played => played.Duration > TimeSpan.Zero).ToArray();
+
+        SessionCountText.Text = counted.Length.ToString("N0", CultureInfo.CurrentCulture);
+        AverageSessionText.Text = counted.Length == 0
+            ? Clocks.Describe(TimeSpan.Zero)
+            : Clocks.Describe(TimeSpan.FromSeconds(counted.Average(played => played.Duration.TotalSeconds)));
+        LongestSessionText.Text = counted.Length == 0
+            ? Clocks.Describe(TimeSpan.Zero)
+            : Clocks.Describe(counted.Max(played => played.Duration));
 
         FavouritesPanel.Children.Clear();
 

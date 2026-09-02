@@ -1246,6 +1246,34 @@
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock x:Name="SessionCountText" FontSize="19" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.sessions}" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock x:Name="AverageSessionText" FontSize="19" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.average}" Margin="0,4,0,0" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock x:Name="LongestSessionText" FontSize="19" FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextBrush}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.longest}" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
                             <StackPanel>
                                 <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.favourites}" />
                                 <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.favouritesHint}" />

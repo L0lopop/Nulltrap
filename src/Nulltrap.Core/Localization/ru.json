@@ -193,8 +193,6 @@
   "activity.confirmClear": "Забыть все записанные сессии?",
   "activity.nothingYet": "Пока ничего не записано. Поиграйте и возвращайтесь.",
   "activity.unknownGame": "Игра, которую Roblox не назвал",
-  "time.daysHours": "{0} д {1} ч",
-  "time.hoursMinutes": "{0} ч {1} мин",
   "time.minutes": "{0} мин",
   "time.seconds": "{0} с",
   "nav.mods": "Моды",
@@ -429,5 +427,10 @@
   "graphics.vr": "VR",
   "graphics.vrHint": "Запускаться в шлеме, если он подключён.",
   "graphics.ownWhileOpen": "Roblox сейчас открыт — при выходе он перепишет этот файл, так что сохраняйте при закрытом клиенте.",
-  "graphics.pulled": "Roblox изменил свои настройки — перечитал"
+  "graphics.pulled": "Roblox изменил свои настройки — перечитал",
+  "time.days": "{0} д",
+  "time.hours": "{0} ч",
+  "activity.sessions": "сессий",
+  "activity.average": "средняя сессия",
+  "activity.longest": "самая долгая"
 }
