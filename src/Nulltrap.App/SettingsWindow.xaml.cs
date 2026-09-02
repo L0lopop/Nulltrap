@@ -635,12 +635,6 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowPlaytime(SessionHistory history)
     {
-        InstalledClient? player = App.Services.StateStore.Load().Get(BinaryType.WindowsPlayer);
-
-        HomePlayHint.Text = player is null
-            ? Strings.Get("home.firstLaunch")
-            : Strings.Get("home.robloxVersion", player.Version);
-
         ProfileTotal.Text = Clocks.Short(history.Total());
         ProfileToday.Text = Clocks.Short(history.Since(DateTimeOffset.Now.Date));
         ProfileGames.Text = history.Sessions
@@ -761,7 +755,7 @@ public partial class SettingsWindow : ChromeWindow
         }
     }
 
-    private Button Tile(string title, string caption, string? iconUrl, long placeId)
+    private StackPanel Tile(string title, string caption, string? iconUrl, long placeId)
     {
         var picture = new Image { Stretch = System.Windows.Media.Stretch.UniformToFill };
 
@@ -770,47 +764,12 @@ public partial class SettingsWindow : ChromeWindow
             picture.Source = Picture(iconUrl, TilePixels);
         }
 
-        var glyph = new TextBlock
-        {
-            Text = "\uE768",
-            FontFamily = new System.Windows.Media.FontFamily("Segoe MDL2 Assets"),
-            FontSize = 20,
-            Margin = new Thickness(3, 0, 0, 0),
-            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-
-        var disc = new Border
-        {
-            Width = 54,
-            Height = 54,
-            CornerRadius = new CornerRadius(27),
-            Background = (System.Windows.Media.Brush)FindResource("AccentBrush"),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Child = glyph,
-        };
-
-        var overlay = new Border
-        {
-            Background = (System.Windows.Media.Brush)FindResource("ScrimBrush"),
-            CornerRadius = new CornerRadius(10),
-            Opacity = 0,
-            IsHitTestVisible = false,
-            Child = disc,
-        };
-
-        var layers = new Grid();
-        layers.Children.Add(picture);
-        layers.Children.Add(overlay);
-
         var art = new Border
         {
             CornerRadius = new CornerRadius(10),
             Background = (System.Windows.Media.Brush)FindResource("SurfaceHoverBrush"),
             ClipToBounds = true,
-            Child = layers,
+            Child = picture,
         };
 
         art.SetBinding(HeightProperty, new System.Windows.Data.Binding(nameof(ActualWidth))
@@ -824,6 +783,7 @@ public partial class SettingsWindow : ChromeWindow
             FontSize = 13,
             Margin = new Thickness(0, 10, 0, 0),
             TextTrimming = TextTrimming.CharacterEllipsis,
+            ToolTip = title,
             Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
         };
 
@@ -836,44 +796,23 @@ public partial class SettingsWindow : ChromeWindow
             Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
         };
 
-        var stack = new StackPanel();
-        stack.Children.Add(art);
-        stack.Children.Add(name);
-        stack.Children.Add(note);
-
-        var tile = new Button
+        var play = new Button
         {
-            Style = (Style)FindResource("Tile"),
-            Margin = new Thickness(0, 0, TileGap, 0),
-            Content = stack,
+            Style = (Style)FindResource("BluePlay"),
+            Content = Strings.Get("home.playThis"),
+            Margin = new Thickness(0, 10, 0, 0),
             Tag = placeId,
         };
 
-        tile.MouseEnter += (_, _) => Reveal(overlay, 1);
-        tile.MouseLeave += (_, _) => Reveal(overlay, 0);
-        tile.Click += OnPlayTile;
+        play.Click += OnPlayTile;
 
-        return tile;
-    }
+        var stack = new StackPanel { Margin = new Thickness(0, 0, TileGap, 0) };
+        stack.Children.Add(art);
+        stack.Children.Add(name);
+        stack.Children.Add(note);
+        stack.Children.Add(play);
 
-    private static void Reveal(UIElement overlay, double to) =>
-        overlay.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation
-        {
-            To = to,
-            Duration = TimeSpan.FromMilliseconds(150),
-            EasingFunction = new System.Windows.Media.Animation.CubicEase
-            {
-                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
-            },
-        });
-
-    private void OnLaunchFromHome(object sender, RoutedEventArgs e)
-    {
-        if (Owner is MainWindow home)
-        {
-            Close();
-            home.LaunchPlayer();
-        }
+        return stack;
     }
 
     private void OnPlayTile(object sender, RoutedEventArgs e)

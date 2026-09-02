@@ -152,33 +152,6 @@
                             </Grid>
                         </Border>
 
-                        <Button x:Name="HomePlayButton"
-                                Style="{StaticResource PlayCard}"
-                                Margin="0,4,0,4"
-                                Click="OnLaunchFromHome">
-                            <Grid>
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="&#xE768;"
-                                               FontFamily="Segoe MDL2 Assets"
-                                               FontSize="20"
-                                               VerticalAlignment="Center"
-                                               Foreground="#FFFFFFFF" />
-                                    <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock Text="{loc:S home.launch}" FontSize="16" FontWeight="SemiBold" />
-                                        <TextBlock x:Name="HomePlayHint"
-                                                   FontSize="12"
-                                                   Margin="0,2,0,0"
-                                                   Opacity="0.85" />
-                                    </StackPanel>
-                                </StackPanel>
-                                <TextBlock Text="&#xE76C;"
-                                           FontFamily="Segoe MDL2 Assets"
-                                           FontSize="12"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Center"
-                                           Opacity="0.85" />
-                            </Grid>
-                        </Button>
                     </StackPanel>
 
 

@@ -432,5 +432,6 @@
   "time.hours": "{0} ч",
   "activity.sessions": "сессий",
   "activity.average": "средняя сессия",
-  "activity.longest": "самая долгая"
+  "activity.longest": "самая долгая",
+  "home.playThis": "Играть"
 }

@@ -432,5 +432,6 @@
   "time.hours": "{0} h",
   "activity.sessions": "sessions",
   "activity.average": "average session",
-  "activity.longest": "longest session"
+  "activity.longest": "longest session",
+  "home.playThis": "Play"
 }
