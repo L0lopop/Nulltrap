@@ -465,7 +465,7 @@
 
                         <StackPanel x:Name="GraphicsQuality">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.ownHeading}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                            <TextBlock x:Name="RobloxOwner1" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
@@ -489,11 +489,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="QualityLevelSlider" Style="{StaticResource Slider}"
-                                                Minimum="1" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="QualityLevelSlider" Steps="10" Lowest="1"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="QualityLevelSliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -581,7 +580,7 @@
 
                         <StackPanel x:Name="GraphicsFrames" Visibility="Collapsed">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.ownHeading}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                            <TextBlock x:Name="RobloxOwner2" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
@@ -653,7 +652,7 @@
 
                         <StackPanel x:Name="GraphicsSound" Visibility="Collapsed">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabSound}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                            <TextBlock x:Name="RobloxOwner3" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
@@ -665,11 +664,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="MasterVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="MasterVolumeSlider" Steps="10" Lowest="0"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="MasterVolumeSliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -684,11 +682,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="VoiceVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="VoiceVolumeSlider" Steps="10" Lowest="0"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="VoiceVolumeSliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -703,11 +700,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="PartyVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="PartyVolumeSlider" Steps="10" Lowest="0"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="PartyVolumeSliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -727,7 +723,7 @@
 
                         <StackPanel x:Name="GraphicsInterface" Visibility="Collapsed">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabInterface}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                            <TextBlock x:Name="RobloxOwner4" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
@@ -739,11 +735,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="TransparencySlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="TransparencySlider" Steps="10" Lowest="0"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="TransparencySliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                     <Grid Margin="0,4,0,0">
@@ -763,11 +758,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="TextSizeSlider" Style="{StaticResource Slider}"
-                                                Minimum="1" Maximum="4" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="TextSizeSlider" Steps="4" Lowest="1"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="TextSizeSliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -857,7 +851,7 @@
 
                         <StackPanel x:Name="GraphicsControl" Visibility="Collapsed">
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabControl}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                            <TextBlock x:Name="RobloxOwner5" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
@@ -869,11 +863,10 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <Slider x:Name="SensitivitySlider" Style="{StaticResource Slider}"
-                                                Minimum="1" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"
-                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <local:StepBar x:Name="SensitivitySlider" Steps="10" Lowest="1"
+                                           Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="SensitivitySliderValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>

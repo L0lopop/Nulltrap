@@ -427,5 +427,7 @@
   "graphics.movementKeyboard": "Клавиатура и мышь",
   "graphics.movementClick": "Клик для движения",
   "graphics.vr": "VR",
-  "graphics.vrHint": "Запускаться в шлеме, если он подключён."
+  "graphics.vrHint": "Запускаться в шлеме, если он подключён.",
+  "graphics.ownWhileOpen": "Roblox сейчас открыт — при выходе он перепишет этот файл, так что сохраняйте при закрытом клиенте.",
+  "graphics.pulled": "Roblox изменил свои настройки — перечитал"
 }

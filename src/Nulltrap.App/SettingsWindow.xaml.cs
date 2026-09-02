@@ -146,6 +146,14 @@ public partial class SettingsWindow : ChromeWindow
 
     private readonly UserGameSettings _roblox = new(UserGameSettings.DefaultPath);
 
+    private readonly System.Windows.Threading.DispatcherTimer _robloxSettle = new()
+    {
+        Interval = TimeSpan.FromMilliseconds(600),
+    };
+
+    private FileSystemWatcher? _robloxWatcher;
+    private bool _robloxMine;
+
     private static readonly GridLength[] FlagColumns =
     [
         new(34),
@@ -193,6 +201,8 @@ public partial class SettingsWindow : ChromeWindow
         FillChoices(MsaaBox, MsaaLevels, _flags.GetValueOrDefault(MsaaFlag));
         FillChoices(GrassBox, GrassDistances, _flags.GetValueOrDefault(MaxGrassFlag));
         FillChoices(GraphicsApis_Box(), GraphicsApis, ChosenGraphicsApi());
+        _robloxSettle.Tick += OnRobloxSettled;
+        WatchRobloxSettings();
         ShowRobloxSettings();
 
         bool overridingTexture =
@@ -296,11 +306,52 @@ public partial class SettingsWindow : ChromeWindow
         return null;
     }
 
+    private void WatchRobloxSettings()
+    {
+        string? folder = Path.GetDirectoryName(UserGameSettings.DefaultPath);
+
+        if (folder is null || !Directory.Exists(folder))
+        {
+            return;
+        }
+
+        _robloxWatcher = new FileSystemWatcher(folder, UserGameSettings.FileName)
+        {
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName,
+        };
+
+        _robloxWatcher.Changed += OnRobloxFileTouched;
+        _robloxWatcher.Created += OnRobloxFileTouched;
+        _robloxWatcher.Renamed += OnRobloxFileTouched;
+        _robloxWatcher.EnableRaisingEvents = true;
+    }
+
+    private void OnRobloxFileTouched(object sender, FileSystemEventArgs e) =>
+        Dispatcher.BeginInvoke(() =>
+        {
+            _robloxSettle.Stop();
+            _robloxSettle.Start();
+        });
+
+    private void OnRobloxSettled(object? sender, EventArgs e)
+    {
+        _robloxSettle.Stop();
+
+        if (_robloxMine)
+        {
+            _robloxMine = false;
+            return;
+        }
+
+        ShowRobloxSettings();
+        ShowFlagNotice(Strings.Get("graphics.pulled"));
+    }
+
     private void ShowRobloxSettings()
     {
         _roblox.Load();
 
-        ReadNumber(QualityLevelSlider, "SavedQualityLevel", fallback: 10);
+        ReadStep(QualityLevelSlider, "SavedQualityLevel", fallback: 10);
         ReadChoice(QualityModeBox, "SavedQualityLevel", QualityModes, whenZero: 0, otherwise: 1);
         ReadChoice(OptimizationBox, "GraphicsOptimizationMode", OptimizationModes);
         ReadFlag(MaxQualityBox, "MaxQualityEnabled");
@@ -310,13 +361,13 @@ public partial class SettingsWindow : ChromeWindow
         ReadFlag(FullscreenBox, "Fullscreen");
         ReadFlag(StartMaximisedBox, "StartMaximized", fallback: true);
 
-        ReadNumber(MasterVolumeSlider, "MasterVolume", scale: 100, fallback: 0.5);
-        ReadNumber(VoiceVolumeSlider, "VoiceChatVolume", scale: 100, fallback: 1);
-        ReadNumber(PartyVolumeSlider, "PartyVoiceVolume", scale: 100, fallback: 1);
+        ReadStep(MasterVolumeSlider, "MasterVolume", scale: 10, fallback: 0.5);
+        ReadStep(VoiceVolumeSlider, "VoiceChatVolume", scale: 10, fallback: 1);
+        ReadStep(PartyVolumeSlider, "PartyVoiceVolume", scale: 10, fallback: 1);
         ReadHaptics();
 
-        ReadNumber(TransparencySlider, "PreferredTransparency", scale: 100, fallback: 1);
-        ReadNumber(TextSizeSlider, "PreferredTextSize", fallback: 1);
+        ReadStep(TransparencySlider, "PreferredTransparency", scale: 10, fallback: 1);
+        ReadStep(TextSizeSlider, "PreferredTextSize", fallback: 1);
         ReadFlag(ReducedMotionBox, "ReducedMotion");
         ReadFlag(UiNavigationBox, "UiNavigationKeyBindEnabled", fallback: true);
         ReadFlag(PerformanceStatsBox, "PerformanceStatsVisible");
@@ -326,7 +377,7 @@ public partial class SettingsWindow : ChromeWindow
         ReadFlag(PlayerNamesBox, "PlayerNamesEnabled", fallback: true);
         ReadFlag(BadgesBox, "BadgeVisible", fallback: true);
 
-        ReadNumber(SensitivitySlider, "MouseSensitivity", fallback: 1);
+        ReadStep(SensitivitySlider, "MouseSensitivity", fallback: 1);
         ReadFlag(CameraInvertedBox, "CameraYInverted");
         ReadChoice(CameraModeBox, "ComputerCameraMovementMode", CameraModes);
         ReadChoice(MovementModeBox, "ComputerMovementMode", MovementModes);
@@ -334,6 +385,7 @@ public partial class SettingsWindow : ChromeWindow
 
         ShowSliderValues();
         ShowQualityMode();
+        ShowRobloxOwner();
     }
 
     private void ShowQualityMode()
@@ -355,13 +407,13 @@ public partial class SettingsWindow : ChromeWindow
         box.Tag = name;
     }
 
-    private void ReadNumber(Slider slider, string name, double scale = 1, double fallback = 0)
+    private void ReadStep(StepBar bar, string name, double scale = 1, double fallback = 0)
     {
         double? kept = _roblox.Number(name);
 
-        slider.IsEnabled = kept.HasValue;
-        slider.Value = Math.Clamp((kept ?? fallback) * scale, slider.Minimum, slider.Maximum);
-        slider.Tag = name;
+        bar.IsEnabled = kept.HasValue;
+        bar.Step = (int)Math.Round(Math.Clamp((kept ?? fallback) * scale, bar.Lowest, bar.Steps));
+        bar.Tag = name;
     }
 
     private void ReadText(TextBox box, string name, int fallback)
@@ -423,7 +475,7 @@ public partial class SettingsWindow : ChromeWindow
         }
 
         bool manual = Picked(QualityModeBox, 1) == 1;
-        WriteNumber(QualityLevelSlider, manual ? QualityLevelSlider.Value : 0);
+        WriteStep(QualityLevelSlider, manual ? QualityLevelSlider.Step : 0);
         WriteChoice(OptimizationBox, "GraphicsOptimizationMode");
         WriteFlag(MaxQualityBox);
         WriteFlag(VignetteBox);
@@ -439,17 +491,17 @@ public partial class SettingsWindow : ChromeWindow
         WriteFlag(FullscreenBox);
         WriteFlag(StartMaximisedBox);
 
-        WriteNumber(MasterVolumeSlider, MasterVolumeSlider.Value / 100, decimals: 3);
-        WriteNumber(VoiceVolumeSlider, VoiceVolumeSlider.Value / 100, decimals: 3);
-        WriteNumber(PartyVolumeSlider, PartyVolumeSlider.Value / 100, decimals: 3);
+        WriteStep(MasterVolumeSlider, MasterVolumeSlider.Step / (double)10, decimals: 3);
+        WriteStep(VoiceVolumeSlider, VoiceVolumeSlider.Step / (double)10, decimals: 3);
+        WriteStep(PartyVolumeSlider, PartyVolumeSlider.Step / (double)10, decimals: 3);
 
         if (HapticsBox.IsEnabled)
         {
             _roblox.SetNumber("HapticStrength", HapticsBox.IsChecked == true ? 1 : 0);
         }
 
-        WriteNumber(TransparencySlider, TransparencySlider.Value / 100, decimals: 3);
-        WriteNumber(TextSizeSlider, TextSizeSlider.Value);
+        WriteStep(TransparencySlider, TransparencySlider.Step / (double)10, decimals: 3);
+        WriteStep(TextSizeSlider, TextSizeSlider.Step);
         WriteFlag(ReducedMotionBox);
         WriteFlag(UiNavigationBox);
         WriteFlag(PerformanceStatsBox);
@@ -459,7 +511,7 @@ public partial class SettingsWindow : ChromeWindow
         WriteFlag(PlayerNamesBox);
         WriteFlag(BadgesBox);
 
-        WriteNumber(SensitivitySlider, SensitivitySlider.Value, decimals: 3);
+        WriteStep(SensitivitySlider, SensitivitySlider.Step);
         WriteFlag(CameraInvertedBox);
 
         if (WriteChoice(CameraModeBox, "ComputerCameraMovementMode"))
@@ -474,7 +526,30 @@ public partial class SettingsWindow : ChromeWindow
 
         WriteFlag(VrBox);
 
-        _roblox.Save();
+        _robloxMine = _roblox.Save();
+        ShowRobloxOwner();
+    }
+
+    private void ShowRobloxOwner()
+    {
+        string told = Strings.Get(RobloxIsRunning() ? "graphics.ownWhileOpen" : "graphics.ownHint");
+
+        foreach (TextBlock line in new[] { RobloxOwner1, RobloxOwner2, RobloxOwner3, RobloxOwner4, RobloxOwner5 })
+        {
+            line.Text = told;
+        }
+    }
+
+    private static bool RobloxIsRunning()
+    {
+        try
+        {
+            return System.Diagnostics.Process.GetProcessesByName("RobloxPlayerBeta").Length > 0;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private void WriteFlag(CheckBox box)
@@ -485,9 +560,9 @@ public partial class SettingsWindow : ChromeWindow
         }
     }
 
-    private void WriteNumber(Slider slider, double value, int decimals = 0)
+    private void WriteStep(StepBar bar, double value, int decimals = 0)
     {
-        if (slider is { IsEnabled: true, Tag: string name })
+        if (bar is { IsEnabled: true, Tag: string name })
         {
             _roblox.SetNumber(name, value, decimals);
         }
@@ -515,22 +590,22 @@ public partial class SettingsWindow : ChromeWindow
             return;
         }
 
-        QualityLevelSliderValue.Text = Strings.Get("graphics.levelValue", (int)QualityLevelSlider.Value);
-        MasterVolumeSliderValue.Text = Percent(MasterVolumeSlider.Value);
-        VoiceVolumeSliderValue.Text = Percent(VoiceVolumeSlider.Value);
-        PartyVolumeSliderValue.Text = Percent(PartyVolumeSlider.Value);
-        TransparencySliderValue.Text = Percent(TransparencySlider.Value);
-        TextSizeSliderValue.Text = Strings.Get(TextSizes[Math.Clamp((int)TextSizeSlider.Value, 1, 4) - 1]);
-        SensitivitySliderValue.Text = ((int)SensitivitySlider.Value).ToString(CultureInfo.CurrentCulture);
+        QualityLevelSliderValue.Text = Strings.Get("graphics.levelValue", QualityLevelSlider.Step);
+        MasterVolumeSliderValue.Text = Percent(MasterVolumeSlider.Step);
+        VoiceVolumeSliderValue.Text = Percent(VoiceVolumeSlider.Step);
+        PartyVolumeSliderValue.Text = Percent(PartyVolumeSlider.Step);
+        TransparencySliderValue.Text = Percent(TransparencySlider.Step);
+        TextSizeSliderValue.Text = Strings.Get(TextSizes[Math.Clamp(TextSizeSlider.Step, 1, 4) - 1]);
+        SensitivitySliderValue.Text = SensitivitySlider.Step.ToString(CultureInfo.CurrentCulture);
     }
 
     private static readonly string[] TextSizes =
         ["graphics.textDefault", "graphics.textLarge", "graphics.textLarger", "graphics.textLargest"];
 
-    private static string Percent(double value) =>
-        ((int)Math.Round(value)).ToString(CultureInfo.CurrentCulture) + "%";
+    private static string Percent(int step) =>
+        (step * 10).ToString(CultureInfo.CurrentCulture) + "%";
 
-    private void OnRobloxSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowSliderValues();
+    private void OnStepBarChanged(object? sender, EventArgs e) => ShowSliderValues();
 
     private async Task BuildHomeAsync(bool force = false)
     {
@@ -1240,6 +1315,7 @@ public partial class SettingsWindow : ChromeWindow
             if (page == "Graphics")
             {
                 BuildReady();
+                ShowRobloxOwner();
             }
 
             if (page == "Flags")
@@ -2150,6 +2226,15 @@ public partial class SettingsWindow : ChromeWindow
     {
         _fastFlags.Save(_flags);
         Open(Path.GetDirectoryName(_fastFlags.SourcePath)!);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _robloxSettle.Stop();
+        _robloxWatcher?.Dispose();
+        _robloxWatcher = null;
+
+        base.OnClosed(e);
     }
 
     private void OnSave(object sender, RoutedEventArgs e)

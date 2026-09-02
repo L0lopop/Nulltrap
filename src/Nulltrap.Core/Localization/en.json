@@ -427,5 +427,7 @@
   "graphics.movementKeyboard": "Keyboard and mouse",
   "graphics.movementClick": "Click to move",
   "graphics.vr": "VR",
-  "graphics.vrHint": "Start in a headset when one is connected."
+  "graphics.vrHint": "Start in a headset when one is connected.",
+  "graphics.ownWhileOpen": "Roblox is open right now - it rewrites this file when it exits, so save with the client closed.",
+  "graphics.pulled": "Roblox changed its settings - reloaded"
 }
