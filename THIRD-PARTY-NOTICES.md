@@ -40,6 +40,20 @@ Both were studied for feature scope and project layout. Voidstrap's split into
 separate core, platform-abstraction and platform-implementation projects is a
 good idea, and Nulltrap's solution structure follows the same principle.
 
+## Fonts and glyphs
+
+Nulltrap draws its text in Segoe UI and its icons from Segoe MDL2 Assets, and
+shows flag names in Consolas. All three ship with Windows and are used through
+the system, not redistributed, so no font licence travels with this repository.
+
+## Build-time tools
+
+`scripts/make-icon.py` imports NumPy (BSD 3-Clause), Pillow (MIT-CMU), OpenCV
+(Apache 2.0) and SciPy (BSD 3-Clause). It runs on a developer's machine to turn
+the artwork in `assets/` into the icon files; none of it is redistributed, and
+nothing it produces contains their code. The test suite uses xUnit (Apache 2.0),
+which likewise does not ship with the launcher.
+
 ## Roblox
 
 Nulltrap is an unofficial, independent project. It is not affiliated with,

@@ -8,6 +8,14 @@ public sealed record InstallOptions(
     bool RegisterPlayer = true,
     bool RegisterStudio = false);
 
+public enum Removal
+{
+    LauncherOnly,
+    Everything,
+}
+
+public sealed record UninstallReport(string? WaitingToGo);
+
 public sealed record InstallReport(
     string ExecutablePath,
     bool CopiedExecutable,
@@ -17,6 +25,9 @@ public sealed record InstallReport(
 public sealed class Installer
 {
     public const string ProductName = "Nulltrap";
+    public const string StateFile = "State.json";
+
+    private static readonly string[] Keepsakes = ["Settings.json", StateFile, "History.json"];
 
     private readonly IApplicationPaths _paths;
     private readonly IProtocolRegistrar _protocols;
@@ -106,7 +117,7 @@ public sealed class Installer
         return new InstallReport(target, copied, replaced, previous);
     }
 
-    public void Uninstall(bool keepDownloads = false)
+    public UninstallReport Uninstall(Removal removal, bool keepDownloadCache = false)
     {
         _protocols.Unregister(LaunchTarget.Player);
         _protocols.Unregister(LaunchTarget.Studio);
@@ -117,12 +128,41 @@ public sealed class Installer
         _uninstall.Remove();
 
         Delete(_paths.Versions);
-        Delete(_paths.Modifications);
         Delete(_paths.Logs);
 
-        if (!keepDownloads)
+        if (!keepDownloadCache || removal == Removal.Everything)
         {
             Delete(_paths.Downloads);
+        }
+
+        if (removal == Removal.LauncherOnly)
+        {
+            Erase(Path.Combine(_paths.Root, StateFile));
+
+            return new UninstallReport(File.Exists(InstalledExecutablePath) ? InstalledExecutablePath : null);
+        }
+
+        Delete(_paths.Modifications);
+
+        foreach (string file in Keepsakes)
+        {
+            Erase(Path.Combine(_paths.Root, file));
+        }
+
+        return new UninstallReport(Directory.Exists(_paths.Root) ? _paths.Root : null);
+    }
+
+    private static void Erase(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        {
         }
     }
 

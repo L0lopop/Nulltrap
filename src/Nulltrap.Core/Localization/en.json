@@ -82,7 +82,6 @@
   "storage.nothing": "nothing stored",
   "storage.packages": "packages",
   "storage.files": "files",
-  "confirm.uninstall": "Remove Nulltrap and the Roblox client it downloaded?",
   "language.help": "Something worded badly?",
   "language.helpHint": "Translations live in two JSON files in the repository. Fixing a phrase is editing one line and opening a pull request.",
   "graphics.automatic": "Roblox decides",
@@ -433,5 +432,14 @@
   "activity.sessions": "sessions",
   "activity.average": "average session",
   "activity.longest": "longest session",
-  "home.playThis": "Play"
+  "home.playThis": "Play",
+  "remove.title": "Remove Nulltrap",
+  "remove.question": "What should go with it?",
+  "remove.launcherOnly": "The launcher only",
+  "remove.launcherOnlyHint": "Settings, playtime history, mods and your FastFlags stay where they are, and a later install finds them again. The downloaded Roblox clients go either way - nothing is left to run them.",
+  "remove.everything": "The launcher and everything it kept",
+  "remove.everythingHint": "Settings, history, mods and flags as well. Roblox's own settings are not touched - they are the client's, not ours.",
+  "remove.confirm": "Remove",
+  "remove.gone": "Nulltrap is removed. What you set up is still on the disk.",
+  "remove.goneAll": "Nulltrap is removed along with everything it kept."
 }

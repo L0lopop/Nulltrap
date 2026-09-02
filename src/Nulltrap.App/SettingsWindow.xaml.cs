@@ -1383,16 +1383,14 @@ public partial class SettingsWindow : ChromeWindow
 
     private void OnUninstall(object sender, RoutedEventArgs e)
     {
-        if (MessageBox.Show(
-                Strings.Get("confirm.uninstall"),
-                "Nulltrap",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        var asking = new RemoveDialog(App.Services.Paths.Root) { Owner = this };
+
+        if (asking.ShowDialog() != true)
         {
             return;
         }
 
-        App.Services.Installer.Uninstall(_settings.KeepDownloadCache);
+        App.Sweep(App.Services.Installer.Uninstall(asking.Chosen, _settings.KeepDownloadCache));
         DialogResult = true;
         Close();
     }

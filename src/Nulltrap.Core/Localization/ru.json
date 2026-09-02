@@ -82,7 +82,6 @@
   "storage.nothing": "ничего не хранится",
   "storage.packages": "пакетов",
   "storage.files": "файлов",
-  "confirm.uninstall": "Удалить Nulltrap и скачанный им клиент Roblox?",
   "language.help": "Что-то сформулировано плохо?",
   "language.helpHint": "Переводы лежат в двух JSON-файлах в репозитории. Поправить формулировку — это одна строка и пул-реквест.",
   "graphics.automatic": "На усмотрение Roblox",
@@ -433,5 +432,14 @@
   "activity.sessions": "сессий",
   "activity.average": "средняя сессия",
   "activity.longest": "самая долгая",
-  "home.playThis": "Играть"
+  "home.playThis": "Играть",
+  "remove.title": "Удаление Nulltrap",
+  "remove.question": "Что убрать вместе с ним?",
+  "remove.launcherOnly": "Только лаунчер",
+  "remove.launcherOnlyHint": "Настройки, история игры, моды и ваши FastFlags остаются на месте — установите снова, и он их найдёт. Скачанные клиенты Roblox уйдут в любом случае: запускать их будет нечем.",
+  "remove.everything": "Лаунчер и всё, что он хранил",
+  "remove.everythingHint": "Вместе с настройками, историей, модами и флагами. Собственные настройки Roblox не трогаем — они принадлежат клиенту, а не нам.",
+  "remove.confirm": "Удалить",
+  "remove.gone": "Nulltrap удалён. Ваши настройки остались на диске.",
+  "remove.goneAll": "Nulltrap удалён вместе со всем, что хранил."
 }

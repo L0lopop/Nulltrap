@@ -1,0 +1,69 @@
+﻿<local:ChromeWindow x:Class="Nulltrap.App.RemoveDialog"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
+                    mc:Ignorable="d"
+                    Style="{StaticResource ChromeWindowStyle}"
+                    Title="{loc:S remove.title}"
+                    Height="410" Width="560"
+                    ShowMinimize="False"
+                    ResizeMode="NoResize"
+                    ShowInTaskbar="False"
+                    WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="26,20,26,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="{loc:S remove.question}"
+                   FontSize="14"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,16"
+                   Foreground="{StaticResource TextBrush}" />
+
+        <StackPanel Grid.Row="1">
+            <Border Style="{StaticResource RowCard}">
+                <StackPanel>
+                    <RadioButton x:Name="LauncherOnlyChoice"
+                                 Style="{StaticResource Pick}"
+                                 GroupName="Removal"
+                                 IsChecked="True"
+                                 FontWeight="SemiBold"
+                                 Content="{loc:S remove.launcherOnly}" />
+                    <TextBlock Style="{StaticResource RowHint}" Margin="26,6,0,0"
+                               Text="{loc:S remove.launcherOnlyHint}" />
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource RowCard}">
+                <StackPanel>
+                    <RadioButton x:Name="EverythingChoice"
+                                 Style="{StaticResource Pick}"
+                                 GroupName="Removal"
+                                 FontWeight="SemiBold"
+                                 Content="{loc:S remove.everything}" />
+                    <TextBlock Style="{StaticResource RowHint}" Margin="26,6,0,0"
+                               Text="{loc:S remove.everythingHint}" />
+                    <TextBlock x:Name="WhereText" Style="{StaticResource RowHint}" Margin="26,6,0,0"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="ConfirmButton" Style="{StaticResource Accent}" MinWidth="128"
+                        Content="{loc:S remove.confirm}" Click="OnConfirm" />
+                <Button Style="{StaticResource Quiet}" MinWidth="110" Margin="8,0,0,0"
+                        Content="{loc:S action.cancel}" Click="OnCancel" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</local:ChromeWindow>

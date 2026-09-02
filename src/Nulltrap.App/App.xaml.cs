@@ -135,29 +135,43 @@ public partial class App : Application
 
     private void RunUninstall(LaunchArguments arguments)
     {
+        Removal removal = Removal.LauncherOnly;
+
         if (!arguments.Quiet)
         {
-            MessageBoxResult answer = MessageBox.Show(
-                Strings.Get("confirm.uninstall"),
-                "Nulltrap",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            var asking = new RemoveDialog(Services.Paths.Root);
 
-            if (answer != MessageBoxResult.Yes)
+            if (asking.ShowDialog() != true)
             {
                 Shutdown();
                 return;
             }
+
+            removal = asking.Chosen;
         }
 
-        Services.Installer.Uninstall(Services.Settings.Load().KeepDownloadCache);
+        Sweep(Services.Installer.Uninstall(removal, Services.Settings.Load().KeepDownloadCache));
 
         if (!arguments.Quiet)
         {
-            MessageBox.Show("Nulltrap has been removed.", "Nulltrap", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                Strings.Get(removal == Removal.Everything ? "remove.goneAll" : "remove.gone"),
+                "Nulltrap",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
         }
 
         Shutdown();
+    }
+
+    public static void Sweep(UninstallReport report)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+
+        if (report.WaitingToGo is not null)
+        {
+            Services.Remover.RemoveAfterExit(report.WaitingToGo);
+        }
     }
 
     private async Task RunLaunchAsync(LaunchArguments arguments)

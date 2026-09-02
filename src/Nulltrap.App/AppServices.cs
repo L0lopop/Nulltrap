@@ -34,6 +34,7 @@ public sealed class AppServices : IDisposable
         Shortcuts = new WindowsShortcutManager();
         UninstallEntry = new WindowsUninstallEntry();
         ProcessLauncher = new WindowsProcessLauncher();
+        Remover = new WindowsDeferredRemover();
 
         StateStore = new InstallStateStore(Paths);
         Settings = new SettingsStore(Paths);
@@ -77,6 +78,8 @@ public sealed class AppServices : IDisposable
     public IUninstallEntry UninstallEntry { get; }
 
     public IProcessLauncher ProcessLauncher { get; }
+
+    public IDeferredRemover Remover { get; }
 
     public InstallStateStore StateStore { get; }
 

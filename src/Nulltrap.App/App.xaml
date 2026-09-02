@@ -494,6 +494,56 @@
             <Setter Property="Margin" Value="2,0,0,12" />
         </Style>
 
+        <Style x:Key="Pick" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <StackPanel Orientation="Horizontal" Background="Transparent">
+                            <Border x:Name="Ring" Width="19" Height="19" CornerRadius="10"
+                                    Background="{StaticResource VoidBrush}"
+                                    BorderBrush="{StaticResource RuleBrush}" BorderThickness="1"
+                                    VerticalAlignment="Center">
+                                <Ellipse x:Name="Dot" Width="9" Height="9" Opacity="0"
+                                         Fill="{StaticResource TextBrush}"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ContentPresenter Margin="11,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Ring" Property="BorderBrush" Value="{StaticResource PurpleBrightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Ring" Property="Background" Value="{StaticResource AccentBrush}" />
+                                <Setter TargetName="Ring" Property="BorderBrush" Value="{StaticResource PurpleBrightBrush}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Dot"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="Dot"
+                                                             Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.12" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="Tick" TargetType="CheckBox">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Margin" Value="0,0,0,9" />
