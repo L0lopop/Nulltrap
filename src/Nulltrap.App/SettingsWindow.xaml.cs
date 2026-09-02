@@ -74,6 +74,35 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly AccountInfo SampleAccount = new(2374586903, "Roblox683038", "Roblox683038", null);
 
+    private static readonly (int Value, string Key)[] QualityModes =
+    [
+        (0, "graphics.qualityAutomatic"),
+        (1, "graphics.qualityManual"),
+    ];
+
+    private static readonly (int Value, string Key)[] OptimizationModes =
+    [
+        (0, "graphics.optimizationSpeed"),
+        (1, "graphics.optimizationBalance"),
+        (2, "graphics.optimizationQuality"),
+    ];
+
+    private static readonly (int Value, string Key)[] CameraModes =
+    [
+        (0, "graphics.cameraDefault"),
+        (1, "graphics.cameraClassic"),
+        (2, "graphics.cameraFollow"),
+        (3, "graphics.cameraOrbital"),
+        (4, "graphics.cameraToggle"),
+    ];
+
+    private static readonly (int Value, string Key)[] MovementModes =
+    [
+        (0, "graphics.movementDefault"),
+        (1, "graphics.movementKeyboard"),
+        (2, "graphics.movementClick"),
+    ];
+
     private static readonly (string? Value, string Key)[] TextureLevels =
     [
         (null, "graphics.automatic"),
@@ -269,34 +298,122 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowRobloxSettings()
     {
-        bool found = _roblox.Load();
+        _roblox.Load();
 
-        QualityLevelSlider.Value = _roblox.Number("GraphicsQualityLevel") ?? 21;
-        MaxQualityBox.IsChecked = _roblox.Flag("MaxQualityEnabled") == true;
-        VignetteBox.IsChecked = _roblox.Flag("VignetteEnabled") != false;
-        ReducedMotionBox.IsChecked = _roblox.Flag("ReducedMotion") == true;
-        CapBox.Text = ((int)(_roblox.Number("FramerateCap") ?? 240)).ToString(CultureInfo.CurrentCulture);
-        FullscreenBox.IsChecked = _roblox.Flag("Fullscreen") == true;
-        StartMaximisedBox.IsChecked = _roblox.Flag("StartMaximized") != false;
-        MasterVolumeSlider.Value = Math.Round((_roblox.Number("MasterVolume") ?? 0.5) * 100);
-        VoiceVolumeSlider.Value = Math.Round((_roblox.Number("VoiceChatVolume") ?? 1) * 100);
-        PartyVolumeSlider.Value = Math.Round((_roblox.Number("PartyVoiceVolume") ?? 1) * 100);
+        ReadNumber(QualityLevelSlider, "SavedQualityLevel", fallback: 10);
+        ReadChoice(QualityModeBox, "SavedQualityLevel", QualityModes, whenZero: 0, otherwise: 1);
+        ReadChoice(OptimizationBox, "GraphicsOptimizationMode", OptimizationModes);
+        ReadFlag(MaxQualityBox, "MaxQualityEnabled");
+        ReadFlag(VignetteBox, "VignetteEnabled", fallback: true);
 
-        ShowQualityLevel();
-        ShowVolumes();
+        ReadText(CapBox, "FramerateCap", fallback: 240);
+        ReadFlag(FullscreenBox, "Fullscreen");
+        ReadFlag(StartMaximisedBox, "StartMaximized", fallback: true);
 
-        foreach (Control control in RobloxControls())
+        ReadNumber(MasterVolumeSlider, "MasterVolume", scale: 100, fallback: 0.5);
+        ReadNumber(VoiceVolumeSlider, "VoiceChatVolume", scale: 100, fallback: 1);
+        ReadNumber(PartyVolumeSlider, "PartyVoiceVolume", scale: 100, fallback: 1);
+        ReadHaptics();
+
+        ReadNumber(TransparencySlider, "PreferredTransparency", scale: 100, fallback: 1);
+        ReadNumber(TextSizeSlider, "PreferredTextSize", fallback: 1);
+        ReadFlag(ReducedMotionBox, "ReducedMotion");
+        ReadFlag(UiNavigationBox, "UiNavigationKeyBindEnabled", fallback: true);
+        ReadFlag(PerformanceStatsBox, "PerformanceStatsVisible");
+        ReadFlag(MicroProfilerBox, "OnScreenProfilerEnabled");
+        ReadFlag(PlayerListBox, "PlayerListVisible", fallback: true);
+        ReadFlag(ChatVisibleBox, "ChatVisible");
+        ReadFlag(PlayerNamesBox, "PlayerNamesEnabled", fallback: true);
+        ReadFlag(BadgesBox, "BadgeVisible", fallback: true);
+
+        ReadNumber(SensitivitySlider, "MouseSensitivity", fallback: 1);
+        ReadFlag(CameraInvertedBox, "CameraYInverted");
+        ReadChoice(CameraModeBox, "ComputerCameraMovementMode", CameraModes);
+        ReadChoice(MovementModeBox, "ComputerMovementMode", MovementModes);
+        ReadFlag(VrBox, "VREnabled");
+
+        ShowSliderValues();
+        ShowQualityMode();
+    }
+
+    private void ShowQualityMode()
+    {
+        if (IsInitialized && QualityModeBox.IsEnabled)
         {
-            control.IsEnabled = found;
+            QualityLevelSlider.IsEnabled = Picked(QualityModeBox, 1) == 1;
         }
     }
 
-    private Control[] RobloxControls() =>
-    [
-        QualityLevelSlider, MaxQualityBox, VignetteBox, ReducedMotionBox,
-        CapBox, FullscreenBox, StartMaximisedBox,
-        MasterVolumeSlider, VoiceVolumeSlider, PartyVolumeSlider,
-    ];
+    private void OnQualityModeChanged(object sender, SelectionChangedEventArgs e) => ShowQualityMode();
+
+    private void ReadFlag(CheckBox box, string name, bool fallback = false)
+    {
+        bool? kept = _roblox.Flag(name);
+
+        box.IsEnabled = kept.HasValue;
+        box.IsChecked = kept ?? fallback;
+        box.Tag = name;
+    }
+
+    private void ReadNumber(Slider slider, string name, double scale = 1, double fallback = 0)
+    {
+        double? kept = _roblox.Number(name);
+
+        slider.IsEnabled = kept.HasValue;
+        slider.Value = Math.Clamp((kept ?? fallback) * scale, slider.Minimum, slider.Maximum);
+        slider.Tag = name;
+    }
+
+    private void ReadText(TextBox box, string name, int fallback)
+    {
+        double? kept = _roblox.Number(name);
+
+        box.IsEnabled = kept.HasValue;
+        box.Text = ((int)(kept ?? fallback)).ToString(CultureInfo.CurrentCulture);
+    }
+
+    private void ReadChoice(
+        ComboBox box,
+        string name,
+        (int Value, string Key)[] choices,
+        int? whenZero = null,
+        int otherwise = 0)
+    {
+        double? kept = _roblox.Number(name);
+        int current = (int)(kept ?? 0);
+
+        if (whenZero is not null)
+        {
+            current = current == 0 ? whenZero.Value : otherwise;
+        }
+
+        box.Items.Clear();
+
+        foreach ((int value, string key) in choices)
+        {
+            var item = new Choice(Strings.Get(key), value);
+            box.Items.Add(item);
+
+            if (value == current)
+            {
+                box.SelectedItem = item;
+            }
+        }
+
+        box.SelectedItem ??= box.Items[0];
+        box.IsEnabled = kept.HasValue;
+    }
+
+    private void ReadHaptics()
+    {
+        double? kept = _roblox.Number("HapticStrength");
+
+        HapticsBox.IsEnabled = kept.HasValue;
+        HapticsBox.IsChecked = (kept ?? 1) > 0;
+    }
+
+    private static int Picked(ComboBox box, int fallback) =>
+        (box.SelectedItem as Choice)?.Value is int value ? value : fallback;
 
     private void SaveRobloxSettings()
     {
@@ -305,53 +422,115 @@ public partial class SettingsWindow : ChromeWindow
             return;
         }
 
-        _roblox.SetNumber("GraphicsQualityLevel", QualityLevelSlider.Value);
-        _roblox.SetFlag("MaxQualityEnabled", MaxQualityBox.IsChecked == true);
-        _roblox.SetFlag("VignetteEnabled", VignetteBox.IsChecked == true);
-        _roblox.SetFlag("ReducedMotion", ReducedMotionBox.IsChecked == true);
-        _roblox.SetFlag("Fullscreen", FullscreenBox.IsChecked == true);
-        _roblox.SetFlag("StartMaximized", StartMaximisedBox.IsChecked == true);
+        bool manual = Picked(QualityModeBox, 1) == 1;
+        WriteNumber(QualityLevelSlider, manual ? QualityLevelSlider.Value : 0);
+        WriteChoice(OptimizationBox, "GraphicsOptimizationMode");
+        WriteFlag(MaxQualityBox);
+        WriteFlag(VignetteBox);
+        _roblox.SetFlag("VignetteEnabledCustomOption", VignetteBox.IsChecked == true);
 
-        if (int.TryParse(CapBox.Text.Trim(), NumberStyles.None, CultureInfo.CurrentCulture, out int cap) && cap > 0)
+        if (CapBox.IsEnabled
+            && int.TryParse(CapBox.Text.Trim(), NumberStyles.None, CultureInfo.CurrentCulture, out int cap)
+            && cap > 0)
         {
             _roblox.SetNumber("FramerateCap", Math.Clamp(cap, 1, 9999));
         }
 
-        _roblox.SetNumber("MasterVolume", MasterVolumeSlider.Value / 100, decimals: 3);
-        _roblox.SetNumber("VoiceChatVolume", VoiceVolumeSlider.Value / 100, decimals: 3);
-        _roblox.SetNumber("PartyVoiceVolume", PartyVolumeSlider.Value / 100, decimals: 3);
+        WriteFlag(FullscreenBox);
+        WriteFlag(StartMaximisedBox);
+
+        WriteNumber(MasterVolumeSlider, MasterVolumeSlider.Value / 100, decimals: 3);
+        WriteNumber(VoiceVolumeSlider, VoiceVolumeSlider.Value / 100, decimals: 3);
+        WriteNumber(PartyVolumeSlider, PartyVolumeSlider.Value / 100, decimals: 3);
+
+        if (HapticsBox.IsEnabled)
+        {
+            _roblox.SetNumber("HapticStrength", HapticsBox.IsChecked == true ? 1 : 0);
+        }
+
+        WriteNumber(TransparencySlider, TransparencySlider.Value / 100, decimals: 3);
+        WriteNumber(TextSizeSlider, TextSizeSlider.Value);
+        WriteFlag(ReducedMotionBox);
+        WriteFlag(UiNavigationBox);
+        WriteFlag(PerformanceStatsBox);
+        WriteFlag(MicroProfilerBox);
+        WriteFlag(PlayerListBox);
+        WriteFlag(ChatVisibleBox);
+        WriteFlag(PlayerNamesBox);
+        WriteFlag(BadgesBox);
+
+        WriteNumber(SensitivitySlider, SensitivitySlider.Value, decimals: 3);
+        WriteFlag(CameraInvertedBox);
+
+        if (WriteChoice(CameraModeBox, "ComputerCameraMovementMode"))
+        {
+            _roblox.SetFlag("ComputerCameraMovementChanged", true);
+        }
+
+        if (WriteChoice(MovementModeBox, "ComputerMovementMode"))
+        {
+            _roblox.SetFlag("ComputerMovementChanged", true);
+        }
+
+        WriteFlag(VrBox);
 
         _roblox.Save();
     }
 
-    private void ShowQualityLevel()
+    private void WriteFlag(CheckBox box)
     {
-        if (QualityLevelValue is null)
+        if (box is { IsEnabled: true, Tag: string name })
+        {
+            _roblox.SetFlag(name, box.IsChecked == true);
+        }
+    }
+
+    private void WriteNumber(Slider slider, double value, int decimals = 0)
+    {
+        if (slider is { IsEnabled: true, Tag: string name })
+        {
+            _roblox.SetNumber(name, value, decimals);
+        }
+    }
+
+    private bool WriteChoice(ComboBox box, string name)
+    {
+        if (!box.IsEnabled)
+        {
+            return false;
+        }
+
+        double? before = _roblox.Number(name);
+        int chosen = Picked(box, (int)(before ?? 0));
+
+        _roblox.SetNumber(name, chosen);
+
+        return before is not null && (int)before.Value != chosen;
+    }
+
+    private void ShowSliderValues()
+    {
+        if (!IsInitialized)
         {
             return;
         }
 
-        QualityLevelValue.Text = Strings.Get("graphics.levelValue", (int)QualityLevelSlider.Value);
+        QualityLevelSliderValue.Text = Strings.Get("graphics.levelValue", (int)QualityLevelSlider.Value);
+        MasterVolumeSliderValue.Text = Percent(MasterVolumeSlider.Value);
+        VoiceVolumeSliderValue.Text = Percent(VoiceVolumeSlider.Value);
+        PartyVolumeSliderValue.Text = Percent(PartyVolumeSlider.Value);
+        TransparencySliderValue.Text = Percent(TransparencySlider.Value);
+        TextSizeSliderValue.Text = Strings.Get(TextSizes[Math.Clamp((int)TextSizeSlider.Value, 1, 4) - 1]);
+        SensitivitySliderValue.Text = ((int)SensitivitySlider.Value).ToString(CultureInfo.CurrentCulture);
     }
 
-    private void ShowVolumes()
-    {
-        if (MasterVolumeValue is null || VoiceVolumeValue is null || PartyVolumeValue is null)
-        {
-            return;
-        }
-
-        MasterVolumeValue.Text = Percent(MasterVolumeSlider.Value);
-        VoiceVolumeValue.Text = Percent(VoiceVolumeSlider.Value);
-        PartyVolumeValue.Text = Percent(PartyVolumeSlider.Value);
-    }
+    private static readonly string[] TextSizes =
+        ["graphics.textDefault", "graphics.textLarge", "graphics.textLarger", "graphics.textLargest"];
 
     private static string Percent(double value) =>
         ((int)Math.Round(value)).ToString(CultureInfo.CurrentCulture) + "%";
 
-    private void OnQualityLevelChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowQualityLevel();
-
-    private void OnVolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowVolumes();
+    private void OnRobloxSliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => ShowSliderValues();
 
     private async Task BuildHomeAsync(bool force = false)
     {
@@ -904,7 +1083,7 @@ public partial class SettingsWindow : ChromeWindow
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
-        ["Graphics"] = ["GraphicsQuality", "GraphicsFrames", "GraphicsSound", "GraphicsReady"],
+        ["Graphics"] = ["GraphicsQuality", "GraphicsFrames", "GraphicsSound", "GraphicsInterface", "GraphicsControl", "GraphicsReady"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
     };
 
@@ -912,8 +1091,10 @@ public partial class SettingsWindow : ChromeWindow
     {
         ["GraphicsQuality"] = ("Graphics", "GraphicsQuality"),
         ["GraphicsSound"] = ("Graphics", "GraphicsSound"),
-        ["GraphicsFrames"] = ("Graphics", "GraphicsFrames"),
+        ["GraphicsInterface"] = ("Graphics", "GraphicsInterface"),
+        ["GraphicsControl"] = ("Graphics", "GraphicsControl"),
         ["GraphicsReady"] = ("Graphics", "GraphicsReady"),
+        ["GraphicsFrames"] = ("Graphics", "GraphicsFrames"),
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
         ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
         ["VersionsStorage"] = ("Versions", "VersionsStorage"),

@@ -452,6 +452,12 @@
                                              x:Name="TabGraphicsSound" Tag="GraphicsSound"
                                              Content="{loc:S graphics.tabSound}" Checked="OnSubTab" />
                                 <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
+                                             x:Name="TabGraphicsInterface" Tag="GraphicsInterface"
+                                             Content="{loc:S graphics.tabInterface}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
+                                             x:Name="TabGraphicsControl" Tag="GraphicsControl"
+                                             Content="{loc:S graphics.tabControl}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GraphicsTabs"
                                              x:Name="TabGraphicsReady" Tag="GraphicsReady"
                                              Content="{loc:S flags.tabReady}" Checked="OnSubTab" />
                             </StackPanel>
@@ -463,6 +469,18 @@
                                        Text="{loc:S graphics.ownHint}" />
 
                             <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,230,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.qualityMode}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.qualityModeHint}" />
+                                    </StackPanel>
+                                    <ComboBox x:Name="QualityModeBox" Style="{StaticResource Dropdown}" Width="220"
+                                      SelectionChanged="OnQualityModeChanged"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
                                 <StackPanel Margin="0,0,20,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.level}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.levelHint}" />
@@ -472,13 +490,24 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Slider x:Name="QualityLevelSlider" Style="{StaticResource Slider}"
-                                                Minimum="1" Maximum="21"
-                                                ValueChanged="OnQualityLevelChanged" />
-                                        <TextBlock x:Name="QualityLevelValue" Grid.Column="1"
+                                                Minimum="1" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="QualityLevelSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,230,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.optimization}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.optimizationHint}" />
+                                    </StackPanel>
+                                    <ComboBox x:Name="OptimizationBox" Style="{StaticResource Dropdown}" Width="220"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
@@ -501,49 +530,39 @@
                                 </Grid>
                             </Border>
 
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.reducedMotion}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.reducedMotionHint}" />
-                                    </StackPanel>
-                                    <CheckBox x:Name="ReducedMotionBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                                </Grid>
-                            </Border>
-
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.flagHeading}" />
                             <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                        Text="{loc:S graphics.flagHint}" />
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
-                                    <StackPanel Margin="0,0,190,0">
+                                    <StackPanel Margin="0,0,230,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.textureQuality}" />
                                         <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.textureQualityHint}" />
                                     </StackPanel>
-                                    <ComboBox x:Name="TextureQualityBox" Style="{StaticResource Dropdown}"
+                                    <ComboBox x:Name="TextureQualityBox" Style="{StaticResource Dropdown}" Width="220"
                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
-                                    <StackPanel Margin="0,0,190,0">
+                                    <StackPanel Margin="0,0,230,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.msaa}" />
                                         <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.msaaHint}" />
                                     </StackPanel>
-                                    <ComboBox x:Name="MsaaBox" Style="{StaticResource Dropdown}"
+                                    <ComboBox x:Name="MsaaBox" Style="{StaticResource Dropdown}" Width="220"
                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
-                                    <StackPanel Margin="0,0,190,0">
+                                    <StackPanel Margin="0,0,230,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.grass}" />
                                         <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.grassHint}" />
                                     </StackPanel>
-                                    <ComboBox x:Name="GrassBox" Style="{StaticResource Dropdown}"
+                                    <ComboBox x:Name="GrassBox" Style="{StaticResource Dropdown}" Width="220"
                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
@@ -557,6 +576,7 @@
                                     <CheckBox x:Name="DisableDpiScaleBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                                 </Grid>
                             </Border>
+
                         </StackPanel>
 
                         <StackPanel x:Name="GraphicsFrames" Visibility="Collapsed">
@@ -620,14 +640,15 @@
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
-                                    <StackPanel Margin="0,0,190,0">
+                                    <StackPanel Margin="0,0,230,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.api}" />
                                         <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.apiHint}" />
                                     </StackPanel>
-                                    <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}"
+                                    <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}" Width="220"
                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
+
                         </StackPanel>
 
                         <StackPanel x:Name="GraphicsSound" Visibility="Collapsed">
@@ -645,9 +666,10 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Slider x:Name="MasterVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100" ValueChanged="OnVolumeChanged" />
-                                        <TextBlock x:Name="MasterVolumeValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="60" VerticalAlignment="Center"
+                                                Minimum="0" Maximum="100"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="MasterVolumeSliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -663,9 +685,10 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Slider x:Name="VoiceVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100" ValueChanged="OnVolumeChanged" />
-                                        <TextBlock x:Name="VoiceVolumeValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="60" VerticalAlignment="Center"
+                                                Minimum="0" Maximum="100"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="VoiceVolumeSliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
@@ -681,13 +704,223 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <Slider x:Name="PartyVolumeSlider" Style="{StaticResource Slider}"
-                                                Minimum="0" Maximum="100" ValueChanged="OnVolumeChanged" />
-                                        <TextBlock x:Name="PartyVolumeValue" Grid.Column="1"
-                                                   Margin="16,0,0,0" MinWidth="60" VerticalAlignment="Center"
+                                                Minimum="0" Maximum="100"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="PartyVolumeSliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
                                                    FontSize="12" Foreground="{StaticResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.haptics}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.hapticsHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="HapticsBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                        </StackPanel>
+
+                        <StackPanel x:Name="GraphicsInterface" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabInterface}" />
+                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                                       Text="{loc:S graphics.ownHint}" />
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.transparency}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.transparencyHint}" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="TransparencySlider" Style="{StaticResource Slider}"
+                                                Minimum="0" Maximum="100"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="TransparencySliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
+                                    <Grid Margin="0,4,0,0">
+                                        <TextBlock Text="{loc:S graphics.transparent}" FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
+                                        <TextBlock Text="{loc:S graphics.opaque}" FontSize="11" HorizontalAlignment="Right"
+                                                   Margin="0,0,112,0" Foreground="{StaticResource TextSoftBrush}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.textSize}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.textSizeHint}" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="TextSizeSlider" Style="{StaticResource Slider}"
+                                                Minimum="1" Maximum="4" IsSnapToTickEnabled="True" TickFrequency="1"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="TextSizeSliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.reducedMotion}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.reducedMotionHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="ReducedMotionBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.uiNavigation}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.uiNavigationHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="UiNavigationBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.performanceStats}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.performanceStatsHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PerformanceStatsBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.microProfiler}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.microProfilerHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="MicroProfilerBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.playerList}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.playerListHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PlayerListBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.chat}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.chatHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="ChatVisibleBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.playerNames}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.playerNamesHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="PlayerNamesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.badges}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.badgesHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="BadgesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                        </StackPanel>
+
+                        <StackPanel x:Name="GraphicsControl" Visibility="Collapsed">
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.tabControl}" />
+                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                                       Text="{loc:S graphics.ownHint}" />
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel Margin="0,0,20,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.sensitivity}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.sensitivityHint}" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="SensitivitySlider" Style="{StaticResource Slider}"
+                                                Minimum="1" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"
+                                                ValueChanged="OnRobloxSliderChanged" />
+                                        <TextBlock x:Name="SensitivitySliderValue" Grid.Column="1"
+                                                   Margin="16,0,0,0" MinWidth="96" VerticalAlignment="Center"
+                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.cameraInverted}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.cameraInvertedHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="CameraInvertedBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,230,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.cameraMode}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.cameraModeHint}" />
+                                    </StackPanel>
+                                    <ComboBox x:Name="CameraModeBox" Style="{StaticResource Dropdown}" Width="220"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,230,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.movementMode}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.movementModeHint}" />
+                                    </StackPanel>
+                                    <ComboBox x:Name="MovementModeBox" Style="{StaticResource Dropdown}" Width="220"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.vr}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.vrHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="VrBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
                         </StackPanel>
 
                         <StackPanel x:Name="GraphicsReady" Visibility="Collapsed">
@@ -704,8 +937,6 @@
                         </StackPanel>
 
                     </StackPanel>
-
-
 
                     <StackPanel x:Name="PageVersions" Visibility="Collapsed">
                         <Border Style="{StaticResource SubTabStrip}">
