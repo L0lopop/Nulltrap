@@ -794,7 +794,8 @@
                                           Content="&#xE949;" />
 
                             <UniformGrid x:Name="PART_Cells" Grid.Column="1"
-                                         Rows="1" Margin="10,4,10,4" />
+                                         Rows="1" Margin="10,4,10,4"
+                                         Background="Transparent" />
 
                             <RepeatButton x:Name="PART_More" Grid.Column="2"
                                           Style="{StaticResource RoundStep}"

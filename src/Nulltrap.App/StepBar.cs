@@ -40,6 +40,7 @@ public sealed class StepBar : Control
                 OnStepChanged));
 
     private UniformGrid? _cells;
+    private bool _dragging;
 
     static StepBar() =>
         DefaultStyleKeyProperty.OverrideMetadata(typeof(StepBar), new FrameworkPropertyMetadata(typeof(StepBar)));
@@ -69,6 +70,15 @@ public sealed class StepBar : Control
         base.OnApplyTemplate();
 
         _cells = GetTemplateChild(CellsPart) as UniformGrid;
+
+        if (_cells is not null)
+        {
+            _cells.Cursor = Cursors.Hand;
+            _cells.MouseLeftButtonDown += OnPressed;
+            _cells.MouseMove += OnDragged;
+            _cells.MouseLeftButtonUp += OnReleased;
+            _cells.LostMouseCapture += (_, _) => _dragging = false;
+        }
 
         if (GetTemplateChild(LessPart) is ButtonBase less)
         {
@@ -109,27 +119,63 @@ public sealed class StepBar : Control
 
         for (int index = 1; index <= Steps; index++)
         {
-            var cell = new Border
+            _cells.Children.Add(new Border
             {
                 CornerRadius = new CornerRadius(3),
                 Margin = new Thickness(2, 0, 2, 0),
-                Cursor = Cursors.Hand,
                 Tag = index,
-            };
-
-            cell.MouseLeftButtonDown += OnCellPressed;
-            _cells.Children.Add(cell);
+            });
         }
 
         Paint();
     }
 
-    private void OnCellPressed(object sender, MouseButtonEventArgs e)
+    private void OnPressed(object sender, MouseButtonEventArgs e)
     {
-        if (IsEnabled && sender is Border { Tag: int index })
+        if (_cells is null || !IsEnabled)
         {
-            Step = index;
+            return;
         }
+
+        _dragging = _cells.CaptureMouse();
+        Aim(e.GetPosition(_cells).X);
+        e.Handled = true;
+    }
+
+    private void OnDragged(object sender, MouseEventArgs e)
+    {
+        if (_dragging && _cells is not null)
+        {
+            Aim(e.GetPosition(_cells).X);
+        }
+    }
+
+    private void OnReleased(object sender, MouseButtonEventArgs e)
+    {
+        if (_dragging)
+        {
+            _dragging = false;
+            _cells?.ReleaseMouseCapture();
+            e.Handled = true;
+        }
+    }
+
+    private void Aim(double x)
+    {
+        if (_cells is null || _cells.ActualWidth <= 0)
+        {
+            return;
+        }
+
+        if (x < 0)
+        {
+            Step = Lowest;
+            return;
+        }
+
+        double cell = _cells.ActualWidth / Math.Max(1, Steps);
+
+        Step = Math.Clamp((int)(x / cell) + 1, Lowest, Steps);
     }
 
     private void Paint()

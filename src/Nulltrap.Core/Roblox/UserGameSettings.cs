@@ -15,6 +15,7 @@ public sealed class UserGameSettings
         OmitXmlDeclaration = true,
         Indent = true,
         IndentChars = "\t",
+        NewLineChars = "\n",
         Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false),
     };
 
