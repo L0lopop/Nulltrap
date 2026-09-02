@@ -16,8 +16,8 @@
         <Color x:Key="TextColor">#FFF3EFFA</Color>
         <Color x:Key="TextSoftColor">#FFC8C1D8</Color>
         <Color x:Key="DangerColor">#FFFF7E74</Color>
-        <Color x:Key="RobloxColor">#FF00B06F</Color>
-        <Color x:Key="RobloxBrightColor">#FF13CE8A</Color>
+        <Color x:Key="RobloxColor">#FF1446FF</Color>
+        <Color x:Key="RobloxBrightColor">#FF3D66FF</Color>
 
         <SolidColorBrush x:Key="VoidBrush" Color="{StaticResource VoidColor}" />
         <SolidColorBrush x:Key="VeilBrush" Color="{StaticResource VoidColor}" Opacity="0.75" />

@@ -635,6 +635,12 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowPlaytime(SessionHistory history)
     {
+        InstalledClient? player = App.Services.StateStore.Load().Get(BinaryType.WindowsPlayer);
+
+        HomePlayHint.Text = player is null
+            ? Strings.Get("home.firstLaunch")
+            : Strings.Get("home.robloxVersion", player.Version);
+
         ProfileTotal.Text = Clocks.Short(history.Total());
         ProfileToday.Text = Clocks.Short(history.Since(DateTimeOffset.Now.Date));
         ProfileGames.Text = history.Sessions
@@ -860,6 +866,15 @@ public partial class SettingsWindow : ChromeWindow
                 EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
             },
         });
+
+    private void OnLaunchFromHome(object sender, RoutedEventArgs e)
+    {
+        if (Owner is MainWindow home)
+        {
+            Close();
+            home.LaunchPlayer();
+        }
+    }
 
     private void OnPlayTile(object sender, RoutedEventArgs e)
     {
