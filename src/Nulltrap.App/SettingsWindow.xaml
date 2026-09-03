@@ -1397,10 +1397,9 @@
 
             <Border x:Name="SavedToast"
                     Grid.Row="1"
-                    HorizontalAlignment="Left"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Bottom"
-                    Margin="32,0,32,16"
-                    MaxWidth="420"
+                    Margin="38,0,42,16"
                     Background="{StaticResource SurfaceBrush}"
                     BorderBrush="{StaticResource PurpleBrush}"
                     BorderThickness="1"
