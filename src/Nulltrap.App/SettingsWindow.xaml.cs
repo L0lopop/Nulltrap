@@ -1390,7 +1390,7 @@ public partial class SettingsWindow : ChromeWindow
             return;
         }
 
-        App.Sweep(App.Services.Installer.Uninstall(asking.Chosen, _settings.KeepDownloadCache));
+        App.Sweep(App.Services.Installer.Uninstall(asking.Chosen, _settings.KeepDownloadCache), asking.Chosen);
 
         MessageBox.Show(
             Strings.Get(asking.Chosen == Removal.Everything ? "remove.goneAll" : "remove.gone"),

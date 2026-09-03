@@ -150,7 +150,7 @@ public partial class App : Application
             removal = asking.Chosen;
         }
 
-        Sweep(Services.Installer.Uninstall(removal, Services.Settings.Load().KeepDownloadCache));
+        Sweep(Services.Installer.Uninstall(removal, Services.Settings.Load().KeepDownloadCache), removal);
 
         if (!arguments.Quiet)
         {
@@ -164,9 +164,17 @@ public partial class App : Application
         Shutdown();
     }
 
-    public static void Sweep(UninstallReport report)
+    public static void Sweep(UninstallReport report, Removal removal)
     {
         ArgumentNullException.ThrowIfNull(report);
+
+        if (removal == Removal.LauncherOnly)
+        {
+            Core.Settings.NulltrapSettings kept = Services.Settings.Load();
+
+            kept.SetupCompleted = false;
+            Services.Settings.Save(kept);
+        }
 
         if (report.WaitingToGo is not null)
         {
