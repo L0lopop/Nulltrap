@@ -113,6 +113,7 @@
   "graphics.grassNormal": "Normal",
   "graphics.grassFar": "Far",
   "settings.saved": "Settings saved",
+  "settings.savedNote": "They take effect the next time the game starts",
   "presence.joining": "Joining a game",
   "presence.playing": "Playing Roblox",
   "presence.byCreator": "by {0}",

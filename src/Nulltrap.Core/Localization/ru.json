@@ -113,6 +113,7 @@
   "graphics.grassNormal": "Обычно",
   "graphics.grassFar": "Далеко",
   "settings.saved": "Настройки сохранены",
+  "settings.savedNote": "Применятся при следующем запуске игры",
   "presence.joining": "Заходит в игру",
   "presence.playing": "Играет в Roblox",
   "presence.byCreator": "от {0}",

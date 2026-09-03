@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -2261,16 +2261,29 @@ public partial class SettingsWindow : ChromeWindow
     private void ShowSaved()
     {
         SavedToastText.Text = Strings.Get("settings.saved");
+        SavedToastNote.Text = Strings.Get("settings.savedNote");
 
         var fade = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames();
         fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
             1, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(160))));
         fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
-            1, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(2.4))));
+            1, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(4.6))));
         fade.KeyFrames.Add(new System.Windows.Media.Animation.LinearDoubleKeyFrame(
-            0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(3))));
+            0, System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromSeconds(5.2))));
 
         SavedToast.BeginAnimation(OpacityProperty, fade);
+        SavedToastLift.BeginAnimation(
+            System.Windows.Media.TranslateTransform.YProperty,
+            new System.Windows.Media.Animation.DoubleAnimation
+            {
+                From = 12,
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(220),
+                EasingFunction = new System.Windows.Media.Animation.CubicEase
+                {
+                    EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut,
+                },
+            });
     }
 
     private void OnUnlockFpsChanged(object sender, RoutedEventArgs e)

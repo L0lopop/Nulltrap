@@ -1395,27 +1395,44 @@
                 </Grid>
             </ScrollViewer>
 
+            <Border x:Name="SavedToast"
+                    Grid.Row="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    Margin="32,0,32,16"
+                    MaxWidth="420"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource PurpleBrush}"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12,8"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    RenderTransformOrigin="0,1">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="SavedToastLift" />
+                </Border.RenderTransform>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="7" Height="7"
+                             VerticalAlignment="Top"
+                             Margin="0,5,0,0"
+                             Fill="{StaticResource PurpleBrightBrush}" />
+                    <StackPanel Margin="9,0,0,0">
+                        <TextBlock x:Name="SavedToastText"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextBrush}"
+                                   TextWrapping="Wrap" />
+                        <TextBlock x:Name="SavedToastNote"
+                                   Margin="0,2,0,0"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextSoftBrush}"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
                 <Grid Margin="32,14,32,14">
-                    <Border x:Name="SavedToast"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Background="{StaticResource SurfaceBrush}"
-                            BorderBrush="{StaticResource PurpleBrush}"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            Padding="12,6"
-                            Opacity="0">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse Width="7" Height="7" VerticalAlignment="Center"
-                                     Fill="{StaticResource PurpleBrightBrush}" />
-                            <TextBlock x:Name="SavedToastText"
-                                       Margin="9,0,0,0"
-                                       VerticalAlignment="Center"
-                                       FontSize="12"
-                                       Foreground="{StaticResource TextBrush}" />
-                        </StackPanel>
-                    </Border>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
                         <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
