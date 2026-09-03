@@ -1391,8 +1391,14 @@ public partial class SettingsWindow : ChromeWindow
         }
 
         App.Sweep(App.Services.Installer.Uninstall(asking.Chosen, _settings.KeepDownloadCache));
-        DialogResult = true;
-        Close();
+
+        MessageBox.Show(
+            Strings.Get(asking.Chosen == Removal.Everything ? "remove.goneAll" : "remove.gone"),
+            "Nulltrap",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+
+        Application.Current.Shutdown();
     }
 
     private DeploymentChannel ChosenChannel() =>

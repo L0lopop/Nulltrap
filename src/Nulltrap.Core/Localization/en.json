@@ -440,6 +440,6 @@
   "remove.everything": "The launcher and everything it kept",
   "remove.everythingHint": "Settings, history, mods and flags as well. Roblox's own settings are not touched - they are the client's, not ours.",
   "remove.confirm": "Remove",
-  "remove.gone": "Nulltrap is removed. What you set up is still on the disk.",
-  "remove.goneAll": "Nulltrap is removed along with everything it kept."
+  "remove.gone": "Nulltrap is removed and will close now. What you set up is still on the disk.",
+  "remove.goneAll": "Nulltrap is removed along with everything it kept, and will close now."
 }

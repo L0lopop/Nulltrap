@@ -7,7 +7,7 @@ namespace Nulltrap.Platform.Windows;
 
 public sealed class WindowsDeferredRemover : IDeferredRemover
 {
-    public const int WaitSeconds = 4;
+    public const int Attempts = 600;
 
     public bool RemoveAfterExit(string path)
     {
@@ -27,11 +27,12 @@ public sealed class WindowsDeferredRemover : IDeferredRemover
         }
 
         string sweep = Directory.Exists(full) ? $"rd /s /q \"{full}\"" : $"del /f /q \"{full}\"";
+        string once = $"{sweep} > nul 2>&1 & ping -n 2 127.0.0.1 > nul & if not exist \"{full}\" exit /b";
 
         var startInfo = new ProcessStartInfo
         {
             FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe"),
-            Arguments = $"/c ping -n {WaitSeconds + 1} 127.0.0.1 > nul & {sweep}",
+            Arguments = $"/c for /l %i in (1,1,{Attempts}) do @({once})",
             WorkingDirectory = Environment.SystemDirectory,
             UseShellExecute = false,
             CreateNoWindow = true,
