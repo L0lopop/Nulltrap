@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Installation;
@@ -23,7 +23,10 @@ public partial class App : Application
         base.OnStartup(e);
 
         _services = new AppServices();
-        Strings.Use(_services.Settings.Load().Language);
+        Core.Settings.NulltrapSettings chosen = _services.Settings.Load();
+
+        Strings.Use(chosen.Language);
+        Themes.Apply(chosen.Theme);
         _services.KeepHandlersRegistered();
         _services.StartTracking();
         _services.StartClientUpdates();

@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -154,9 +154,26 @@ public class ChromeWindow : Window
         _source = HwndSource.FromHwnd(handle);
         _source?.AddHook(Filter);
 
-        Ask(handle, ImmersiveDarkMode, 1);
+        Shade();
         Ask(handle, WindowCornerPreference, RoundedCorners);
         Dress();
+
+        Themes.Changed += OnThemeChanged;
+        Closed += (_, _) => Themes.Changed -= OnThemeChanged;
+    }
+
+    private void OnThemeChanged(object? sender, EventArgs e)
+    {
+        Shade();
+        Dress();
+    }
+
+    private void Shade()
+    {
+        if (_source is not null)
+        {
+            Ask(_source.Handle, ImmersiveDarkMode, Themes.IsLight ? 0 : 1);
+        }
     }
 
     private void Dress()
@@ -186,7 +203,9 @@ public class ChromeWindow : Window
 
         _source.CompositionTarget.BackgroundColor = wanted
             ? System.Windows.Media.Colors.Transparent
-            : System.Windows.Media.Colors.Black;
+            : Themes.IsLight
+                ? System.Windows.Media.Colors.White
+                : System.Windows.Media.Colors.Black;
 
         HasBackdrop = wanted;
     }

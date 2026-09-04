@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.Presence;
@@ -12,6 +12,9 @@ public sealed record NulltrapSettings
 
     [JsonPropertyName("language")]
     public string Language { get; set; } = Localization.Strings.Fallback;
+
+    [JsonPropertyName("theme")]
+    public AppTheme Theme { get; set; } = AppTheme.Nulltrap;
 
     [JsonPropertyName("channel")]
     public string Channel { get; set; } = DeploymentChannel.DefaultName;

@@ -27,7 +27,7 @@
                        FontFamily="Segoe MDL2 Assets"
                        FontSize="13"
                        VerticalAlignment="Center"
-                       Foreground="{StaticResource TextSoftBrush}" />
+                       Foreground="{DynamicResource TextSoftBrush}" />
             <CheckBox x:Name="Base64Box"
                       Style="{StaticResource Tick}"
                       Margin="10,0,0,0"
@@ -56,7 +56,7 @@
                     <TextBlock Text="{loc:S flags.name}"
                                VerticalAlignment="Center"
                                FontSize="13"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                     <TextBox x:Name="NameBox" Grid.Column="1" Style="{StaticResource Field}"
                              FontFamily="Consolas" TextChanged="OnTyped" />
                 </Grid>
@@ -71,7 +71,7 @@
                     <TextBlock Text="{loc:S flags.value}"
                                VerticalAlignment="Center"
                                FontSize="13"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                     <TextBox x:Name="ValueBox" Grid.Column="1" Style="{StaticResource Field}"
                              FontFamily="Consolas" TextChanged="OnTyped" />
                     <Button x:Name="SuggestButton" Grid.Column="3" Style="{StaticResource Quiet}"
@@ -89,7 +89,7 @@
                 <TextBlock Style="{StaticResource RowHint}" Margin="0,16,0,0"
                            Text="{loc:S flags.addHint}" />
                 <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
-                           Foreground="{StaticResource DangerBrush}"
+                           Foreground="{DynamicResource DangerBrush}"
                            Text="{loc:S flags.yourRisk}" />
             </StackPanel>
 
@@ -123,7 +123,7 @@
                        Margin="0,0,220,0"
                        FontSize="12"
                        TextWrapping="Wrap"
-                       Foreground="{StaticResource DangerBrush}" />
+                       Foreground="{DynamicResource DangerBrush}" />
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="ConfirmButton" Style="{StaticResource Accent}" MinWidth="96"

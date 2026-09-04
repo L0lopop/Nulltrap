@@ -29,17 +29,17 @@
 
             <TextBlock Text="Nulltrap"
                        Margin="0,14,0,0"
-                       Foreground="{StaticResource TextBrush}"
+                       Foreground="{DynamicResource TextBrush}"
                        FontSize="26"
                        FontWeight="SemiBold" />
 
             <TextBlock x:Name="VersionText"
-                       Foreground="{StaticResource TextSoftBrush}"
+                       Foreground="{DynamicResource TextSoftBrush}"
                        FontSize="12" />
 
             <TextBlock x:Name="ClientText"
                        Margin="0,10,0,0"
-                       Foreground="{StaticResource TextSoftBrush}"
+                       Foreground="{DynamicResource TextSoftBrush}"
                        FontSize="12"
                        TextWrapping="Wrap" />
 
@@ -79,14 +79,14 @@
                         <TextBlock x:Name="PlayHint"
                                    FontSize="12"
                                    Margin="0,2,0,0"
-                                   Foreground="{StaticResource TextSoftBrush}" />
+                                   Foreground="{DynamicResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
                                FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                 </Grid>
             </Button>
 
@@ -100,14 +100,14 @@
                         <TextBlock x:Name="StudioHint"
                                    FontSize="12"
                                    Margin="0,2,0,0"
-                                   Foreground="{StaticResource TextSoftBrush}" />
+                                   Foreground="{DynamicResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
                                FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                 </Grid>
             </Button>
 
@@ -121,14 +121,14 @@
                         <TextBlock Text="{loc:S home.settingsHint}"
                                    FontSize="12"
                                    Margin="0,2,0,0"
-                                   Foreground="{StaticResource TextSoftBrush}" />
+                                   Foreground="{DynamicResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
                                FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                 </Grid>
             </Button>
 
@@ -142,14 +142,14 @@
                         <TextBlock Text="{loc:S home.aboutHint}"
                                    FontSize="12"
                                    Margin="0,2,0,0"
-                                   Foreground="{StaticResource TextSoftBrush}" />
+                                   Foreground="{DynamicResource TextSoftBrush}" />
                     </StackPanel>
                     <TextBlock Text="&#xE76C;"
                                FontFamily="Segoe MDL2 Assets"
                                FontSize="12"
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSoftBrush}" />
+                               Foreground="{DynamicResource TextSoftBrush}" />
                 </Grid>
             </Button>
         </Grid>

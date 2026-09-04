@@ -36,18 +36,18 @@
                    HorizontalAlignment="Center"
                    TextAlignment="Center"
                    TextTrimming="CharacterEllipsis"
-                   Foreground="{StaticResource TextBrush}"
+                   Foreground="{DynamicResource TextBrush}"
                    FontSize="14" />
 
         <Border Grid.Row="2"
                 Height="7"
                 Margin="0,18,0,0"
-                Background="{StaticResource SurfaceHoverBrush}"
+                Background="{DynamicResource SurfaceHoverBrush}"
                 CornerRadius="4">
             <Border x:Name="ProgressFill"
                     HorizontalAlignment="Left"
                     Width="0"
-                    Background="{StaticResource PurpleBrightBrush}"
+                    Background="{DynamicResource PurpleBrightBrush}"
                     CornerRadius="4" />
         </Border>
 
@@ -64,18 +64,18 @@
                 <Style TargetType="Button">
                     <Setter Property="Cursor" Value="Hand" />
                     <Setter Property="FontSize" Value="13" />
-                    <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="Button">
                                 <Border x:Name="Face"
-                                        Background="{StaticResource SurfaceHoverBrush}"
+                                        Background="{DynamicResource SurfaceHoverBrush}"
                                         CornerRadius="5">
                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Face" Property="Background" Value="{StaticResource PurpleBrush}" />
+                                        <Setter TargetName="Face" Property="Background" Value="{DynamicResource PurpleBrush}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>

@@ -213,6 +213,7 @@ public partial class SettingsWindow : ChromeWindow
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
         BuildLanguageButtons();
+        BuildThemeButtons();
         BuildChangelog();
 
         App.Services.Jobs.Changed += OnJobChanged;
@@ -955,6 +956,41 @@ public partial class SettingsWindow : ChromeWindow
             button.Click += OnLanguageChosen;
             LanguageButtons.Children.Add(button);
         }
+    }
+
+    private void BuildThemeButtons()
+    {
+        ThemeButtons.Children.Clear();
+
+        foreach (AppTheme theme in Enum.GetValues<AppTheme>())
+        {
+            bool active = theme == _settings.Theme;
+
+            var button = new System.Windows.Controls.Button
+            {
+                Content = Strings.Get("theme." + theme.ToString().ToLowerInvariant()),
+                Style = (Style)FindResource(active ? "Accent" : "Quiet"),
+                Margin = new Thickness(0, 0, 8, 0),
+                MinWidth = 104,
+                Tag = theme,
+            };
+
+            button.Click += OnThemeChosen;
+            ThemeButtons.Children.Add(button);
+        }
+    }
+
+    private void OnThemeChosen(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { Tag: AppTheme theme } || theme == _settings.Theme)
+        {
+            return;
+        }
+
+        _settings.Theme = theme;
+        _store.Save(_settings);
+        Themes.Apply(theme);
+        BuildThemeButtons();
     }
 
     private void OnLanguageChosen(object sender, RoutedEventArgs e)
@@ -2227,6 +2263,17 @@ public partial class SettingsWindow : ChromeWindow
 
         RefreshFacts();
         ShowSaved();
+    }
+
+    private void OnSaveAndPlay(object sender, RoutedEventArgs e)
+    {
+        OnSave(sender, e);
+
+        if (Owner is MainWindow home)
+        {
+            Close();
+            home.LaunchPlayer();
+        }
     }
 
     private void ShowSaved()

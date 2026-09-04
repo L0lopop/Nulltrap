@@ -21,21 +21,21 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,0,1,0">
+        <Border Grid.Column="0" Background="{DynamicResource CaptionBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="0,0,1,0">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,16">
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavNews" Tag="News" Content="{loc:S nav.news}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavLauncher" Tag="Launcher" Content="{loc:S nav.settings}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavAbout" Tag="About" Content="{loc:S nav.aboutNulltrap}" Checked="OnNavigate" />
 
-                    <Border Height="1" Background="{StaticResource RuleBrush}" Margin="16,12,16,12" />
+                    <Border Height="1" Background="{DynamicResource RuleBrush}" Margin="16,12,16,12" />
 
                     <StackPanel Margin="16,0,16,0">
                         <TextBlock x:Name="SidebarVersion"
-                                   Foreground="{StaticResource TextSoftBrush}"
+                                   Foreground="{DynamicResource TextSoftBrush}"
                                    FontSize="12" />
                         <TextBlock x:Name="SidebarLocation"
-                                   Foreground="{StaticResource TextSoftBrush}"
+                                   Foreground="{DynamicResource TextSoftBrush}"
                                    FontSize="12"
                                    TextTrimming="CharacterEllipsis"
                                    Margin="0,3,0,0" />
@@ -68,11 +68,11 @@
 
             <StackPanel Grid.Row="0" Margin="38,26,38,0">
                 <TextBlock x:Name="PageTitle"
-                           Foreground="{StaticResource TextBrush}"
+                           Foreground="{DynamicResource TextBrush}"
                            FontSize="22"
                            FontWeight="SemiBold" />
                 <TextBlock x:Name="PageSubtitle"
-                           Foreground="{StaticResource TextSoftBrush}"
+                           Foreground="{DynamicResource TextSoftBrush}"
                            FontSize="12"
                            Margin="0,3,0,0" />
             </StackPanel>
@@ -90,7 +90,7 @@
 
                                 <Border Grid.Column="0" Width="66" Height="66" CornerRadius="33"
                                         ClipToBounds="True" VerticalAlignment="Top"
-                                        Background="{StaticResource SurfaceHoverBrush}">
+                                        Background="{DynamicResource SurfaceHoverBrush}">
                                     <Image x:Name="ProfileAvatar" Stretch="UniformToFill"
                                            RenderOptions.BitmapScalingMode="HighQuality" />
                                 </Border>
@@ -98,28 +98,28 @@
                                 <StackPanel Grid.Column="1" Margin="18,2,0,0">
                                     <TextBlock x:Name="ProfileName" FontSize="19" FontWeight="SemiBold"
                                                TextTrimming="CharacterEllipsis"
-                                               Foreground="{StaticResource TextBrush}" />
+                                               Foreground="{DynamicResource TextBrush}" />
                                     <TextBlock x:Name="ProfileHandle" FontSize="12" Margin="0,2,0,0"
-                                               Foreground="{StaticResource TextSoftBrush}" />
+                                               Foreground="{DynamicResource TextSoftBrush}" />
 
                                     <StackPanel x:Name="ProfileStats" Orientation="Horizontal" Margin="0,14,0,0">
                                         <StackPanel Margin="0,0,34,0">
                                             <TextBlock x:Name="ProfileTotal" FontSize="16" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource PurpleBrightBrush}" />
+                                                       Foreground="{DynamicResource PurpleBrightBrush}" />
                                             <TextBlock Text="{loc:S activity.total}" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                                       Foreground="{DynamicResource TextSoftBrush}" />
                                         </StackPanel>
                                         <StackPanel Margin="0,0,34,0">
                                             <TextBlock x:Name="ProfileGames" FontSize="16" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource TextBrush}" />
+                                                       Foreground="{DynamicResource TextBrush}" />
                                             <TextBlock Text="{loc:S home.gamesPlayed}" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                                       Foreground="{DynamicResource TextSoftBrush}" />
                                         </StackPanel>
                                         <StackPanel>
                                             <TextBlock x:Name="ProfileToday" FontSize="16" FontWeight="SemiBold"
-                                                       Foreground="{StaticResource TextBrush}" />
+                                                       Foreground="{DynamicResource TextBrush}" />
                                             <TextBlock Text="{loc:S activity.today}" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                                       Foreground="{DynamicResource TextSoftBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
@@ -133,7 +133,7 @@
                         <Border Style="{StaticResource RowCard}" Padding="18,18,18,20">
                             <Grid>
                                 <TextBlock x:Name="RecommendedEmpty" FontSize="12"
-                                           Foreground="{StaticResource TextSoftBrush}"
+                                           Foreground="{DynamicResource TextSoftBrush}"
                                            Text="{loc:S home.recommendedEmpty}" />
                                 <UniformGrid x:Name="RecommendedPanel" Columns="5" Margin="0,0,-12,0" />
                             </Grid>
@@ -146,7 +146,7 @@
                         <Border Style="{StaticResource RowCard}" Padding="18,18,18,20">
                             <Grid>
                                 <TextBlock x:Name="RecentEmpty" FontSize="12"
-                                           Foreground="{StaticResource TextSoftBrush}"
+                                           Foreground="{DynamicResource TextSoftBrush}"
                                            Text="{loc:S activity.nothingYet}" />
                                 <UniformGrid x:Name="RecentGamesPanel" Columns="5" Margin="0,0,-12,0" />
                             </Grid>
@@ -258,7 +258,7 @@
                                         <TextBlock x:Name="CustomRpcChevron" Text="&#xE70D;"
                                                    FontFamily="Segoe MDL2 Assets" FontSize="12"
                                                    HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   Foreground="{StaticResource TextSoftBrush}"
+                                                   Foreground="{DynamicResource TextSoftBrush}"
                                                    RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <RotateTransform x:Name="CustomRpcTurn" Angle="0" />
@@ -306,54 +306,54 @@
                                 <StackPanel>
                                     <Grid Margin="0,0,0,12">
                                         <TextBlock Text="{loc:S presence.playing}" FontSize="12" FontWeight="Bold"
-                                                   Foreground="{StaticResource TextBrush}" />
+                                                   Foreground="{DynamicResource TextBrush}" />
                                         <Border HorizontalAlignment="Right" CornerRadius="4" Padding="8,3"
-                                                Background="{StaticResource SurfaceHoverBrush}">
+                                                Background="{DynamicResource SurfaceHoverBrush}">
                                             <TextBlock Text="{loc:S presence.previewTag}" FontSize="11"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                                       Foreground="{DynamicResource TextSoftBrush}" />
                                         </Border>
                                     </Grid>
 
                                     <StackPanel Orientation="Horizontal">
                                         <Grid Width="64" Height="64" VerticalAlignment="Top">
                                             <Border x:Name="PreviewIcon" CornerRadius="8"
-                                                    Background="{StaticResource AccentBrush}" />
+                                                    Background="{DynamicResource AccentBrush}" />
                                             <TextBlock x:Name="PreviewIconGlyph" Text="R" FontSize="26" FontWeight="Bold"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                       Foreground="{StaticResource TextBrush}" />
+                                                       Foreground="{DynamicResource TextBrush}" />
                                             <Border x:Name="PreviewAccount" Width="24" Height="24" CornerRadius="12"
                                                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
                                                     Margin="0,0,-6,-6"
-                                                    Background="{StaticResource PurpleBrush}"
-                                                    BorderBrush="{StaticResource SurfaceBrush}" BorderThickness="2">
+                                                    Background="{DynamicResource PurpleBrush}"
+                                                    BorderBrush="{DynamicResource SurfaceBrush}" BorderThickness="2">
                                                 <TextBlock x:Name="PreviewAccountGlyph" FontSize="11" FontWeight="Bold"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                           Foreground="{StaticResource TextBrush}" />
+                                                           Foreground="{DynamicResource TextBrush}" />
                                             </Border>
                                         </Grid>
 
                                         <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                                             <TextBlock Text="Roblox" FontSize="13" FontWeight="Bold"
-                                                       Foreground="{StaticResource TextBrush}" />
+                                                       Foreground="{DynamicResource TextBrush}" />
                                             <TextBlock x:Name="PreviewDetails" FontSize="13" Margin="0,3,0,0"
-                                                       Foreground="{StaticResource TextBrush}" />
+                                                       Foreground="{DynamicResource TextBrush}" />
                                             <TextBlock x:Name="PreviewState" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{StaticResource TextSoftBrush}" />
+                                                       Foreground="{DynamicResource TextSoftBrush}" />
                                             <TextBlock x:Name="PreviewElapsed" FontSize="12" Margin="0,2,0,0"
                                                        Foreground="#FF67D68A" />
                                         </StackPanel>
                                     </StackPanel>
 
                                     <Border x:Name="PreviewJoin" Margin="0,14,0,0" Padding="0,9"
-                                            CornerRadius="4" Background="{StaticResource SurfaceHoverBrush}">
+                                            CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
                                         <TextBlock x:Name="PreviewJoinText" FontSize="12" HorizontalAlignment="Center"
-                                                   Foreground="{StaticResource TextBrush}" />
+                                                   Foreground="{DynamicResource TextBrush}" />
                                     </Border>
 
                                     <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="0,9"
-                                            CornerRadius="4" Background="{StaticResource SurfaceHoverBrush}">
+                                            CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
                                         <TextBlock x:Name="PreviewButtonText" FontSize="12" HorizontalAlignment="Center"
-                                                   Foreground="{StaticResource TextBrush}" />
+                                                   Foreground="{DynamicResource TextBrush}" />
                                     </Border>
                                 </StackPanel>
                             </Border>
@@ -399,6 +399,14 @@
                         </Border>
 
                         <Border Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.theme}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.themeHint}" />
+                                <StackPanel x:Name="ThemeButtons" Orientation="Horizontal" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <StackPanel Margin="0,0,150,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S launcher.location}" />
@@ -427,14 +435,14 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource RowCard}" BorderBrush="{StaticResource DangerBrush}">
+                        <Border Style="{StaticResource RowCard}" BorderBrush="{DynamicResource DangerBrush}">
                             <Grid>
                                 <StackPanel Margin="0,0,150,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S about.remove}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S about.removeHint}" />
                                 </StackPanel>
                                 <Button Style="{StaticResource Quiet}" Content="{loc:S action.uninstall}"
-                                        Foreground="{StaticResource DangerBrush}"
+                                        Foreground="{DynamicResource DangerBrush}"
                                         HorizontalAlignment="Right" VerticalAlignment="Center" Click="OnUninstall" />
                             </Grid>
                         </Border>
@@ -494,7 +502,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="QualityLevelSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -594,7 +602,7 @@
                                         <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
                                         <TextBlock Text="{loc:S graphics.fpsUnit}" VerticalAlignment="Center"
                                                    Margin="10,0,0,0" FontSize="12"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -654,7 +662,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="MasterVolumeSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -672,7 +680,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="VoiceVolumeSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -690,7 +698,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="PartyVolumeSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -725,12 +733,12 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="TransparencySliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                     <Grid Margin="0,4,0,0">
-                                        <TextBlock Text="{loc:S graphics.transparent}" FontSize="11" Foreground="{StaticResource TextSoftBrush}" />
+                                        <TextBlock Text="{loc:S graphics.transparent}" FontSize="11" Foreground="{DynamicResource TextSoftBrush}" />
                                         <TextBlock Text="{loc:S graphics.opaque}" FontSize="11" HorizontalAlignment="Right"
-                                                   Margin="0,0,112,0" Foreground="{StaticResource TextSoftBrush}" />
+                                                   Margin="0,0,112,0" Foreground="{DynamicResource TextSoftBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -748,7 +756,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="TextSizeSliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -853,7 +861,7 @@
                                            Changed="OnStepBarChanged" />
                                         <TextBlock x:Name="SensitivitySliderValue" Grid.Column="1"
                                                    Margin="16,0,0,0" MinWidth="104" VerticalAlignment="Center"
-                                                   FontSize="12" Foreground="{StaticResource TextBrush}" />
+                                                   FontSize="12" Foreground="{DynamicResource TextBrush}" />
                                     </Grid>
                                 </StackPanel>
                             </Border>
@@ -980,10 +988,10 @@
                                 </Grid>
 
                                 <Border x:Name="TransferTrack" Height="7" Margin="0,16,0,0"
-                                        Background="{StaticResource SurfaceHoverBrush}" CornerRadius="4"
+                                        Background="{DynamicResource SurfaceHoverBrush}" CornerRadius="4"
                                         SizeChanged="OnTransferTrackResized">
                                     <Border x:Name="TransferFill" HorizontalAlignment="Left" Width="0"
-                                            Background="{StaticResource PurpleBrightBrush}" CornerRadius="4" />
+                                            Background="{DynamicResource PurpleBrightBrush}" CornerRadius="4" />
                                 </Border>
 
                                 <Grid Margin="0,10,0,0">
@@ -1127,26 +1135,26 @@
                                                    Margin="12,0,0,0"
                                                    VerticalAlignment="Center"
                                                    IsHitTestVisible="False"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                         <TextBlock x:Name="FlagSearchHint"
                                                    Text="{loc:S flags.search}"
                                                    Margin="34,0,0,0"
                                                    VerticalAlignment="Center"
                                                    IsHitTestVisible="False"
                                                    FontSize="13"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                     </Grid>
 
                                     <TextBlock x:Name="FlagFactsText" Grid.Column="1"
                                                Margin="18,0,2,0" VerticalAlignment="Center"
-                                               FontSize="12" Foreground="{StaticResource TextSoftBrush}" />
+                                               FontSize="12" Foreground="{DynamicResource TextSoftBrush}" />
                                 </Grid>
                             </StackPanel>
                         </Border>
 
                         <Border Style="{StaticResource RowCard}" Padding="0">
                             <StackPanel>
-                                <Border Background="{StaticResource SurfaceHoverBrush}"
+                                <Border Background="{DynamicResource SurfaceHoverBrush}"
                                         CornerRadius="10,10,0,0" Padding="14,9,14,9">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -1158,16 +1166,16 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="1" Text="{loc:S flags.colTags}"
                                                    FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                         <TextBlock Grid.Column="2" Text="{loc:S flags.colPreset}"
                                                    FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                         <TextBlock Grid.Column="3" Text="{loc:S flags.colName}"
                                                    FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                         <TextBlock Grid.Column="4" Text="{loc:S flags.colValue}"
                                                    FontSize="12" FontWeight="SemiBold"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
+                                                   Foreground="{DynamicResource TextSoftBrush}" />
                                     </Grid>
                                 </Border>
 
@@ -1178,12 +1186,12 @@
                                                FontFamily="Segoe MDL2 Assets"
                                                FontSize="34"
                                                HorizontalAlignment="Center"
-                                               Foreground="{StaticResource RuleBrush}" />
+                                               Foreground="{DynamicResource RuleBrush}" />
                                     <TextBlock x:Name="FlagsEmptyText"
                                                Margin="0,14,0,0"
                                                HorizontalAlignment="Center"
                                                FontSize="13"
-                                               Foreground="{StaticResource TextSoftBrush}" />
+                                               Foreground="{DynamicResource TextSoftBrush}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -1197,7 +1205,7 @@
                                 <Button Style="{StaticResource Quiet}" MinWidth="150" Margin="8,0,0,0"
                                         Content="{loc:S flags.openFile}" Click="OnOpenFlagFile" />
                                 <TextBlock x:Name="FlagNoticeText" Margin="16,0,0,0" VerticalAlignment="Center"
-                                           FontSize="12" Foreground="{StaticResource PurpleBrightBrush}" />
+                                           FontSize="12" Foreground="{DynamicResource PurpleBrightBrush}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -1214,25 +1222,25 @@
 
                                 <StackPanel Grid.Column="0">
                                     <TextBlock x:Name="PlayedWeekText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{StaticResource PurpleBrightBrush}" />
+                                               Foreground="{DynamicResource PurpleBrightBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.week}" Margin="0,4,0,0" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
                                     <TextBlock x:Name="SessionCountText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
+                                               Foreground="{DynamicResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.sessions}" Margin="0,4,0,0" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2">
                                     <TextBlock x:Name="AverageSessionText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
+                                               Foreground="{DynamicResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.average}" Margin="0,4,0,0" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="3">
                                     <TextBlock x:Name="LongestSessionText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
+                                               Foreground="{DynamicResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.longest}" Margin="0,4,0,0" />
                                 </StackPanel>
                             </Grid>
@@ -1271,12 +1279,13 @@
                         </Border>
 
                         <Border x:Name="UpdateBanner" Style="{StaticResource RowCard}" Visibility="Collapsed"
-                                Background="{StaticResource AccentBrush}">
+                                Background="{DynamicResource AccentBrush}">
                             <Grid>
                                 <StackPanel Margin="0,0,150,0">
-                                    <TextBlock x:Name="UpdateBannerTitle" Style="{StaticResource RowTitle}" />
+                                    <TextBlock x:Name="UpdateBannerTitle" Style="{StaticResource RowTitle}"
+                                               Foreground="{DynamicResource OnAccentBrush}" />
                                     <TextBlock x:Name="UpdateBannerHint" Style="{StaticResource RowHint}"
-                                               Foreground="{StaticResource TextBrush}" />
+                                               Foreground="{DynamicResource OnAccentBrush}" />
                                 </StackPanel>
                                 <Button x:Name="OpenReleaseButton" Style="{StaticResource Quiet}"
                                         Content="{loc:S news.open}" MinWidth="130"
@@ -1319,7 +1328,7 @@
                                     </Image.Source>
                                 </Image>
                                 <StackPanel Margin="16,0,0,0">
-                                    <TextBlock Text="Nulltrap" Foreground="{StaticResource TextBrush}" FontSize="17" FontWeight="SemiBold" />
+                                    <TextBlock Text="Nulltrap" Foreground="{DynamicResource TextBrush}" FontSize="17" FontWeight="SemiBold" />
                                     <TextBlock x:Name="AboutVersionText" Style="{StaticResource RowHint}" Margin="0,2,0,0" />
                                     <TextBlock Style="{StaticResource RowHint}" Margin="0,8,0,0"
                                                Text="{loc:S about.unofficial}" />
@@ -1356,8 +1365,8 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Bottom"
                     Margin="38,0,42,16"
-                    Background="{StaticResource SurfaceBrush}"
-                    BorderBrush="{StaticResource PurpleBrush}"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource PurpleBrush}"
                     BorderThickness="1"
                     CornerRadius="6"
                     Padding="12,8"
@@ -1371,26 +1380,28 @@
                     <Ellipse Width="7" Height="7"
                              VerticalAlignment="Top"
                              Margin="0,5,0,0"
-                             Fill="{StaticResource PurpleBrightBrush}" />
+                             Fill="{DynamicResource PurpleBrightBrush}" />
                     <StackPanel Margin="9,0,0,0">
                         <TextBlock x:Name="SavedToastText"
                                    FontSize="12"
-                                   Foreground="{StaticResource TextBrush}"
+                                   Foreground="{DynamicResource TextBrush}"
                                    TextWrapping="Wrap" />
                         <TextBlock x:Name="SavedToastNote"
                                    Margin="0,2,0,0"
                                    FontSize="11"
-                                   Foreground="{StaticResource TextSoftBrush}"
+                                   Foreground="{DynamicResource TextSoftBrush}"
                                    TextWrapping="Wrap" />
                     </StackPanel>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Row="2" Background="{StaticResource CaptionBrush}" BorderBrush="{StaticResource RuleBrush}" BorderThickness="0,1,0,0">
+            <Border Grid.Row="2" Background="{DynamicResource CaptionBrush}" BorderBrush="{DynamicResource RuleBrush}" BorderThickness="0,1,0,0">
                 <Grid Margin="32,14,32,14">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Style="{StaticResource Quiet}" Content="{loc:S action.close}" Margin="0,0,8,0" Click="OnCancel" />
                         <Button Style="{StaticResource Accent}" Content="{loc:S action.save}" Click="OnSave" />
+                        <Button Style="{StaticResource BluePlay}" Content="{loc:S action.saveAndPlay}"
+                                MinWidth="196" Margin="8,0,0,0" Click="OnSaveAndPlay" />
                     </StackPanel>
                 </Grid>
             </Border>
