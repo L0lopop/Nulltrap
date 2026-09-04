@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 
@@ -41,6 +41,18 @@ public static class Strings
         CultureInfo.DefaultThreadCurrentUICulture = culture;
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
+    }
+
+    public static string? Look(string key)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+        if (_active.TryGetValue(key, out string? translated))
+        {
+            return translated;
+        }
+
+        return Loaded.TryGetValue(key, out string? original) ? original : null;
     }
 
     public static string Get(string key)

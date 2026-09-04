@@ -193,6 +193,33 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
+                                <StackPanel Margin="0,0,350,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.cache}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.cacheHint}" />
+                                    <TextBlock x:Name="SweepSizeText" Style="{StaticResource RowHint}" Margin="0,7,0,0" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <ComboBox x:Name="CacheSweepBox" Style="{StaticResource Dropdown}" Width="200" />
+                                    <Button x:Name="SweepNowButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S action.sweepNow}" MinWidth="132" Margin="8,0,0,0"
+                                            Click="OnSweepNow" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.trimMemory}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.trimMemoryHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="TrimMemoryBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
                                 <StackPanel Margin="0,0,60,0">
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.multiInstance}" />
                                     <TextBlock Style="{StaticResource RowHint}"
@@ -205,6 +232,14 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PagePresence" Visibility="Collapsed">
+                        <Border x:Name="PresenceLocked" Style="{StaticResource RowCard}"
+                                BorderBrush="{DynamicResource DangerBrush}" Visibility="Collapsed">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.needsMonitoring}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.needsMonitoringHint}" />
+                            </StackPanel>
+                        </Border>
+
                             <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.richPresence}" />
                             <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,14"
                                        Text="{loc:S presence.richPresenceHint}" />
@@ -1211,6 +1246,29 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PageActivity" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.monitoring}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.monitoringHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="MonitoringBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top"
+                                          Click="OnMonitoringChanged" />
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.serverNotice}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.serverNoticeHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="ServerNoticeBox" Style="{StaticResource Switch}"
+                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
+                            </Grid>
+                        </Border>
+
                         <Border Style="{StaticResource RowCard}">
                             <Grid>
                                 <Grid.ColumnDefinitions>

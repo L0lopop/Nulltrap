@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
 
@@ -148,6 +148,11 @@ public partial class MainWindow : ChromeWindow
             {
                 Close();
                 return;
+            }
+
+            if (settings.TrimMemory)
+            {
+                App.Services.Memory.Trim();
             }
         }
         catch (OperationCanceledException)

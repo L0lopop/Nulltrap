@@ -1,10 +1,11 @@
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Reflection;
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.Presence;
@@ -24,6 +25,8 @@ public sealed class AppServices : IDisposable
 {
     private readonly HttpClient _http;
 
+    private bool _watching;
+
     public AppServices()
     {
         _http = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
@@ -35,6 +38,8 @@ public sealed class AppServices : IDisposable
         UninstallEntry = new WindowsUninstallEntry();
         ProcessLauncher = new WindowsProcessLauncher();
         Remover = new WindowsDeferredRemover();
+        Memory = new WindowsMemoryTrimmer();
+        Cache = new CacheSweeper();
 
         StateStore = new InstallStateStore(Paths);
         Settings = new SettingsStore(Paths);
@@ -49,6 +54,7 @@ public sealed class AppServices : IDisposable
         Mods.Enabled = Settings.Load().Mods;
 
         Games = new GameInfoClient(_http);
+        Locator = new ServerLocator(_http);
         Discover = new DiscoverClient(_http);
         Accounts = new AccountInfoClient(_http);
         LauncherUpdates = new LauncherUpdateClient(_http);
@@ -80,6 +86,10 @@ public sealed class AppServices : IDisposable
     public IProcessLauncher ProcessLauncher { get; }
 
     public IDeferredRemover Remover { get; }
+
+    public IMemoryTrimmer Memory { get; }
+
+    public CacheSweeper Cache { get; }
 
     public InstallStateStore StateStore { get; }
 
@@ -115,7 +125,9 @@ public sealed class AppServices : IDisposable
 
     public SessionRecorder Recorder { get; }
 
-    public RobloxLogWatcher LogWatcher { get; }
+    public RobloxLogWatcher LogWatcher { get; private set; }
+
+    public ServerLocator Locator { get; }
 
     public IPresenceTransportFactory PresenceTransports { get; }
 
@@ -145,6 +157,32 @@ public sealed class AppServices : IDisposable
         }
     }
 
+    public static bool RobloxIsRunning() =>
+        System.Diagnostics.Process.GetProcessesByName("RobloxPlayerBeta").Length > 0
+        || System.Diagnostics.Process.GetProcessesByName("RobloxStudioBeta").Length > 0;
+
+    public SweepReport? SweepCache(bool asked = false)
+    {
+        NulltrapSettings settings = Settings.Load();
+
+        if (!asked && !CacheSchedule.Due(settings.CacheSweep, settings.LastCacheSweep, DateTimeOffset.UtcNow))
+        {
+            return null;
+        }
+
+        if (RobloxIsRunning())
+        {
+            return null;
+        }
+
+        SweepReport report = Cache.Sweep();
+
+        settings.LastCacheSweep = DateTimeOffset.UtcNow;
+        Settings.Save(settings);
+
+        return report;
+    }
+
     public void StartClientUpdates()
     {
         NulltrapSettings settings = Settings.Load();
@@ -160,8 +198,32 @@ public sealed class AppServices : IDisposable
 
     public void StartTracking()
     {
-        Recorder.Start();
-        LogWatcher.Start();
+        _watching = false;
+        ApplyMonitoring();
+    }
+
+    public void ApplyMonitoring()
+    {
+        bool wanted = Settings.Load().Monitoring;
+
+        if (wanted == _watching)
+        {
+            return;
+        }
+
+        if (wanted)
+        {
+            LogWatcher = new RobloxLogWatcher(RobloxLogWatcher.DefaultDirectory, Sessions);
+            Recorder.Start();
+            LogWatcher.Start();
+        }
+        else
+        {
+            LogWatcher.Dispose();
+            Recorder.Dispose();
+        }
+
+        _watching = wanted;
     }
 
     public void StartPresence()
@@ -173,13 +235,13 @@ public sealed class AppServices : IDisposable
 
         string applicationId = PresenceService.ApplicationId(settings.DiscordApplicationId);
 
-        if (!settings.DiscordPresence || string.IsNullOrWhiteSpace(applicationId))
+        if (!settings.Monitoring || !settings.DiscordPresence || string.IsNullOrWhiteSpace(applicationId))
         {
             return;
         }
 
         var discord = new DiscordPresenceClient(PresenceTransports, applicationId);
-        Presence = new PresenceService(discord, Games, Sessions, Accounts)
+        Presence = new PresenceService(discord, Games, Sessions, Accounts, Locator)
         {
             Options = settings.PresenceOptions,
         };

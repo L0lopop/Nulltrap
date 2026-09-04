@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 using Nulltrap.Core.Deployment;
+using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Presence;
 
 namespace Nulltrap.Core.Settings;
@@ -37,6 +38,12 @@ public sealed record NulltrapSettings
     [JsonPropertyName("confirmMultipleInstances")]
     public bool ConfirmMultipleInstances { get; set; } = true;
 
+    [JsonPropertyName("monitoring")]
+    public bool Monitoring { get; set; } = true;
+
+    [JsonPropertyName("serverNotice")]
+    public bool ServerNotice { get; set; }
+
     [JsonPropertyName("discordPresence")]
     public bool DiscordPresence { get; set; } = true;
 
@@ -63,6 +70,15 @@ public sealed record NulltrapSettings
 
     [JsonPropertyName("discordApplicationId")]
     public string DiscordApplicationId { get; set; } = string.Empty;
+
+    [JsonPropertyName("cacheSweep")]
+    public CacheSweep CacheSweep { get; set; } = CacheSweep.Never;
+
+    [JsonPropertyName("lastCacheSweep")]
+    public DateTimeOffset? LastCacheSweep { get; set; }
+
+    [JsonPropertyName("trimMemory")]
+    public bool TrimMemory { get; set; } = true;
 
     [JsonPropertyName("mods")]
     public bool Mods { get; set; } = true;

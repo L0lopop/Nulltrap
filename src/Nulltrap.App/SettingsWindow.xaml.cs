@@ -9,6 +9,7 @@ using Nulltrap.Core.Deployment;
 using Nulltrap.Core.FastFlags;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Localization;
+using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Presence;
 using Nulltrap.Core.Roblox;
@@ -74,6 +75,8 @@ public partial class SettingsWindow : ChromeWindow
     };
 
     private static readonly AccountInfo SampleAccount = new(2374586903, "Roblox683038", "Roblox683038", null);
+
+    private static ServerPlace SamplePlace => new(ServerLocator.CountryName("DE"), "Frankfurt am Main");
 
     private static readonly (int Value, string Key)[] QualityModes =
     [
@@ -194,6 +197,14 @@ public partial class SettingsWindow : ChromeWindow
         PresenceButtonBox.IsChecked = _settings.DiscordShowGameButton;
 
 
+
+        TrimMemoryBox.IsChecked = _settings.TrimMemory;
+        FillSweepPlans();
+        ShowCacheSize();
+
+        MonitoringBox.IsChecked = _settings.Monitoring;
+        ServerNoticeBox.IsChecked = _settings.ServerNotice;
+        ShowMonitoring();
 
         bool unlocked = _flags.ContainsKey(FpsFlag);
         UnlockFpsBox.IsChecked = unlocked;
@@ -1062,7 +1073,8 @@ public partial class SettingsWindow : ChromeWindow
     {
         bool on = PresenceEnabledBox.IsChecked == true;
         PresenceOptions shape = PresenceShape();
-        PresenceActivity sample = PresenceService.Compose(SampleSession, SampleGame, shape, SampleAccount);
+        PresenceActivity sample = PresenceService.Compose(
+            SampleSession, SampleGame, shape, SampleAccount, SamplePlace);
 
         PresencePreview.Opacity = on ? 1 : 0.4;
         PreviewDetails.Text = sample.Details;
@@ -1072,6 +1084,7 @@ public partial class SettingsWindow : ChromeWindow
         PreviewElapsed.Visibility = shape.ShowElapsed ? Visibility.Visible : Visibility.Collapsed;
         PreviewIcon.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
         PreviewIconGlyph.Visibility = shape.ShowGameIcon ? Visibility.Visible : Visibility.Collapsed;
+        PreviewIcon.ToolTip = sample.LargeText;
 
         PreviewAccount.Visibility = sample.SmallText is null ? Visibility.Collapsed : Visibility.Visible;
         PreviewAccountGlyph.Text = sample.SmallText?[..1].ToUpperInvariant() ?? string.Empty;
@@ -2214,6 +2227,10 @@ public partial class SettingsWindow : ChromeWindow
 
     private void OnSave(object sender, RoutedEventArgs e)
     {
+        _settings.CacheSweep = ChosenSweep();
+        _settings.TrimMemory = TrimMemoryBox.IsChecked == true;
+        _settings.Monitoring = MonitoringBox.IsChecked == true;
+        _settings.ServerNotice = ServerNoticeBox.IsChecked == true;
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
         _settings.ConfirmMultipleInstances = ConfirmMultipleInstancesBox.IsChecked == true;
         _settings.DesktopShortcut = DesktopShortcutBox.IsChecked == true;
@@ -2259,10 +2276,90 @@ public partial class SettingsWindow : ChromeWindow
         _fastFlags.Save(_flags);
         SaveRobloxSettings();
         App.Services.Mods.Enabled = _settings.Mods;
+        App.Services.ApplyMonitoring();
         App.Services.StartPresence();
 
         RefreshFacts();
         ShowSaved();
+    }
+
+    private static readonly (CacheSweep Plan, string Key)[] SweepPlans =
+    [
+        (CacheSweep.Never, "cache.never"),
+        (CacheSweep.EachStart, "cache.eachStart"),
+        (CacheSweep.Daily, "cache.daily"),
+        (CacheSweep.Weekly, "cache.weekly"),
+    ];
+
+    private void FillSweepPlans()
+    {
+        CacheSweepBox.Items.Clear();
+
+        foreach ((CacheSweep plan, string key) in SweepPlans)
+        {
+            var item = new Choice(Strings.Get(key), plan);
+            CacheSweepBox.Items.Add(item);
+
+            if (plan == _settings.CacheSweep)
+            {
+                CacheSweepBox.SelectedItem = item;
+            }
+        }
+
+        CacheSweepBox.SelectedIndex = CacheSweepBox.SelectedIndex < 0 ? 0 : CacheSweepBox.SelectedIndex;
+    }
+
+    private CacheSweep ChosenSweep() =>
+        CacheSweepBox.SelectedItem is Choice { Value: CacheSweep plan } ? plan : CacheSweep.Never;
+
+    private void ShowCacheSize()
+    {
+        _ = Task.Run(() => App.Services.Cache.Weigh()).ContinueWith(
+            weighed => SweepSizeText.Text = Strings.Get("general.cacheSize", Megabytes(weighed.Result)),
+            TaskScheduler.FromCurrentSynchronizationContext());
+    }
+
+    private static string Megabytes(long bytes) =>
+        (bytes / (double)(1024 * 1024)).ToString("N0", CultureInfo.CurrentCulture);
+
+    private void OnSweepNow(object sender, RoutedEventArgs e)
+    {
+        if (AppServices.RobloxIsRunning())
+        {
+            SweepSizeText.Text = Strings.Get("general.cacheBusy");
+            return;
+        }
+
+        SweepNowButton.IsEnabled = false;
+        SweepSizeText.Text = Strings.Get("general.cacheWorking");
+
+        _ = Task.Run(() => App.Services.SweepCache(asked: true)).ContinueWith(
+            swept =>
+            {
+                SweepNowButton.IsEnabled = true;
+                CacheSizeText.Text = swept.Result is { } report
+                    ? Strings.Get("general.cacheSwept", Megabytes(report.Bytes), report.Files.ToString("N0", CultureInfo.CurrentCulture))
+                    : Strings.Get("general.cacheBusy");
+            },
+            TaskScheduler.FromCurrentSynchronizationContext());
+    }
+
+    private void OnMonitoringChanged(object sender, RoutedEventArgs e) => ShowMonitoring();
+
+    private void ShowMonitoring()
+    {
+        bool watching = MonitoringBox.IsChecked == true;
+
+        ServerNoticeBox.IsEnabled = watching;
+        PresenceLocked.Visibility = watching ? Visibility.Collapsed : Visibility.Visible;
+
+        foreach (UIElement child in PagePresence.Children)
+        {
+            if (!ReferenceEquals(child, PresenceLocked))
+            {
+                child.IsEnabled = watching;
+            }
+        }
     }
 
     private void OnSaveAndPlay(object sender, RoutedEventArgs e)

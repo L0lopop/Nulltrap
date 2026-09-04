@@ -12,11 +12,46 @@ public partial class App : Application
 {
     private static readonly TimeSpan ClientWindowTimeout = TimeSpan.FromMinutes(3);
 
+    private static readonly TimeSpan MemoryRelief = TimeSpan.FromMinutes(2);
+
+    private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
+
     private AppServices? _services;
 
     public static AppServices Services =>
         (Current as App)?._services
         ?? throw new InvalidOperationException("Services are not available yet.");
+
+    private void OnJoinedServer(object? sender, Core.Sessions.RobloxSession session)
+    {
+        if (_services is null || !_services.Settings.Load().ServerNotice)
+        {
+            return;
+        }
+
+        _ = Dispatcher.InvokeAsync(async () =>
+        {
+            Core.Roblox.GameInfo? game = await _services.Games
+                .DescribeAsync(session.UniverseId)
+                .ConfigureAwait(true);
+
+            Core.Roblox.ServerPlace? place = await _services.Locator
+                .DescribeAsync(session.ServerAddress)
+                .ConfigureAwait(true);
+
+            NoticeWindow.Announce(
+                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
+                place?.Describe ?? Core.Localization.Strings.Get("notice.unknownPlace"));
+        });
+    }
+
+    private void OnMemoryRelief(object? sender, EventArgs e)
+    {
+        if (_services?.Settings.Load().TrimMemory == true)
+        {
+            _services.Memory.Trim();
+        }
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -31,6 +66,12 @@ public partial class App : Application
         _services.StartTracking();
         _services.StartClientUpdates();
         _services.StartPresence();
+        _services.Sessions.Joined += OnJoinedServer;
+
+        _ = Task.Run(() => _services.SweepCache());
+
+        _relief.Tick += OnMemoryRelief;
+        _relief.Start();
 
         LaunchArguments arguments = LaunchArguments.Parse(e.Args);
 

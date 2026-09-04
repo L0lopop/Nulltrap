@@ -1,4 +1,4 @@
-using Nulltrap.Core.Localization;
+﻿using Nulltrap.Core.Localization;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 
@@ -16,6 +16,7 @@ public sealed class PresenceService : IDisposable
     private readonly GameInfoClient _games;
     private readonly SessionTracker _tracker;
     private readonly AccountInfoClient? _accounts;
+    private readonly ServerLocator? _servers;
 
     private CancellationTokenSource _work = new();
 
@@ -23,7 +24,8 @@ public sealed class PresenceService : IDisposable
         DiscordPresenceClient discord,
         GameInfoClient games,
         SessionTracker tracker,
-        AccountInfoClient? accounts = null)
+        AccountInfoClient? accounts = null,
+        ServerLocator? servers = null)
     {
         ArgumentNullException.ThrowIfNull(discord);
         ArgumentNullException.ThrowIfNull(games);
@@ -33,6 +35,7 @@ public sealed class PresenceService : IDisposable
         _games = games;
         _tracker = tracker;
         _accounts = accounts;
+        _servers = servers;
     }
 
     public PresenceOptions Options { get; set; } = PresenceOptions.Default;
@@ -71,14 +74,19 @@ public sealed class PresenceService : IDisposable
             ? await _accounts.DescribeAsync(session.UserId, cancellationToken).ConfigureAwait(false)
             : null;
 
-        return Compose(session, game, Options, account);
+        ServerPlace? place = Options.Subline.HasFlag(PresenceSubline.ServerRegion) && _servers is not null
+            ? await _servers.DescribeAsync(session.ServerAddress, cancellationToken).ConfigureAwait(false)
+            : null;
+
+        return Compose(session, game, Options, account, place);
     }
 
     public static PresenceActivity Compose(
         RobloxSession session,
         GameInfo? game,
         PresenceOptions options,
-        AccountInfo? account = null)
+        AccountInfo? account = null,
+        ServerPlace? place = null)
     {
         ArgumentNullException.ThrowIfNull(session);
         ArgumentNullException.ThrowIfNull(options);
@@ -104,10 +112,10 @@ public sealed class PresenceService : IDisposable
         return new PresenceActivity
         {
             Details = headline,
-            State = Subline(session, game, options),
+            State = Subline(game, options, place),
             StartedAt = options.ShowElapsed ? session.StartedAt : null,
             LargeImage = options.ShowGameIcon ? game?.IconUrl ?? FallbackImage : null,
-            LargeText = game?.Name,
+            LargeText = Tooltip(game, options),
             SmallImage = named ? account!.AvatarUrl : null,
             SmallText = named ? account!.Name : null,
             Buttons = buttons,
@@ -131,13 +139,25 @@ public sealed class PresenceService : IDisposable
         return string.Join(" · ", parts);
     }
 
-    private static string? Subline(RobloxSession session, GameInfo? game, PresenceOptions options)
+    private static string? Tooltip(GameInfo? game, PresenceOptions options)
+    {
+        if (game is null)
+        {
+            return null;
+        }
+
+        return options.Subline.HasFlag(PresenceSubline.Creator) && game.CreatorName is not null
+            ? $"{game.Name} · {Strings.Get("presence.byCreator", game.CreatorName)}"
+            : game.Name;
+    }
+
+    private static string? Subline(GameInfo? game, PresenceOptions options, ServerPlace? place)
     {
         var parts = new List<string>();
 
-        if (options.Subline.HasFlag(PresenceSubline.Creator) && game?.CreatorName is not null)
+        if (options.Subline.HasFlag(PresenceSubline.ServerRegion) && place is not null)
         {
-            parts.Add(Strings.Get("presence.byCreator", game.CreatorName));
+            parts.Add(place.Describe);
         }
 
         if (options.Subline.HasFlag(PresenceSubline.PlayerCount) && game is { Playing: > 0 })
@@ -145,17 +165,7 @@ public sealed class PresenceService : IDisposable
             parts.Add(Strings.Get("presence.playerCount", game.Playing.ToString("N0")));
         }
 
-        if (options.Subline.HasFlag(PresenceSubline.ServerRegion) && session.ServerAddress is not null)
-        {
-            parts.Add(Strings.Get("presence.onServer", session.ServerAddress));
-        }
-
-        if (options.AllowJoin && session.JobId is not null)
-        {
-            parts.Add(Strings.Get("presence.publicServer"));
-        }
-
-        return parts.Count == 0 ? null : string.Join(" | ", parts);
+        return parts.Count == 0 ? null : string.Join(" · ", parts);
     }
 
     private void OnJoining(object? sender, RobloxSession session) => Push(new PresenceActivity
