@@ -580,54 +580,15 @@
                         </StackPanel>
 
                         <StackPanel x:Name="GraphicsFrames" Visibility="Collapsed">
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.ownHeading}" />
-                            <TextBlock x:Name="RobloxOwner2" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
-                                       Text="{loc:S graphics.ownHint}" />
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.frameHeading}" />
+                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                                       Text="{loc:S graphics.frameHint}" />
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,260,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.cap}" />
                                         <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.capHint}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                        <TextBox x:Name="CapBox" Style="{StaticResource Field}" Width="110" />
-                                        <TextBlock Text="{loc:S graphics.fpsUnit}" VerticalAlignment="Center"
-                                                   Margin="10,0,0,0" FontSize="12"
-                                                   Foreground="{StaticResource TextSoftBrush}" />
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.fullscreen}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.fullscreenHint}" />
-                                    </StackPanel>
-                                    <CheckBox x:Name="FullscreenBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                                </Grid>
-                            </Border>
-
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.maximised}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.maximisedHint}" />
-                                    </StackPanel>
-                                    <CheckBox x:Name="StartMaximisedBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                                </Grid>
-                            </Border>
-
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.flagHeading}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
-                                       Text="{loc:S graphics.flagHint}" />
-
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,260,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.targetFps}" />
-                                        <TextBlock x:Name="FpsWarning" Style="{StaticResource RowHint}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <TextBox x:Name="FpsBox" Style="{StaticResource Field}" Width="110" />
@@ -646,6 +607,30 @@
                                     </StackPanel>
                                     <ComboBox x:Name="GraphicsApiBox" Style="{StaticResource Dropdown}" Width="220"
                                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+
+                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S graphics.ownHeading}" />
+                            <TextBlock x:Name="RobloxOwner2" Style="{StaticResource RowHint}" Margin="2,-6,0,12"
+                                       Text="{loc:S graphics.ownHint}" />
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.fullscreen}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.fullscreenHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="FullscreenBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.maximised}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S graphics.maximisedHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="StartMaximisedBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                                 </Grid>
                             </Border>
 
@@ -1224,50 +1209,29 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock x:Name="PlayedTodayText" FontSize="24" FontWeight="SemiBold"
+                                    <TextBlock x:Name="PlayedWeekText" FontSize="22" FontWeight="SemiBold"
                                                Foreground="{StaticResource PurpleBrightBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.today}" Margin="0,4,0,0" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock x:Name="PlayedWeekText" FontSize="24" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.week}" Margin="0,4,0,0" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock x:Name="PlayedTotalText" FontSize="24" FontWeight="SemiBold"
-                                               Foreground="{StaticResource TextBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.total}" Margin="0,4,0,0" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock x:Name="SessionCountText" FontSize="19" FontWeight="SemiBold"
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock x:Name="SessionCountText" FontSize="22" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.sessions}" Margin="0,4,0,0" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock x:Name="AverageSessionText" FontSize="19" FontWeight="SemiBold"
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock x:Name="AverageSessionText" FontSize="22" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.average}" Margin="0,4,0,0" />
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock x:Name="LongestSessionText" FontSize="19" FontWeight="SemiBold"
+                                <StackPanel Grid.Column="3">
+                                    <TextBlock x:Name="LongestSessionText" FontSize="22" FontWeight="SemiBold"
                                                Foreground="{StaticResource TextBrush}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.longest}" Margin="0,4,0,0" />
                                 </StackPanel>
@@ -1284,16 +1248,8 @@
 
                         <Border Style="{StaticResource RowCard}">
                             <StackPanel>
-                                <Grid>
-                                    <StackPanel Margin="0,0,150,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.recent}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.recentHint}" />
-                                    </StackPanel>
-                                    <Button x:Name="ClearHistoryButton" Style="{StaticResource Quiet}"
-                                            Content="{loc:S activity.clear}" MinWidth="128"
-                                            HorizontalAlignment="Right" VerticalAlignment="Center"
-                                            Click="OnClearHistory" />
-                                </Grid>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.recent}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.recentHint}" />
                                 <StackPanel x:Name="RecentPanel" Margin="0,12,0,0" />
                             </StackPanel>
                         </Border>

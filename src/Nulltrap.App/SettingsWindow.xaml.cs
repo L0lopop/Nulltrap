@@ -25,6 +25,7 @@ public partial class SettingsWindow : ChromeWindow
     private const string FpsFlag = "DFIntTaskSchedulerTargetFps";
     private const string FpsCapFlag = "FFlagTaskSchedulerLimitTargetFpsTo2402";
     private const int DefaultTargetFps = 9999;
+    private const int RobloxFrameCeiling = 240;
     private const string TextureQualityEnabledFlag = "DFFlagTextureQualityOverrideEnabled";
     private const string TextureQualityFlag = "DFIntTextureQualityOverride";
     private const string MsaaFlag = "FIntDebugForceMSAASamples";
@@ -196,7 +197,7 @@ public partial class SettingsWindow : ChromeWindow
 
         bool unlocked = _flags.ContainsKey(FpsFlag);
         UnlockFpsBox.IsChecked = unlocked;
-        FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, DefaultTargetFps.ToString());
+        FpsBox.Text = _flags.GetValueOrDefault(FpsFlag, RobloxFrameCeiling.ToString());
         FpsBox.IsEnabled = unlocked;
         FillChoices(MsaaBox, MsaaLevels, _flags.GetValueOrDefault(MsaaFlag));
         FillChoices(GrassBox, GrassDistances, _flags.GetValueOrDefault(MaxGrassFlag));
@@ -210,9 +211,6 @@ public partial class SettingsWindow : ChromeWindow
         FillChoices(TextureQualityBox, TextureLevels, overridingTexture ? _flags.GetValueOrDefault(TextureQualityFlag) : null);
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
-
-        FpsWarning.Text = Strings.Get(
-            FastFlagAllowlist.IsAllowed(FpsFlag) ? "graphics.fpsAllowed" : "graphics.fpsUnlisted");
 
         BuildLanguageButtons();
         BuildChangelog();
@@ -357,7 +355,6 @@ public partial class SettingsWindow : ChromeWindow
         ReadFlag(MaxQualityBox, "MaxQualityEnabled");
         ReadFlag(VignetteBox, "VignetteEnabled", fallback: true);
 
-        ReadText(CapBox, "FramerateCap", fallback: 240);
         ReadFlag(FullscreenBox, "Fullscreen");
         ReadFlag(StartMaximisedBox, "StartMaximized", fallback: true);
 
@@ -480,13 +477,6 @@ public partial class SettingsWindow : ChromeWindow
         WriteFlag(MaxQualityBox);
         WriteFlag(VignetteBox);
         _roblox.SetFlag("VignetteEnabledCustomOption", VignetteBox.IsChecked == true);
-
-        if (CapBox.IsEnabled
-            && int.TryParse(CapBox.Text.Trim(), NumberStyles.None, CultureInfo.CurrentCulture, out int cap)
-            && cap > 0)
-        {
-            _roblox.SetNumber("FramerateCap", Math.Clamp(cap, 1, 9999));
-        }
 
         WriteFlag(FullscreenBox);
         WriteFlag(StartMaximisedBox);
@@ -1585,9 +1575,7 @@ public partial class SettingsWindow : ChromeWindow
         SessionHistory history = App.Services.History.Load();
         DateTimeOffset now = DateTimeOffset.Now;
 
-        PlayedTodayText.Text = Clocks.Describe(history.Since(now.Date));
         PlayedWeekText.Text = Clocks.Describe(history.Since(now.Date.AddDays(-6)));
-        PlayedTotalText.Text = Clocks.Describe(history.Total());
 
         PlayedSession[] counted = history.Sessions.Where(played => played.Duration > TimeSpan.Zero).ToArray();
 
@@ -1628,8 +1616,6 @@ public partial class SettingsWindow : ChromeWindow
         {
             RecentPanel.Children.Add(Faint(Strings.Get("activity.nothingYet")));
         }
-
-        ClearHistoryButton.IsEnabled = history.Sessions.Count > 0;
     }
 
     private Grid Line(string title, string detail, string trailing)
@@ -1678,21 +1664,6 @@ public partial class SettingsWindow : ChromeWindow
         FontSize = 12,
         Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
     };
-
-    private void OnClearHistory(object sender, RoutedEventArgs e)
-    {
-        if (MessageBox.Show(
-                Strings.Get("activity.confirmClear"),
-                "Nulltrap",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question) != MessageBoxResult.Yes)
-        {
-            return;
-        }
-
-        App.Services.History.Clear();
-        BuildActivity();
-    }
 
     private void BuildMods()
     {
@@ -2288,9 +2259,18 @@ public partial class SettingsWindow : ChromeWindow
 
     private void OnUnlockFpsChanged(object sender, RoutedEventArgs e)
     {
-        FpsBox.IsEnabled = UnlockFpsBox.IsChecked == true;
+        bool unlocked = UnlockFpsBox.IsChecked == true;
+        FpsBox.IsEnabled = unlocked;
 
-        if (FpsBox.IsEnabled && string.IsNullOrWhiteSpace(FpsBox.Text))
+        if (!unlocked)
+        {
+            FpsBox.Text = RobloxFrameCeiling.ToString();
+            return;
+        }
+
+        string asked = FpsBox.Text.Trim();
+
+        if (asked.Length == 0 || asked == RobloxFrameCeiling.ToString())
         {
             FpsBox.Text = DefaultTargetFps.ToString();
         }
