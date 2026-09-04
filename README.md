@@ -60,11 +60,14 @@ a flag will be ignored, rather than letting you believe it applied.
 
 ## Status
 
-<img src="assets/status.svg" alt="Phases 0, 1 and 2 complete, phase 3 in progress" width="820">
+<img src="assets/status.svg" alt="Phases 0, 1, 2 and 3 complete, phase 4 next" width="820">
 
 Working today: self-installation without administrator rights, Roblox and
 Studio downloads with a checksum-addressed cache, protocol handlers, the
-graphics settings Roblox still allows, and an English and Russian interface.
+graphics settings Roblox still allows, per-game profiles that carry both
+FastFlags and ordinary Roblox settings, a plugin contract with its own SDK,
+a tray icon with a background mode, join notices, and an English and Russian
+interface.
 
 ## Building
 
