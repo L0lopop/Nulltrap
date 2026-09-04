@@ -283,6 +283,8 @@ public partial class App : Application
                 window.Progress,
                 window.CancellationToken);
 
+            Services.PrepareFor(RobloxUri.PlaceFrom(arguments.RobloxUri), result.VersionDirectory);
+
             int client = Services.ProcessLauncher.Start(
                 result.ExecutablePath,
                 ClientArguments.ForUri(arguments.BinaryType, arguments.RobloxUri),

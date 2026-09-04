@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Nulltrap.Core.Profiles;
 
@@ -9,6 +9,9 @@ public sealed record GameProfile
 
     [JsonPropertyName("flags")]
     public Dictionary<string, string> Flags { get; init; } = new(StringComparer.Ordinal);
+
+    [JsonPropertyName("settings")]
+    public Dictionary<string, string> Settings { get; init; } = new(StringComparer.Ordinal);
 
     [JsonPropertyName("places")]
     public List<long> Places { get; init; } = [];

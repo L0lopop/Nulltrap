@@ -186,6 +186,24 @@ public sealed class AppServices : IDisposable
         }
     }
 
+    public GameProfile? PrepareFor(long placeId, string versionDirectory)
+    {
+        GameProfile? profile = Profiles.ApplyTo(versionDirectory, placeId, FastFlags.Load(), Plugins.Flags);
+
+        Profiles.ApplySettings(profile);
+
+        if (profile?.Mods is bool wanted)
+        {
+            bool was = Mods.Enabled;
+
+            Mods.Enabled = wanted;
+            Mods.ApplyTo(versionDirectory);
+            Mods.Enabled = was;
+        }
+
+        return profile;
+    }
+
     public static bool RobloxIsRunning() =>
         System.Diagnostics.Process.GetProcessesByName("RobloxPlayerBeta").Length > 0
         || System.Diagnostics.Process.GetProcessesByName("RobloxStudioBeta").Length > 0;

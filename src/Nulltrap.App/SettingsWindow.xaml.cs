@@ -262,7 +262,10 @@ public partial class SettingsWindow : ChromeWindow
         Show(page);
     }
 
-    public sealed record Choice(string Label, object? Value);
+    public sealed record Choice(string Label, object? Value)
+    {
+        public override string ToString() => Label;
+    }
 
     private static void FillChoices(ComboBox box, (string? Value, string Key)[] choices, string? current)
     {
@@ -1189,13 +1192,14 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "Profiles", "Plugins", "News", "About"];
+        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Modifications", "Flags", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
         ["Graphics"] = ["GraphicsQuality", "GraphicsFrames", "GraphicsSound", "GraphicsInterface", "GraphicsControl", "GraphicsReady"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
         ["Integrations"] = ["IntegrationsActivity", "IntegrationsDiscord"],
+        ["Modifications"] = ["ModsProfiles", "ModsFiles", "ModsPlugins"],
         ["General"] = ["GeneralStart", "GeneralUpkeep"],
     };
 
@@ -1210,6 +1214,9 @@ public partial class SettingsWindow : ChromeWindow
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
         ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
         ["VersionsStorage"] = ("Versions", "VersionsStorage"),
+        ["ModsProfiles"] = ("Modifications", "ModsProfiles"),
+        ["ModsFiles"] = ("Modifications", "ModsFiles"),
+        ["ModsPlugins"] = ("Modifications", "ModsPlugins"),
         ["IntegrationsActivity"] = ("Integrations", "IntegrationsActivity"),
         ["IntegrationsDiscord"] = ("Integrations", "IntegrationsDiscord"),
         ["GeneralStart"] = ("General", "GeneralStart"),
@@ -2454,6 +2461,7 @@ public partial class SettingsWindow : ChromeWindow
         FillPlayed();
         BuildProfilePlaces();
         BuildProfileFlags();
+        ShowProfileSettings();
 
         ProfileModsBox.Items.Clear();
 
@@ -2490,6 +2498,120 @@ public partial class SettingsWindow : ChromeWindow
             .DistinctBy(played => played.PlaceId)
             .Take(25)
             .ToArray();
+
+    private static readonly (string? Value, string Key)[] ProfileFullscreenChoices =
+    [
+        (null, "profiles.leave"),
+        ("true", "profiles.on"),
+        ("false", "profiles.off"),
+    ];
+
+    private static readonly (string? Value, string Key)[] ProfileOptimizationChoices =
+    [
+        (null, "profiles.leave"),
+        ("0", "graphics.optimizationSpeed"),
+        ("1", "graphics.optimizationBalance"),
+        ("2", "graphics.optimizationQuality"),
+    ];
+
+    private static readonly (string Setting, string Box)[] ProfileSettings =
+    [
+        ("SavedQualityLevel", "ProfileQualityBox"),
+        ("GraphicsOptimizationMode", "ProfileOptimizationBox"),
+        ("Fullscreen", "ProfileFullscreenBox"),
+        ("MasterVolume", "ProfileVolumeBox"),
+    ];
+
+    private void ShowProfileSettings()
+    {
+        FillQuality();
+        FillVolume();
+        FillKnown(ProfileOptimizationBox, ProfileOptimizationChoices);
+        FillKnown(ProfileFullscreenBox, ProfileFullscreenChoices);
+
+        foreach ((string setting, string box) in ProfileSettings)
+        {
+            if (FindName(box) is ComboBox picker)
+            {
+                PickSetting(picker, _profile?.Settings.GetValueOrDefault(setting));
+            }
+        }
+    }
+
+    private void FillQuality()
+    {
+        ProfileQualityBox.Items.Clear();
+        ProfileQualityBox.Items.Add(new Choice(Strings.Get("profiles.leave"), null));
+        ProfileQualityBox.Items.Add(new Choice(Strings.Get("profiles.auto"), "0"));
+
+        for (int level = 1; level <= 10; level++)
+        {
+            ProfileQualityBox.Items.Add(new Choice(
+                Strings.Get("graphics.levelValue", level),
+                level.ToString(CultureInfo.InvariantCulture)));
+        }
+    }
+
+    private void FillVolume()
+    {
+        ProfileVolumeBox.Items.Clear();
+        ProfileVolumeBox.Items.Add(new Choice(Strings.Get("profiles.leave"), null));
+
+        for (int step = 0; step <= 10; step++)
+        {
+            ProfileVolumeBox.Items.Add(new Choice(
+                (step * 10).ToString(CultureInfo.CurrentCulture) + " %",
+                (step / 10.0).ToString("0.###", CultureInfo.InvariantCulture)));
+        }
+    }
+
+    private void FillKnown(ComboBox box, (string? Value, string Key)[] choices)
+    {
+        box.Items.Clear();
+
+        foreach ((string? value, string key) in choices)
+        {
+            box.Items.Add(new Choice(Strings.Get(key), value));
+        }
+    }
+
+    private static void PickSetting(ComboBox box, string? wanted)
+    {
+        foreach (Choice choice in box.Items.OfType<Choice>())
+        {
+            if (string.Equals(choice.Value as string, wanted, StringComparison.OrdinalIgnoreCase))
+            {
+                box.SelectedItem = choice;
+                return;
+            }
+        }
+
+        box.SelectedIndex = 0;
+    }
+
+    private void KeepProfileSettings()
+    {
+        if (_profile is null)
+        {
+            return;
+        }
+
+        foreach ((string setting, string box) in ProfileSettings)
+        {
+            if (FindName(box) is not ComboBox picker)
+            {
+                continue;
+            }
+
+            if (picker.SelectedItem is Choice { Value: string chosen } && chosen.Length > 0)
+            {
+                _profile.Settings[setting] = chosen;
+                continue;
+            }
+
+            _profile.Settings.Remove(setting);
+        }
+    }
 
     private void BuildProfilePlaces()
     {
@@ -2642,6 +2764,8 @@ public partial class SettingsWindow : ChromeWindow
             return;
         }
 
+        KeepProfileSettings();
+
         _profile = picked;
         ShowProfile();
     }
@@ -2785,6 +2909,8 @@ public partial class SettingsWindow : ChromeWindow
         {
             _profile.Mods = picked.Value as bool?;
         }
+
+        KeepProfileSettings();
 
         _profiles.Save(_book);
     }

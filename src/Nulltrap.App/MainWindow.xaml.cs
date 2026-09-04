@@ -123,20 +123,7 @@ public partial class MainWindow : ChromeWindow
                 window.Progress,
                 window.CancellationToken);
 
-            Nulltrap.Core.Profiles.GameProfile? profile = App.Services.Profiles.ApplyTo(
-                result.VersionDirectory,
-                placeId,
-                App.Services.FastFlags.Load(),
-                App.Services.Plugins.Flags);
-
-            if (profile?.Mods is bool wanted)
-            {
-                bool was = App.Services.Mods.Enabled;
-
-                App.Services.Mods.Enabled = wanted;
-                App.Services.Mods.ApplyTo(result.VersionDirectory);
-                App.Services.Mods.Enabled = was;
-            }
+            App.Services.PrepareFor(placeId, result.VersionDirectory);
 
             int client = App.Services.ProcessLauncher.Start(
                 result.ExecutablePath,

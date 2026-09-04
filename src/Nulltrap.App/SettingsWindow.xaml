@@ -47,11 +47,9 @@
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavModifications" Tag="Modifications" Content="{loc:S nav.modifications}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavIntegrations" Tag="Integrations" Content="{loc:S nav.integrations}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavProfiles" Tag="Profiles" Content="{loc:S nav.profiles}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavPlugins" Tag="Plugins" Content="{loc:S nav.plugins}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
@@ -1196,55 +1194,229 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageMods" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.enable}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.enableHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="ModsEnabledBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnModsToggled" />
-                            </Grid>
+                    <StackPanel x:Name="PageModifications" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="ModTabs"
+                                             x:Name="TabModsProfiles" Tag="ModsProfiles"
+                                             Content="{loc:S nav.profiles}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="ModTabs"
+                                             x:Name="TabModsFiles" Tag="ModsFiles"
+                                             Content="{loc:S nav.mods}" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="ModTabs"
+                                             x:Name="TabModsPlugins" Tag="ModsPlugins"
+                                             Content="{loc:S nav.plugins}" Checked="OnSubTab" />
+                            </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
+                        <StackPanel x:Name="ModsProfiles">
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.what}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.whatHint}" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,430,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.chosen}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.chosenHint}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <ComboBox x:Name="ProfileBox" Style="{StaticResource Dropdown}" Width="210"
+                                                  SelectionChanged="OnProfileChosen" />
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.add}"
+                                                MinWidth="104" Margin="8,0,0,0" Click="OnAddProfile" />
+                                        <Button x:Name="RemoveProfileButton" Style="{StaticResource Quiet}"
+                                                Content="{loc:S profiles.remove}" MinWidth="96" Margin="8,0,0,0"
+                                                Click="OnRemoveProfile" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="ProfilesEmpty" Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.none}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.noneHint}" />
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel x:Name="ProfileBody" Visibility="Collapsed">
+                                <Border Style="{StaticResource RowCard}">
+                                    <Grid>
+                                        <StackPanel Margin="0,0,330,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.name}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.nameHint}" />
+                                        </StackPanel>
+                                        <TextBox x:Name="ProfileNameBox" Style="{StaticResource Field}" Width="310"
+                                                 HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                 LostFocus="OnProfileNameLeft" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.places}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.placesHint}" />
+                                        <StackPanel x:Name="ProfilePlacesPanel" Margin="0,12,0,0" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                            <ComboBox x:Name="ProfileRecentBox" Style="{StaticResource Dropdown}" Width="300" />
+                                            <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlayed}"
+                                                    MinWidth="150" Margin="8,0,0,0" Click="OnAddPlayedPlace" />
+                                            <TextBox x:Name="ProfilePlaceBox" Style="{StaticResource Field}" Width="140" Margin="20,0,0,0" />
+                                            <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlace}"
+                                                    MinWidth="120" Margin="8,0,0,0" Click="OnAddPlace" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <StackPanel Margin="0,0,160,0">
+                                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.flags}" />
+                                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.flagsHint}" />
+                                            </StackPanel>
+                                            <Button Style="{StaticResource Quiet}" Content="{loc:S flags.add}"
+                                                    MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                    Click="OnAddProfileFlag" />
+                                        </Grid>
+                                        <StackPanel x:Name="ProfileFlagsPanel" Margin="0,12,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.settings}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.settingsHint}" />
+
+                                        <Grid Margin="0,14,0,0">
+                                            <TextBlock Text="{loc:S graphics.level}" FontSize="13" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                            <ComboBox x:Name="ProfileQualityBox" Style="{StaticResource Dropdown}" Width="230"
+                                                      HorizontalAlignment="Right" />
+                                        </Grid>
+
+                                        <Grid Margin="0,10,0,0">
+                                            <TextBlock Text="{loc:S graphics.optimization}" FontSize="13" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                            <ComboBox x:Name="ProfileOptimizationBox" Style="{StaticResource Dropdown}" Width="230"
+                                                      HorizontalAlignment="Right" />
+                                        </Grid>
+
+                                        <Grid Margin="0,10,0,0">
+                                            <TextBlock Text="{loc:S graphics.fullscreen}" FontSize="13" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                            <ComboBox x:Name="ProfileFullscreenBox" Style="{StaticResource Dropdown}" Width="230"
+                                                      HorizontalAlignment="Right" />
+                                        </Grid>
+
+                                        <Grid Margin="0,10,0,0">
+                                            <TextBlock Text="{loc:S graphics.master}" FontSize="13" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                            <ComboBox x:Name="ProfileVolumeBox" Style="{StaticResource Dropdown}" Width="230"
+                                                      HorizontalAlignment="Right" />
+                                        </Grid>
+                                    </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                    <Grid>
+                                        <StackPanel Margin="0,0,240,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.mods}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.modsHint}" />
+                                        </StackPanel>
+                                        <ComboBox x:Name="ProfileModsBox" Style="{StaticResource Dropdown}" Width="230"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel x:Name="ModsFiles" Visibility="Collapsed">
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.enable}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.enableHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="ModsEnabledBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Click="OnModsToggled" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <Grid>
+                                        <StackPanel Margin="0,0,290,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.folder}" />
+                                            <TextBlock x:Name="ModsFolderText" Style="{StaticResource RowHint}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
+                                                    MinWidth="128" Click="OnOpenMods" />
+                                            <Button x:Name="ApplyModsButton" Style="{StaticResource Accent}"
+                                                    Content="{loc:S mods.apply}" MinWidth="150" Margin="10,0,0,0"
+                                                    Click="OnApplyMods" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="ModsAppliedText" Style="{StaticResource RowHint}" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.files}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.filesHint}" />
+                                    <StackPanel x:Name="ModsPanel" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.examples}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.examplesHint}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Margin="0,10,0,0" FontFamily="Consolas"
+                                               Text="{loc:S mods.examplesList}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="ModsPlugins" Visibility="Collapsed">
+                            <Border Style="{StaticResource RowCard}" BorderBrush="{DynamicResource DangerBrush}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.trust}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.trustHint}" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,290,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.folder}" />
-                                        <TextBlock x:Name="ModsFolderText" Style="{StaticResource RowHint}"
-                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.folder}" />
+                                        <TextBlock x:Name="PluginsFolderText" Style="{StaticResource RowHint}" />
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                         <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
-                                                MinWidth="128" Click="OnOpenMods" />
-                                        <Button x:Name="ApplyModsButton" Style="{StaticResource Accent}"
-                                                Content="{loc:S mods.apply}" MinWidth="150" Margin="10,0,0,0"
-                                                Click="OnApplyMods" />
+                                                MinWidth="130" Click="OnOpenPluginsFolder" />
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S plugins.reload}"
+                                                MinWidth="130" Margin="8,0,0,0" Click="OnReloadPlugins" />
                                     </StackPanel>
                                 </Grid>
-                                <TextBlock x:Name="ModsAppliedText" Style="{StaticResource RowHint}" Margin="0,12,0,0" />
-                            </StackPanel>
-                        </Border>
+                            </Border>
 
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.files}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.filesHint}" />
-                                <StackPanel x:Name="ModsPanel" Margin="0,12,0,0" />
-                            </StackPanel>
-                        </Border>
+                            <StackPanel x:Name="PluginsPanel" />
 
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.examples}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.examplesHint}" />
-                                <TextBlock Style="{StaticResource RowHint}" Margin="0,10,0,0" FontFamily="Consolas"
-                                           Text="{loc:S mods.examplesList}" />
-                            </StackPanel>
-                        </Border>
+                            <Border x:Name="PluginsEmpty" Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.none}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.noneHint}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PageFlags" Visibility="Collapsed">
@@ -1358,121 +1530,7 @@
 
 
 
-                    <StackPanel x:Name="PageProfiles" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,430,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.chosen}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.chosenHint}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <ComboBox x:Name="ProfileBox" Style="{StaticResource Dropdown}" Width="210"
-                                              SelectionChanged="OnProfileChosen" />
-                                    <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.add}"
-                                            MinWidth="104" Margin="8,0,0,0" Click="OnAddProfile" />
-                                    <Button x:Name="RemoveProfileButton" Style="{StaticResource Quiet}"
-                                            Content="{loc:S profiles.remove}" MinWidth="96" Margin="8,0,0,0"
-                                            Click="OnRemoveProfile" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
 
-                        <Border x:Name="ProfilesEmpty" Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.none}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.noneHint}" />
-                            </StackPanel>
-                        </Border>
-
-                        <StackPanel x:Name="ProfileBody" Visibility="Collapsed">
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,330,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.name}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.nameHint}" />
-                                    </StackPanel>
-                                    <TextBox x:Name="ProfileNameBox" Style="{StaticResource Field}" Width="310"
-                                             HorizontalAlignment="Right" VerticalAlignment="Center"
-                                             LostFocus="OnProfileNameLeft" />
-                                </Grid>
-                            </Border>
-
-                            <Border Style="{StaticResource RowCard}">
-                                <StackPanel>
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.places}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.placesHint}" />
-                                    <StackPanel x:Name="ProfilePlacesPanel" Margin="0,12,0,0" />
-                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <ComboBox x:Name="ProfileRecentBox" Style="{StaticResource Dropdown}" Width="300" />
-                                        <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlayed}"
-                                                MinWidth="150" Margin="8,0,0,0" Click="OnAddPlayedPlace" />
-                                        <TextBox x:Name="ProfilePlaceBox" Style="{StaticResource Field}" Width="140" Margin="20,0,0,0" />
-                                        <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlace}"
-                                                MinWidth="120" Margin="8,0,0,0" Click="OnAddPlace" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource RowCard}">
-                                <StackPanel>
-                                    <Grid>
-                                        <StackPanel Margin="0,0,160,0">
-                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.flags}" />
-                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.flagsHint}" />
-                                        </StackPanel>
-                                        <Button Style="{StaticResource Quiet}" Content="{loc:S flags.add}"
-                                                MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                Click="OnAddProfileFlag" />
-                                    </Grid>
-                                    <StackPanel x:Name="ProfileFlagsPanel" Margin="0,12,0,0" />
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource RowCard}">
-                                <Grid>
-                                    <StackPanel Margin="0,0,240,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.mods}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.modsHint}" />
-                                    </StackPanel>
-                                    <ComboBox x:Name="ProfileModsBox" Style="{StaticResource Dropdown}" Width="230"
-                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel x:Name="PagePlugins" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}" BorderBrush="{DynamicResource DangerBrush}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.trust}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.trustHint}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,290,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.folder}" />
-                                    <TextBlock x:Name="PluginsFolderText" Style="{StaticResource RowHint}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
-                                            MinWidth="130" Click="OnOpenPluginsFolder" />
-                                    <Button Style="{StaticResource Quiet}" Content="{loc:S plugins.reload}"
-                                            MinWidth="130" Margin="8,0,0,0" Click="OnReloadPlugins" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <StackPanel x:Name="PluginsPanel" />
-
-                        <Border x:Name="PluginsEmpty" Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.none}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.noneHint}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
 
                     <StackPanel x:Name="PageNews" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
