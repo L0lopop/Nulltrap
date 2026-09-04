@@ -19,7 +19,7 @@
             BorderThickness="1"
             CornerRadius="10"
             Padding="16,13"
-            Width="340"
+            Width="360"
             Margin="16">
         <Border.RenderTransform>
             <TranslateTransform x:Name="Lift" />
@@ -30,12 +30,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Image Grid.Column="0" Width="28" Height="28" VerticalAlignment="Top"
-                   RenderOptions.BitmapScalingMode="HighQuality">
-                <Image.Source>
-                    <BitmapImage UriSource="Nulltrap.png" DecodePixelWidth="56" />
-                </Image.Source>
-            </Image>
+            <Border Grid.Column="0" Width="46" Height="46" CornerRadius="9"
+                    VerticalAlignment="Top" ClipToBounds="True"
+                    Background="{DynamicResource SurfaceHoverBrush}">
+                <Image x:Name="NoticeIcon" Stretch="UniformToFill"
+                       RenderOptions.BitmapScalingMode="HighQuality" />
+            </Border>
 
             <StackPanel Grid.Column="1" Margin="13,0,0,0">
                 <TextBlock x:Name="NoticeTitle"
@@ -45,6 +45,11 @@
                            Foreground="{DynamicResource TextBrush}" />
                 <TextBlock x:Name="NoticeBody"
                            Margin="0,3,0,0"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource TextSoftBrush}" />
+                <TextBlock x:Name="NoticeTail"
+                           Margin="0,2,0,0"
                            FontSize="12"
                            TextWrapping="Wrap"
                            Foreground="{DynamicResource TextSoftBrush}" />

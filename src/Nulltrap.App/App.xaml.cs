@@ -52,12 +52,20 @@ public partial class App : Application
                 _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
             }
 
-            if (notice)
+            if (!notice)
             {
-                NoticeWindow.Announce(
-                    game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
-                    place?.Describe ?? Core.Localization.Strings.Get("notice.unknownPlace"));
+                return;
             }
+
+            Core.Roblox.ServerFacts? facts = await _services.Servers
+                .FindAsync(session.PlaceId, session.JobId)
+                .ConfigureAwait(true);
+
+            NoticeWindow.Announce(
+                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
+                Where(place, game),
+                Numbers(facts),
+                game?.IconUrl);
         });
     }
 
@@ -74,6 +82,48 @@ public partial class App : Application
         {
             AppServices.CloseRoblox();
         }
+    }
+
+    private static string Where(Core.Roblox.ServerPlace? place, Core.Roblox.GameInfo? game)
+    {
+        var parts = new List<string>
+        {
+            place?.Describe ?? Core.Localization.Strings.Get("notice.unknownPlace"),
+        };
+
+        if (game is { Playing: > 0 })
+        {
+            parts.Add(Core.Localization.Strings.Get("notice.online", game.Playing.ToString("N0")));
+        }
+
+        return string.Join(" · ", parts);
+    }
+
+    private static string? Numbers(Core.Roblox.ServerFacts? facts)
+    {
+        if (facts is null)
+        {
+            return null;
+        }
+
+        var parts = new List<string>();
+
+        if (facts.MaxPlayers > 0)
+        {
+            parts.Add(Core.Localization.Strings.Get("notice.seats", facts.Playing, facts.MaxPlayers));
+        }
+
+        if (facts.Fps > 0)
+        {
+            parts.Add(Core.Localization.Strings.Get("notice.tick", facts.Fps));
+        }
+
+        if (facts.Ping > 0)
+        {
+            parts.Add(Core.Localization.Strings.Get("notice.ping", facts.Ping));
+        }
+
+        return parts.Count == 0 ? null : string.Join(" · ", parts);
     }
 
     private static Plugins.PluginSession Told(
