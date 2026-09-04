@@ -54,7 +54,7 @@ public sealed class FastFlagManager
             .Where(pair => !string.IsNullOrWhiteSpace(pair.Value))
             .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
 
-        string staging = SourcePath + ".tmp";
+        string staging = $"{SourcePath}.{Environment.ProcessId}.tmp";
         File.WriteAllText(staging, JsonSerializer.Serialize(kept, Options));
         File.Move(staging, SourcePath, overwrite: true);
     }

@@ -91,16 +91,16 @@ public sealed class TrayIcon : IDisposable
 
     public event EventHandler? Quit;
 
-    public void Idle()
+    public void Idle() => On(() =>
     {
         _standing.Header = Strings.Get("tray.idle");
         _server.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Collapsed;
         _play.Visibility = Visibility.Visible;
         Tip("Nulltrap");
-    }
+    });
 
-    public void Playing(string game, ServerPlace? place, ServerFacts? facts)
+    public void Playing(string game, ServerPlace? place, ServerFacts? facts) => On(() =>
     {
         _standing.Header = Strings.Get("tray.playing", game);
         _play.Visibility = Visibility.Collapsed;
@@ -112,6 +112,22 @@ public sealed class TrayIcon : IDisposable
         _server.Visibility = about is null ? Visibility.Collapsed : Visibility.Visible;
 
         Tip($"Nulltrap · {game}");
+    });
+
+    private void On(Action work)
+    {
+        if (_gone)
+        {
+            return;
+        }
+
+        if (_host.Dispatcher.CheckAccess())
+        {
+            work();
+            return;
+        }
+
+        _ = _host.Dispatcher.InvokeAsync(work);
     }
 
     public void Dispose()

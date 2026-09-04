@@ -172,7 +172,7 @@ public sealed class ProfileStore
 
         Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
 
-        string staging = _path + ".tmp";
+        string staging = $"{_path}.{Environment.ProcessId}.tmp";
         File.WriteAllText(staging, JsonSerializer.Serialize(book, Options));
         File.Move(staging, _path, overwrite: true);
     }

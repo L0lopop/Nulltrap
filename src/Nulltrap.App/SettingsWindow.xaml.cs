@@ -2339,6 +2339,12 @@ public partial class SettingsWindow : ChromeWindow
         App.Services.Mods.Enabled = _settings.Mods;
         App.Services.ApplyMonitoring();
         App.Services.ApplyStartup();
+
+        if (Application.Current is App running)
+        {
+            running.ApplyTray();
+        }
+
         App.Services.StartPlugins();
         BuildPlugins();
         App.Services.StartPresence();
@@ -2379,7 +2385,13 @@ public partial class SettingsWindow : ChromeWindow
     private void ShowCacheSize()
     {
         _ = Task.Run(() => App.Services.Cache.Weigh()).ContinueWith(
-            weighed => SweepSizeText.Text = Strings.Get("general.cacheSize", Megabytes(weighed.Result)),
+            weighed =>
+            {
+                if (weighed.IsCompletedSuccessfully)
+                {
+                    SweepSizeText.Text = Strings.Get("general.cacheSize", Megabytes(weighed.Result));
+                }
+            },
             TaskScheduler.FromCurrentSynchronizationContext());
     }
 
@@ -2401,7 +2413,14 @@ public partial class SettingsWindow : ChromeWindow
             swept =>
             {
                 SweepNowButton.IsEnabled = true;
-                CacheSizeText.Text = swept.Result is { } report
+
+                if (!swept.IsCompletedSuccessfully)
+                {
+                    SweepSizeText.Text = Strings.Get("general.cacheBusy");
+                    return;
+                }
+
+                SweepSizeText.Text = swept.Result is { } report
                     ? Strings.Get("general.cacheSwept", Megabytes(report.Bytes), report.Files.ToString("N0", CultureInfo.CurrentCulture))
                     : Strings.Get("general.cacheBusy");
             },

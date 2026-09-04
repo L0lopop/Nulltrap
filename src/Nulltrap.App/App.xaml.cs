@@ -275,6 +275,33 @@ public partial class App : Application
 
     public bool Watching => _tray is not null;
 
+    public void ApplyTray()
+    {
+        if (_services is null)
+        {
+            return;
+        }
+
+        if (_services.Settings.Load().StayInTray)
+        {
+            Linger();
+            return;
+        }
+
+        if (_tray is null)
+        {
+            return;
+        }
+
+        _tray.Dispose();
+        _tray = null;
+
+        _watch?.Dispose();
+        _watch = null;
+
+        ShutdownMode = ShutdownMode.OnLastWindowClose;
+    }
+
     private void Flip()
     {
         if (Windows.OfType<MainWindow>().FirstOrDefault() is { IsVisible: true } standing)

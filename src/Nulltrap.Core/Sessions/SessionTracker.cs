@@ -10,6 +10,8 @@ public sealed partial class SessionTracker
     private const string LeavingExperience = "sendAnalyticsBeforeLeave";
     private const string ReplicatorCreated = "[FLog::Network] Replicator created";
 
+    private readonly Lock _gate = new();
+
     private RobloxSession _session = new();
 
     public SessionState State { get; private set; } = SessionState.Idle;
@@ -28,7 +30,10 @@ public sealed partial class SessionTracker
 
     public void GiveUp()
     {
-        End();
+        lock (_gate)
+        {
+            End();
+        }
     }
 
     public void Feed(string line)
@@ -42,8 +47,14 @@ public sealed partial class SessionTracker
             return;
         }
 
-        string entry = line[channel..];
+        lock (_gate)
+        {
+            Sort(line[channel..]);
+        }
+    }
 
+    private void Sort(string entry)
+    {
         if (entry.StartsWith(EnteredPlaySession, StringComparison.Ordinal))
         {
             Begin();
