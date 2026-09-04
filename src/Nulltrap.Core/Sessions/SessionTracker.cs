@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Nulltrap.Core.Sessions;
@@ -21,6 +21,8 @@ public sealed partial class SessionTracker
     public event EventHandler<RobloxSession>? Joined;
 
     public event EventHandler<RobloxSession>? Left;
+
+    public event EventHandler<RobloxSession>? Moved;
 
     public event EventHandler<string>? MessageFromGame;
 
@@ -110,6 +112,11 @@ public sealed partial class SessionTracker
 
     private void Begin()
     {
+        if (State == SessionState.Playing)
+        {
+            End(moving: true);
+        }
+
         if (State != SessionState.Idle)
         {
             return;
@@ -119,7 +126,7 @@ public sealed partial class SessionTracker
         _session = new RobloxSession();
     }
 
-    private void End()
+    private void End(bool moving = false)
     {
         if (State == SessionState.Idle)
         {
@@ -130,6 +137,12 @@ public sealed partial class SessionTracker
 
         State = SessionState.Idle;
         _session = new RobloxSession();
+
+        if (moving)
+        {
+            Moved?.Invoke(this, finished);
+            return;
+        }
 
         Left?.Invoke(this, finished);
     }

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace Nulltrap.Core.Roblox;
 
@@ -6,7 +6,7 @@ public sealed record ServerFacts(int Playing, int MaxPlayers, int Ping, int Fps)
 
 public sealed class ServerListClient
 {
-    public const int PagesToWalk = 3;
+    public const int PagesToWalk = 6;
 
     private const string Endpoint = "https://games.roblox.com/v1/games/{0}/servers/Public?limit=100";
 

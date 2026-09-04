@@ -69,6 +69,9 @@ public partial class App : Application
         });
     }
 
+    private void OnMovedServer(object? sender, Core.Sessions.RobloxSession session) =>
+        _services?.Plugins.Tell(Told(session, null, null), joined: false);
+
     private void OnLeftServer(object? sender, Core.Sessions.RobloxSession session)
     {
         if (_services is null)
@@ -161,6 +164,7 @@ public partial class App : Application
         _services.StartPresence();
         _services.Sessions.Joined += OnJoinedServer;
         _services.Sessions.Left += OnLeftServer;
+        _services.Sessions.Moved += OnMovedServer;
 
         _ = Task.Run(() => _services.SweepCache());
 

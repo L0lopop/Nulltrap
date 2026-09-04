@@ -1,4 +1,4 @@
-using Nulltrap.Core.Roblox;
+﻿using Nulltrap.Core.Roblox;
 
 namespace Nulltrap.Core.Sessions;
 
@@ -31,12 +31,14 @@ public sealed class SessionRecorder : IDisposable
     {
         _tracker.Joined += OnJoined;
         _tracker.Left += OnLeft;
+        _tracker.Moved += OnLeft;
     }
 
     public void Dispose()
     {
         _tracker.Joined -= OnJoined;
         _tracker.Left -= OnLeft;
+        _tracker.Moved -= OnLeft;
     }
 
     public static PlayedSession Describe(RobloxSession session, GameInfo? game)
