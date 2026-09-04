@@ -16,6 +16,8 @@ public partial class App : Application
 
     private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
 
+    private readonly System.Windows.Threading.DispatcherTimer _pulse = new() { Interval = TimeSpan.FromSeconds(5) };
+
     private const string WatchLock = "Nulltrap.Background";
 
     private AppServices? _services;
@@ -23,8 +25,6 @@ public partial class App : Application
     private TrayIcon? _tray;
 
     private IInstanceLock? _watch;
-
-    private bool _whispered;
 
     public static AppServices Services =>
         (Current as App)?._services
@@ -39,8 +39,9 @@ public partial class App : Application
 
         bool notice = _services.Settings.Load().ServerNotice;
         bool listening = _services.Plugins.Found.Any(plugin => plugin.Running);
+        bool showing = _tray is not null;
 
-        if (!notice && !listening)
+        if (!notice && !listening && !showing)
         {
             return;
         }
@@ -60,7 +61,7 @@ public partial class App : Application
                 _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
             }
 
-            Core.Roblox.ServerFacts? facts = notice || _tray is not null
+            Core.Roblox.ServerFacts? facts = notice || showing
                 ? await _services.Servers.FindAsync(session.PlaceId, session.JobId).ConfigureAwait(true)
                 : null;
 
@@ -154,6 +155,18 @@ public partial class App : Application
             session.ServerAddress,
             country);
 
+    private void OnPulse(object? sender, EventArgs e)
+    {
+        if (_services is null
+            || _services.Sessions.State == Core.Sessions.SessionState.Idle
+            || AppServices.RobloxIsRunning())
+        {
+            return;
+        }
+
+        _services.Sessions.GiveUp();
+    }
+
     private void OnMemoryRelief(object? sender, EventArgs e)
     {
         if (_services?.Settings.Load().TrimMemory == true)
@@ -187,6 +200,9 @@ public partial class App : Application
 
         _relief.Tick += OnMemoryRelief;
         _relief.Start();
+
+        _pulse.Tick += OnPulse;
+        _pulse.Start();
 
         LaunchArguments arguments = LaunchArguments.Parse(e.Args);
 
@@ -250,6 +266,7 @@ public partial class App : Application
 
         _tray = new TrayIcon();
         _tray.Opened += (_, _) => Surface();
+        _tray.Toggled += (_, _) => Flip();
         _tray.Played += (_, _) => Surface()?.LaunchPlayer();
         _tray.Quit += (_, _) => Shutdown();
 
@@ -258,15 +275,15 @@ public partial class App : Application
 
     public bool Watching => _tray is not null;
 
-    public void WhisperOnce()
+    private void Flip()
     {
-        if (_whispered || _tray is null)
+        if (Windows.OfType<MainWindow>().FirstOrDefault() is { IsVisible: true } standing)
         {
+            standing.Hide();
             return;
         }
 
-        _whispered = true;
-        _tray.Whisper(Strings.Get("tray.hidden"), Strings.Get("tray.hiddenHint"));
+        Surface();
     }
 
     private MainWindow? Surface()

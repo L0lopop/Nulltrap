@@ -37,8 +37,6 @@
   "tray.quit": "Выйти",
   "tray.idle": "Roblox не запущен",
   "tray.playing": "Играет: {0}",
-  "tray.hidden": "Nulltrap рядом",
-  "tray.hiddenHint": "Свернулся в значок у часов и следит за игрой. Выйти — правой кнопкой по значку.",
   "general.multiInstance": "Спрашивать перед вторым клиентом Roblox",
   "general.multiInstanceHint": "Спрашивать, если Roblox уже запущен.",
   "graphics.unlockFps": "Снять ограничение кадров",

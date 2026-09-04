@@ -37,8 +37,6 @@
   "tray.quit": "Quit",
   "tray.idle": "Roblox is not running",
   "tray.playing": "Playing: {0}",
-  "tray.hidden": "Nulltrap is nearby",
-  "tray.hiddenHint": "It hid into the icon by the clock and keeps watching. Right-click the icon to quit.",
   "general.multiInstance": "Ask before a second Roblox client",
   "general.multiInstanceHint": "Ask when Roblox is already running.",
   "graphics.unlockFps": "Unlock frame rate",

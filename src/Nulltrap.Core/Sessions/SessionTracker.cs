@@ -26,6 +26,11 @@ public sealed partial class SessionTracker
 
     public event EventHandler<string>? MessageFromGame;
 
+    public void GiveUp()
+    {
+        End();
+    }
+
     public void Feed(string line)
     {
         ArgumentNullException.ThrowIfNull(line);

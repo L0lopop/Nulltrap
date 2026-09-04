@@ -76,10 +76,14 @@ public sealed class TrayIcon : IDisposable
         };
 
         _icon.MouseClick += OnClicked;
-        _icon.DoubleClick += (_, _) => Opened?.Invoke(this, EventArgs.Empty);
+
+        _menu.Closed += (_, _) => _host.Hide();
+        _host.Deactivated += (_, _) => _menu.IsOpen = false;
 
         Idle();
     }
+
+    public event EventHandler? Toggled;
 
     public event EventHandler? Opened;
 
@@ -109,9 +113,6 @@ public sealed class TrayIcon : IDisposable
 
         Tip($"Nulltrap · {game}");
     }
-
-    public void Whisper(string title, string text) =>
-        _icon.ShowBalloonTip(4000, title, text, System.Windows.Forms.ToolTipIcon.None);
 
     public void Dispose()
     {
@@ -168,6 +169,12 @@ public sealed class TrayIcon : IDisposable
 
     private void OnClicked(object? sender, System.Windows.Forms.MouseEventArgs e)
     {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left)
+        {
+            Toggled?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         if (e.Button != System.Windows.Forms.MouseButtons.Right)
         {
             return;
@@ -175,7 +182,6 @@ public sealed class TrayIcon : IDisposable
 
         _host.Show();
         _host.Activate();
-        _host.Hide();
 
         _menu.IsOpen = true;
     }

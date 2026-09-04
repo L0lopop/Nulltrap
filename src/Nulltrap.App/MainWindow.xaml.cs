@@ -66,7 +66,6 @@ public partial class MainWindow : ChromeWindow
         if (Application.Current is App app && app.Linger())
         {
             Hide();
-            app.WhisperOnce();
             return;
         }
 
@@ -75,11 +74,10 @@ public partial class MainWindow : ChromeWindow
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        if (Application.Current is App { Watching: true } watching)
+        if (Application.Current is App { Watching: true })
         {
             e.Cancel = true;
             Hide();
-            watching.WhisperOnce();
             return;
         }
 
