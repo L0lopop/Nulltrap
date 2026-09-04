@@ -55,19 +55,33 @@ public sealed class ProfileStore
         File.Move(staging, _path, overwrite: true);
     }
 
-    public GameProfile? ApplyTo(string versionDirectory, long placeId, IReadOnlyDictionary<string, string> baseFlags)
+    public GameProfile? ApplyTo(
+        string versionDirectory,
+        long placeId,
+        IReadOnlyDictionary<string, string> baseFlags,
+        IReadOnlyDictionary<string, string>? asked = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(versionDirectory);
         ArgumentNullException.ThrowIfNull(baseFlags);
 
         GameProfile? chosen = Load().For(placeId);
 
-        if (chosen is null)
+        if (chosen is null && (asked is null || asked.Count == 0))
         {
             return null;
         }
 
-        Dictionary<string, string> merged = ProfileBook.Overlay(baseFlags, chosen);
+        var beneath = new Dictionary<string, string>(baseFlags, StringComparer.Ordinal);
+
+        foreach ((string name, string value) in asked ?? new Dictionary<string, string>(StringComparer.Ordinal))
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                beneath[name] = value;
+            }
+        }
+
+        Dictionary<string, string> merged = ProfileBook.Overlay(beneath, chosen);
 
         string target = Path.Combine(
             versionDirectory,

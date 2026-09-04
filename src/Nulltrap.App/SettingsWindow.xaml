@@ -51,6 +51,7 @@
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavIntegrations" Tag="Integrations" Content="{loc:S nav.integrations}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavProfiles" Tag="Profiles" Content="{loc:S nav.profiles}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavPlugins" Tag="Plugins" Content="{loc:S nav.plugins}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
@@ -1438,6 +1439,39 @@
                                 </Grid>
                             </Border>
                         </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel x:Name="PagePlugins" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}" BorderBrush="{DynamicResource DangerBrush}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.trust}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.trustHint}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,290,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.folder}" />
+                                    <TextBlock x:Name="PluginsFolderText" Style="{StaticResource RowHint}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Style="{StaticResource Quiet}" Content="{loc:S action.openFolder}"
+                                            MinWidth="130" Click="OnOpenPluginsFolder" />
+                                    <Button Style="{StaticResource Quiet}" Content="{loc:S plugins.reload}"
+                                            MinWidth="130" Margin="8,0,0,0" Click="OnReloadPlugins" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <StackPanel x:Name="PluginsPanel" />
+
+                        <Border x:Name="PluginsEmpty" Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S plugins.none}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S plugins.noneHint}" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
 
                     <StackPanel x:Name="PageNews" Visibility="Collapsed">

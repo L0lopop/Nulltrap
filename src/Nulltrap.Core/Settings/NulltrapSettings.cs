@@ -83,6 +83,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("trimMemory")]
     public bool TrimMemory { get; set; } = true;
 
+    [JsonPropertyName("enabledPlugins")]
+    public List<string> EnabledPlugins { get; init; } = [];
+
     [JsonPropertyName("mods")]
     public bool Mods { get; set; } = true;
 

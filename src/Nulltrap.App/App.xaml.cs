@@ -24,7 +24,15 @@ public partial class App : Application
 
     private void OnJoinedServer(object? sender, Core.Sessions.RobloxSession session)
     {
-        if (_services is null || !_services.Settings.Load().ServerNotice)
+        if (_services is null)
+        {
+            return;
+        }
+
+        bool notice = _services.Settings.Load().ServerNotice;
+        bool listening = _services.Plugins.Found.Any(plugin => plugin.Running);
+
+        if (!notice && !listening)
         {
             return;
         }
@@ -39,21 +47,44 @@ public partial class App : Application
                 .DescribeAsync(session.ServerAddress)
                 .ConfigureAwait(true);
 
-            NoticeWindow.Announce(
-                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
-                place?.Describe ?? Core.Localization.Strings.Get("notice.unknownPlace"));
+            if (listening)
+            {
+                _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
+            }
+
+            if (notice)
+            {
+                NoticeWindow.Announce(
+                    game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
+                    place?.Describe ?? Core.Localization.Strings.Get("notice.unknownPlace"));
+            }
         });
     }
 
     private void OnLeftServer(object? sender, Core.Sessions.RobloxSession session)
     {
-        if (_services is null || !session.IsIdentified || !_services.Settings.Load().CloseRobloxOnLeave)
+        if (_services is null)
         {
             return;
         }
 
-        AppServices.CloseRoblox();
+        _services.Plugins.Tell(Told(session, null, null), joined: false);
+
+        if (session.IsIdentified && _services.Settings.Load().CloseRobloxOnLeave)
+        {
+            AppServices.CloseRoblox();
+        }
     }
+
+    private static Plugins.PluginSession Told(
+        Core.Sessions.RobloxSession session,
+        string? game,
+        string? country) => new(
+            session.PlaceId,
+            session.UniverseId,
+            game,
+            session.ServerAddress,
+            country);
 
     private void OnMemoryRelief(object? sender, EventArgs e)
     {
@@ -73,6 +104,7 @@ public partial class App : Application
         Strings.Use(chosen.Language);
         Themes.Apply(chosen.Theme);
         _services.KeepHandlersRegistered();
+        _services.StartPlugins();
         _services.StartTracking();
         _services.StartClientUpdates();
         _services.StartPresence();

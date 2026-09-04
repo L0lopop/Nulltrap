@@ -126,7 +126,8 @@ public partial class MainWindow : ChromeWindow
             Nulltrap.Core.Profiles.GameProfile? profile = App.Services.Profiles.ApplyTo(
                 result.VersionDirectory,
                 placeId,
-                App.Services.FastFlags.Load());
+                App.Services.FastFlags.Load(),
+                App.Services.Plugins.Flags);
 
             if (profile?.Mods is bool wanted)
             {

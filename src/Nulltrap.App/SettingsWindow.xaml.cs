@@ -12,6 +12,7 @@ using Nulltrap.Core.Localization;
 using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Presence;
+using Nulltrap.Core.Plugins;
 using Nulltrap.Core.Profiles;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
@@ -228,6 +229,7 @@ public partial class SettingsWindow : ChromeWindow
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
         BuildProfiles();
+        BuildPlugins();
         BuildLanguageButtons();
         BuildThemeButtons();
         BuildChangelog();
@@ -1132,7 +1134,7 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "Profiles", "News", "About"];
+        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "Profiles", "Plugins", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
@@ -2270,6 +2272,8 @@ public partial class SettingsWindow : ChromeWindow
         SaveRobloxSettings();
         App.Services.Mods.Enabled = _settings.Mods;
         App.Services.ApplyMonitoring();
+        App.Services.StartPlugins();
+        BuildPlugins();
         App.Services.StartPresence();
 
         RefreshFacts();
@@ -2728,6 +2732,107 @@ public partial class SettingsWindow : ChromeWindow
         }
 
         _profiles.Save(_book);
+    }
+
+    private void BuildPlugins()
+    {
+        PluginsFolderText.Text = App.Services.Plugins.Folder;
+        PluginsPanel.Children.Clear();
+
+        IReadOnlyList<PluginInfo> found = App.Services.Plugins.Found;
+
+        foreach (PluginInfo plugin in found)
+        {
+            PluginsPanel.Children.Add(PluginCard(plugin));
+        }
+
+        PluginsEmpty.Visibility = found.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private Border PluginCard(PluginInfo plugin)
+    {
+        string key = PluginKeeper.KeyFor(plugin.File);
+
+        var lines = new StackPanel { Margin = new Thickness(0, 0, 60, 0) };
+
+        lines.Children.Add(new TextBlock
+        {
+            Text = plugin.Running ? plugin.Name : key,
+            Style = (Style)FindResource("RowTitle"),
+        });
+
+        lines.Children.Add(new TextBlock
+        {
+            Text = plugin.Running
+                ? Strings.Get("plugins.by", plugin.Author, plugin.Version)
+                : Path.GetFileName(plugin.File),
+            Style = (Style)FindResource("RowHint"),
+        });
+
+        if (plugin.Trouble is not null)
+        {
+            lines.Children.Add(new TextBlock
+            {
+                Text = plugin.Trouble == "plugins.noEntry"
+                    ? Strings.Get("plugins.noEntry")
+                    : Strings.Get("plugins.failed", plugin.Trouble),
+                Style = (Style)FindResource("RowHint"),
+                Foreground = (System.Windows.Media.Brush)FindResource("DangerBrush"),
+            });
+        }
+
+        var chosen = new CheckBox
+        {
+            Style = (Style)FindResource("Switch"),
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Top,
+            IsChecked = _settings.EnabledPlugins.Contains(key, StringComparer.OrdinalIgnoreCase),
+            Tag = key,
+        };
+
+        chosen.Click += OnPluginSwitched;
+
+        var row = new Grid();
+        row.Children.Add(lines);
+        row.Children.Add(chosen);
+
+        return new Border
+        {
+            Style = (Style)FindResource("RowCard"),
+            BorderBrush = plugin.Trouble is null
+                ? (System.Windows.Media.Brush)FindResource("RuleBrush")
+                : (System.Windows.Media.Brush)FindResource("DangerBrush"),
+            Child = row,
+        };
+    }
+
+    private void OnPluginSwitched(object sender, RoutedEventArgs e)
+    {
+        if (sender is not CheckBox { Tag: string key } box)
+        {
+            return;
+        }
+
+        _settings.EnabledPlugins.RemoveAll(name => string.Equals(name, key, StringComparison.OrdinalIgnoreCase));
+
+        if (box.IsChecked == true)
+        {
+            _settings.EnabledPlugins.Add(key);
+        }
+    }
+
+    private void OnOpenPluginsFolder(object sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(App.Services.Plugins.Folder);
+        Open(App.Services.Plugins.Folder);
+    }
+
+    private void OnReloadPlugins(object sender, RoutedEventArgs e)
+    {
+        _store.Save(_settings);
+        App.Services.StartPlugins();
+        BuildPlugins();
+        ShowSaved();
     }
 
     private void OnMonitoringChanged(object sender, RoutedEventArgs e) => ShowMonitoring();

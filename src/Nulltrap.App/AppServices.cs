@@ -8,6 +8,7 @@ using Nulltrap.Core.Installation;
 using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Packages;
+using Nulltrap.Core.Plugins;
 using Nulltrap.Core.Presence;
 using Nulltrap.Core.Profiles;
 using Nulltrap.Core.Roblox;
@@ -46,6 +47,7 @@ public sealed class AppServices : IDisposable
         Settings = new SettingsStore(Paths);
         FastFlags = new FastFlagManager(Paths);
         Profiles = new ProfileStore(Paths);
+        Plugins = new PluginKeeper(Paths, Version);
         Deployment = new CoreDeploymentClient(_http);
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
@@ -100,6 +102,8 @@ public sealed class AppServices : IDisposable
     public FastFlagManager FastFlags { get; }
 
     public ProfileStore Profiles { get; }
+
+    public PluginKeeper Plugins { get; }
 
     public CoreDeploymentClient Deployment { get; }
 
@@ -221,6 +225,11 @@ public sealed class AppServices : IDisposable
         Updates.Start();
     }
 
+    public void StartPlugins()
+    {
+        Plugins.Start(Settings.Load().EnabledPlugins);
+    }
+
     public void StartTracking()
     {
         _watching = false;
@@ -279,6 +288,7 @@ public sealed class AppServices : IDisposable
         Updates.Dispose();
         Jobs.Dispose();
         Recorder.Dispose();
+        Plugins.Dispose();
         Presence?.Dispose();
         LogWatcher.Dispose();
         _http.Dispose();
