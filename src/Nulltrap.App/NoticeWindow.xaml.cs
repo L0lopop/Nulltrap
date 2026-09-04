@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -11,6 +11,7 @@ public partial class NoticeWindow : Window
 {
     private static readonly TimeSpan OnScreen = TimeSpan.FromSeconds(8);
     private const int IconPixels = 96;
+    private const double Slide = 12;
 
     private static NoticeWindow? _showing;
 
@@ -88,10 +89,8 @@ public partial class NoticeWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        Rect free = SystemParameters.WorkArea;
-
-        Left = free.Right - ActualWidth;
-        Top = free.Top;
+        Settle();
+        SizeChanged += (_, _) => Settle();
 
         BeginAnimation(OpacityProperty, new DoubleAnimation
         {
@@ -102,13 +101,24 @@ public partial class NoticeWindow : Window
 
         Lift.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation
         {
-            From = -22,
+            From = -Slide,
             To = 0,
             Duration = TimeSpan.FromMilliseconds(260),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
         });
 
         _clock.Start();
+    }
+
+    private void Settle()
+    {
+        Rect free = SystemParameters.WorkArea;
+
+        double left = free.Right - ActualWidth;
+        double top = free.Top;
+
+        Left = Math.Max(free.Left, Math.Min(left, free.Right - ActualWidth));
+        Top = Math.Max(free.Top, Math.Min(top, free.Bottom - ActualHeight));
     }
 
     private void OnClicked(object sender, MouseButtonEventArgs e) => Fade();

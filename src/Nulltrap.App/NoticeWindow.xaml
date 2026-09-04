@@ -20,7 +20,7 @@
             CornerRadius="10"
             Padding="16,13"
             Width="360"
-            Margin="16">
+            Margin="20">
         <Border.RenderTransform>
             <TranslateTransform x:Name="Lift" />
         </Border.RenderTransform>

@@ -6,7 +6,9 @@ public sealed record ServerFacts(int Playing, int MaxPlayers, int Ping, int Fps)
 
 public sealed class ServerListClient
 {
-    public const int PagesToWalk = 6;
+    public const int PagesToWalk = 2;
+
+    private static readonly TimeSpan Breath = TimeSpan.FromMilliseconds(900);
 
     private const string Endpoint = "https://games.roblox.com/v1/games/{0}/servers/Public?limit=100";
 
@@ -83,28 +85,51 @@ public sealed class ServerListClient
 
         for (int page = 0; page < PagesToWalk; page++)
         {
+            if (page > 0)
+            {
+                await Task.Delay(Breath, cancellationToken).ConfigureAwait(false);
+            }
+
             string wanted = cursor is null ? address : $"{address}&cursor={Uri.EscapeDataString(cursor)}";
+            string? payload = await AskAsync(wanted, retry: page == 0, cancellationToken).ConfigureAwait(false);
+
+            if (payload is null)
+            {
+                return null;
+            }
+
+            ServerFacts? found = Read(payload, jobId, out cursor);
+
+            if (found is not null)
+            {
+                return found;
+            }
+
+            if (string.IsNullOrWhiteSpace(cursor))
+            {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<string?> AskAsync(string address, bool retry, CancellationToken cancellationToken)
+    {
+        for (int attempt = 0; attempt < (retry ? 2 : 1); attempt++)
+        {
+            if (attempt > 0)
+            {
+                await Task.Delay(Breath, cancellationToken).ConfigureAwait(false);
+            }
 
             try
             {
-                using HttpResponseMessage answer = await _http.GetAsync(wanted, cancellationToken).ConfigureAwait(false);
+                using HttpResponseMessage answer = await _http.GetAsync(address, cancellationToken).ConfigureAwait(false);
 
-                if (!answer.IsSuccessStatusCode)
+                if (answer.IsSuccessStatusCode)
                 {
-                    return null;
-                }
-
-                string payload = await answer.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                ServerFacts? found = Read(payload, jobId, out cursor);
-
-                if (found is not null)
-                {
-                    return found;
-                }
-
-                if (string.IsNullOrWhiteSpace(cursor))
-                {
-                    return null;
+                    return await answer.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (Exception failure) when (failure is HttpRequestException or TaskCanceledException)
