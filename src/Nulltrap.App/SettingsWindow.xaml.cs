@@ -12,6 +12,7 @@ using Nulltrap.Core.Localization;
 using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Presence;
+using Nulltrap.Core.Profiles;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
@@ -143,6 +144,8 @@ public partial class SettingsWindow : ChromeWindow
     private static readonly TimeSpan HomeFreshness = TimeSpan.FromMinutes(10);
 
     private bool _loaded;
+
+    private bool _building;
     private int _homeShownFor = -1;
     private DateTimeOffset _homeShownAt = DateTimeOffset.MinValue;
 
@@ -224,6 +227,7 @@ public partial class SettingsWindow : ChromeWindow
         DisableDpiScaleBox.IsChecked =
             _flags.GetValueOrDefault(DisableDpiScaleFlag, "False").Equals("True", StringComparison.OrdinalIgnoreCase);
 
+        BuildProfiles();
         BuildLanguageButtons();
         BuildThemeButtons();
         BuildChangelog();
@@ -1128,7 +1132,7 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "News", "About"];
+        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "Profiles", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
@@ -2262,6 +2266,7 @@ public partial class SettingsWindow : ChromeWindow
         SetFlag(DisableDpiScaleFlag, DisableDpiScaleBox.IsChecked == true ? "True" : string.Empty);
 
         _fastFlags.Save(_flags);
+        SaveProfiles();
         SaveRobloxSettings();
         App.Services.Mods.Enabled = _settings.Mods;
         App.Services.ApplyMonitoring();
@@ -2330,6 +2335,399 @@ public partial class SettingsWindow : ChromeWindow
                     : Strings.Get("general.cacheBusy");
             },
             TaskScheduler.FromCurrentSynchronizationContext());
+    }
+
+    private readonly ProfileStore _profiles = App.Services.Profiles;
+
+    private ProfileBook _book = App.Services.Profiles.Load();
+
+    private GameProfile? _profile;
+
+    private static readonly (bool? Wanted, string Key)[] ModChoices =
+    [
+        (null, "profiles.modsAsSet"),
+        (true, "profiles.modsOn"),
+        (false, "profiles.modsOff"),
+    ];
+
+    private void BuildProfiles()
+    {
+        _building = true;
+        ProfileBox.Items.Clear();
+
+        foreach (GameProfile profile in _book.Profiles)
+        {
+            ProfileBox.Items.Add(new Choice(profile.Name, profile));
+        }
+
+        _profile ??= _book.Profiles.FirstOrDefault();
+
+        if (_profile is not null && !_book.Profiles.Contains(_profile))
+        {
+            _profile = _book.Profiles.FirstOrDefault();
+        }
+
+        ProfileBox.SelectedItem = ProfileBox.Items
+            .OfType<Choice>()
+            .FirstOrDefault(item => ReferenceEquals(item.Value, _profile));
+
+        _building = false;
+
+        ShowProfile();
+    }
+
+    private void ShowProfile()
+    {
+        bool any = _profile is not null;
+
+        ProfileBody.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
+        ProfilesEmpty.Visibility = any ? Visibility.Collapsed : Visibility.Visible;
+        ProfileBox.IsEnabled = _book.Profiles.Count > 0;
+        RemoveProfileButton.IsEnabled = any;
+
+        if (_profile is null)
+        {
+            return;
+        }
+
+        ProfileNameBox.Text = _profile.Name;
+
+        FillPlayed();
+        BuildProfilePlaces();
+        BuildProfileFlags();
+
+        ProfileModsBox.Items.Clear();
+
+        foreach ((bool? wanted, string key) in ModChoices)
+        {
+            var item = new Choice(Strings.Get(key), wanted);
+            ProfileModsBox.Items.Add(item);
+
+            if (wanted == _profile.Mods)
+            {
+                ProfileModsBox.SelectedItem = item;
+            }
+        }
+    }
+
+    private void FillPlayed()
+    {
+        ProfileRecentBox.Items.Clear();
+
+        foreach (PlayedSession played in Played())
+        {
+            ProfileRecentBox.Items.Add(new Choice(
+                played.Name ?? played.PlaceId.ToString(CultureInfo.CurrentCulture),
+                played.PlaceId));
+        }
+
+        ProfileRecentBox.SelectedIndex = ProfileRecentBox.Items.Count > 0 ? 0 : -1;
+        ProfileRecentBox.IsEnabled = ProfileRecentBox.Items.Count > 0;
+    }
+
+    private static PlayedSession[] Played() =>
+        App.Services.History.Load().Sessions
+            .Where(played => played.PlaceId > 0)
+            .DistinctBy(played => played.PlaceId)
+            .Take(25)
+            .ToArray();
+
+    private void BuildProfilePlaces()
+    {
+        ProfilePlacesPanel.Children.Clear();
+
+        if (_profile is null)
+        {
+            return;
+        }
+
+        Dictionary<long, string> known = Played()
+            .Where(played => played.Name is not null)
+            .ToDictionary(played => played.PlaceId, played => played.Name!);
+
+        foreach (long place in _profile.Places.ToArray())
+        {
+            ProfilePlacesPanel.Children.Add(PlaceRow(
+                place,
+                known.GetValueOrDefault(place, Strings.Get("profiles.unnamedPlace"))));
+        }
+
+        if (_profile.Places.Count == 0)
+        {
+            ProfilePlacesPanel.Children.Add(Faint(Strings.Get("profiles.noPlaces")));
+        }
+    }
+
+    private Grid PlaceRow(long place, string name)
+    {
+        var row = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var title = new TextBlock
+        {
+            Text = name,
+            FontSize = 13,
+            VerticalAlignment = VerticalAlignment.Center,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+        };
+
+        var id = new TextBlock
+        {
+            Text = place.ToString(CultureInfo.CurrentCulture),
+            FontSize = 12,
+            Margin = new Thickness(0, 2, 0, 0),
+            Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
+        };
+
+        var left = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+        left.Children.Add(title);
+        left.Children.Add(id);
+        Grid.SetColumn(left, 0);
+
+        var drop = new System.Windows.Controls.Button
+        {
+            Style = (Style)FindResource("Quiet"),
+            Content = Strings.Get("profiles.dropPlace"),
+            MinWidth = 104,
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = place,
+        };
+
+        drop.Click += OnDropPlace;
+        Grid.SetColumn(drop, 1);
+
+        row.Children.Add(left);
+        row.Children.Add(drop);
+
+        return row;
+    }
+
+    private void BuildProfileFlags()
+    {
+        ProfileFlagsPanel.Children.Clear();
+
+        if (_profile is null)
+        {
+            return;
+        }
+
+        foreach ((string name, string value) in _profile.Flags.OrderBy(pair => pair.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            ProfileFlagsPanel.Children.Add(ProfileFlagRow(name, value));
+        }
+
+        if (_profile.Flags.Count == 0)
+        {
+            ProfileFlagsPanel.Children.Add(Faint(Strings.Get("profiles.noFlags")));
+        }
+    }
+
+    private Grid ProfileFlagRow(string name, string value)
+    {
+        var row = new Grid { Margin = new Thickness(0, 0, 0, 8) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(190) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+        var title = new TextBlock
+        {
+            Text = name,
+            FontSize = 13,
+            FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 14, 0),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            ToolTip = name,
+            Foreground = (System.Windows.Media.Brush)FindResource("TextBrush"),
+        };
+
+        Grid.SetColumn(title, 0);
+
+        var field = new TextBox
+        {
+            Text = value,
+            Style = (Style)FindResource("Field"),
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = name,
+        };
+
+        field.TextChanged += OnProfileFlagEdited;
+        Grid.SetColumn(field, 1);
+
+        var drop = new System.Windows.Controls.Button
+        {
+            Style = (Style)FindResource("Quiet"),
+            Content = Strings.Get("profiles.dropPlace"),
+            MinWidth = 104,
+            Margin = new Thickness(8, 0, 0, 0),
+            VerticalAlignment = VerticalAlignment.Center,
+            Tag = name,
+        };
+
+        drop.Click += OnDropProfileFlag;
+        Grid.SetColumn(drop, 2);
+
+        row.Children.Add(title);
+        row.Children.Add(field);
+        row.Children.Add(drop);
+
+        return row;
+    }
+
+    private void OnProfileChosen(object sender, SelectionChangedEventArgs e)
+    {
+        if (_building || ProfileBox.SelectedItem is not Choice { Value: GameProfile picked })
+        {
+            return;
+        }
+
+        _profile = picked;
+        ShowProfile();
+    }
+
+    private void OnAddProfile(object sender, RoutedEventArgs e)
+    {
+        var fresh = new GameProfile { Name = _book.FreeName(Strings.Get("profiles.fresh")) };
+
+        _book.Profiles.Add(fresh);
+        _profile = fresh;
+
+        BuildProfiles();
+        ProfileNameBox.Focus();
+        ProfileNameBox.SelectAll();
+    }
+
+    private void OnRemoveProfile(object sender, RoutedEventArgs e)
+    {
+        if (_profile is null
+            || MessageBox.Show(
+                Strings.Get("profiles.confirmRemove", _profile.Name),
+                "Nulltrap",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        _book.Profiles.Remove(_profile);
+        _profile = null;
+
+        BuildProfiles();
+    }
+
+    private void OnProfileNameLeft(object sender, RoutedEventArgs e)
+    {
+        if (_profile is null)
+        {
+            return;
+        }
+
+        string wanted = ProfileNameBox.Text.Trim();
+
+        if (wanted.Length == 0 || string.Equals(wanted, _profile.Name, StringComparison.Ordinal))
+        {
+            ProfileNameBox.Text = _profile.Name;
+            return;
+        }
+
+        _book.Profiles.Remove(_profile);
+        _profile.Name = _book.FreeName(wanted);
+        _book.Profiles.Add(_profile);
+
+        BuildProfiles();
+    }
+
+    private void OnAddPlayedPlace(object sender, RoutedEventArgs e)
+    {
+        if (ProfileRecentBox.SelectedItem is Choice { Value: long place })
+        {
+            KeepPlace(place);
+        }
+    }
+
+    private void OnAddPlace(object sender, RoutedEventArgs e)
+    {
+        if (long.TryParse(ProfilePlaceBox.Text.Trim(), out long place))
+        {
+            ProfilePlaceBox.Clear();
+            KeepPlace(place);
+        }
+    }
+
+    private void KeepPlace(long place)
+    {
+        if (_profile is null || place <= 0 || _profile.Places.Contains(place))
+        {
+            return;
+        }
+
+        _profile.Places.Add(place);
+        BuildProfilePlaces();
+    }
+
+    private void OnDropPlace(object sender, RoutedEventArgs e)
+    {
+        if (_profile is not null && sender is System.Windows.Controls.Button { Tag: long place })
+        {
+            _profile.Places.Remove(place);
+            BuildProfilePlaces();
+        }
+    }
+
+    private void OnAddProfileFlag(object sender, RoutedEventArgs e)
+    {
+        if (_profile is null)
+        {
+            return;
+        }
+
+        var dialog = new FlagDialog(Problem) { Owner = this };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        foreach ((string name, string value) in dialog.Chosen)
+        {
+            _profile.Flags[name] = value;
+        }
+
+        BuildProfileFlags();
+    }
+
+    private void OnProfileFlagEdited(object sender, TextChangedEventArgs e)
+    {
+        if (_profile is not null && sender is TextBox { Tag: string name } field)
+        {
+            _profile.Flags[name] = field.Text.Trim();
+        }
+    }
+
+    private void OnDropProfileFlag(object sender, RoutedEventArgs e)
+    {
+        if (_profile is not null && sender is System.Windows.Controls.Button { Tag: string name })
+        {
+            _profile.Flags.Remove(name);
+            BuildProfileFlags();
+        }
+    }
+
+    private void SaveProfiles()
+    {
+        if (_profile is not null && ProfileNameBox.Text.Trim().Length > 0)
+        {
+            OnProfileNameLeft(ProfileNameBox, new RoutedEventArgs());
+        }
+
+        if (_profile is not null && ProfileModsBox.SelectedItem is Choice picked)
+        {
+            _profile.Mods = picked.Value as bool?;
+        }
+
+        _profiles.Save(_book);
     }
 
     private void OnMonitoringChanged(object sender, RoutedEventArgs e) => ShowMonitoring();

@@ -9,6 +9,7 @@ using Nulltrap.Core.Maintenance;
 using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Packages;
 using Nulltrap.Core.Presence;
+using Nulltrap.Core.Profiles;
 using Nulltrap.Core.Roblox;
 using Nulltrap.Core.Sessions;
 using Nulltrap.Core.Settings;
@@ -44,6 +45,7 @@ public sealed class AppServices : IDisposable
         StateStore = new InstallStateStore(Paths);
         Settings = new SettingsStore(Paths);
         FastFlags = new FastFlagManager(Paths);
+        Profiles = new ProfileStore(Paths);
         Deployment = new CoreDeploymentClient(_http);
         Downloader = new PackageDownloader(_http, Paths);
         Bootstrapper = new ClientBootstrapper(Deployment, Downloader, Paths, StateStore);
@@ -96,6 +98,8 @@ public sealed class AppServices : IDisposable
     public SettingsStore Settings { get; }
 
     public FastFlagManager FastFlags { get; }
+
+    public ProfileStore Profiles { get; }
 
     public CoreDeploymentClient Deployment { get; }
 

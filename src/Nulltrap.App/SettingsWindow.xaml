@@ -50,6 +50,7 @@
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavIntegrations" Tag="Integrations" Content="{loc:S nav.integrations}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavProfiles" Tag="Profiles" Content="{loc:S nav.profiles}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
@@ -1355,6 +1356,89 @@
                     </StackPanel>
 
 
+
+                    <StackPanel x:Name="PageProfiles" Visibility="Collapsed">
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,430,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.chosen}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.chosenHint}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <ComboBox x:Name="ProfileBox" Style="{StaticResource Dropdown}" Width="210"
+                                              SelectionChanged="OnProfileChosen" />
+                                    <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.add}"
+                                            MinWidth="104" Margin="8,0,0,0" Click="OnAddProfile" />
+                                    <Button x:Name="RemoveProfileButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S profiles.remove}" MinWidth="96" Margin="8,0,0,0"
+                                            Click="OnRemoveProfile" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border x:Name="ProfilesEmpty" Style="{StaticResource RowCard}">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.none}" />
+                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.noneHint}" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel x:Name="ProfileBody" Visibility="Collapsed">
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,330,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.name}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.nameHint}" />
+                                    </StackPanel>
+                                    <TextBox x:Name="ProfileNameBox" Style="{StaticResource Field}" Width="310"
+                                             HorizontalAlignment="Right" VerticalAlignment="Center"
+                                             LostFocus="OnProfileNameLeft" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.places}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.placesHint}" />
+                                    <StackPanel x:Name="ProfilePlacesPanel" Margin="0,12,0,0" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <ComboBox x:Name="ProfileRecentBox" Style="{StaticResource Dropdown}" Width="300" />
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlayed}"
+                                                MinWidth="150" Margin="8,0,0,0" Click="OnAddPlayedPlace" />
+                                        <TextBox x:Name="ProfilePlaceBox" Style="{StaticResource Field}" Width="140" Margin="20,0,0,0" />
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S profiles.addPlace}"
+                                                MinWidth="120" Margin="8,0,0,0" Click="OnAddPlace" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
+                                    <Grid>
+                                        <StackPanel Margin="0,0,160,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.flags}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.flagsHint}" />
+                                        </StackPanel>
+                                        <Button Style="{StaticResource Quiet}" Content="{loc:S flags.add}"
+                                                MinWidth="140" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Click="OnAddProfileFlag" />
+                                    </Grid>
+                                    <StackPanel x:Name="ProfileFlagsPanel" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,240,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S profiles.mods}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S profiles.modsHint}" />
+                                    </StackPanel>
+                                    <ComboBox x:Name="ProfileModsBox" Style="{StaticResource Dropdown}" Width="230"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
 
                     <StackPanel x:Name="PageNews" Visibility="Collapsed">
                         <Border Style="{StaticResource RowCard}">
