@@ -35,6 +35,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("closeAfterLaunch")]
     public bool CloseAfterLaunch { get; set; } = true;
 
+    [JsonPropertyName("closeRobloxOnLeave")]
+    public bool CloseRobloxOnLeave { get; set; }
+
     [JsonPropertyName("confirmMultipleInstances")]
     public bool ConfirmMultipleInstances { get; set; } = true;
 

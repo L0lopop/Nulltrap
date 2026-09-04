@@ -199,6 +199,7 @@ public partial class SettingsWindow : ChromeWindow
 
 
         TrimMemoryBox.IsChecked = _settings.TrimMemory;
+        CloseRobloxOnLeaveBox.IsChecked = _settings.CloseRobloxOnLeave;
         FillSweepPlans();
         ShowCacheSize();
 
@@ -1025,7 +1026,6 @@ public partial class SettingsWindow : ChromeWindow
         SidebarVersion.Text = $"Nulltrap {AppServices.Version}";
         SidebarLocation.Text = App.Services.Paths.Root;
         LauncherLocationText.Text = App.Services.Paths.Root;
-        PresenceStatusText.Text = DescribePresence();
         ShowPresencePreview();
         RepairButton.IsEnabled = App.Services.Installer.IsInstalled;
         AboutVersionText.Text = $"Version {AppServices.Version}";
@@ -1034,25 +1034,6 @@ public partial class SettingsWindow : ChromeWindow
         VersionsSizeText.Text = Describe(App.Services.Paths.Versions, Strings.Get("storage.files"));
         ClearCacheButton.IsEnabled = Directory.Exists(App.Services.Paths.Downloads)
             && Directory.EnumerateFiles(App.Services.Paths.Downloads).Any();
-    }
-
-    private string DescribePresence()
-    {
-        if (!_settings.DiscordPresence)
-        {
-            return Strings.Get("presence.off");
-        }
-
-        if (string.IsNullOrWhiteSpace(PresenceService.ApplicationId(_settings.DiscordApplicationId)))
-        {
-            return Strings.Get("presence.notConfigured");
-        }
-
-        PresenceActivity? showing = App.Services.Presence?.Last;
-
-        return showing?.Details is null
-            ? Strings.Get("presence.waiting")
-            : Strings.Get("presence.active", showing.Details);
     }
 
     private PresenceOptions PresenceShape() => new()
@@ -1147,12 +1128,14 @@ public partial class SettingsWindow : ChromeWindow
     }
 
     private static readonly string[] Pages =
-        ["Home", "General", "Graphics", "Launcher", "Presence", "Versions", "Activity", "Mods", "Flags", "News", "About"];
+        ["Home", "General", "Graphics", "Launcher", "Integrations", "Versions", "Mods", "Flags", "News", "About"];
 
     private static readonly Dictionary<string, string[]> Groups = new(StringComparer.Ordinal)
     {
         ["Graphics"] = ["GraphicsQuality", "GraphicsFrames", "GraphicsSound", "GraphicsInterface", "GraphicsControl", "GraphicsReady"],
         ["Versions"] = ["VersionsPlayer", "VersionsStorage"],
+        ["Integrations"] = ["IntegrationsActivity", "IntegrationsDiscord"],
+        ["General"] = ["GeneralStart", "GeneralUpkeep"],
     };
 
     private static readonly Dictionary<string, (string Page, string Group)> Tabs = new(StringComparer.Ordinal)
@@ -1166,6 +1149,10 @@ public partial class SettingsWindow : ChromeWindow
         ["VersionsPlayer"] = ("Versions", "VersionsPlayer"),
         ["VersionsStudio"] = ("Versions", "VersionsPlayer"),
         ["VersionsStorage"] = ("Versions", "VersionsStorage"),
+        ["IntegrationsActivity"] = ("Integrations", "IntegrationsActivity"),
+        ["IntegrationsDiscord"] = ("Integrations", "IntegrationsDiscord"),
+        ["GeneralStart"] = ("General", "GeneralStart"),
+        ["GeneralUpkeep"] = ("General", "GeneralUpkeep"),
     };
 
     private void Show(string page)
@@ -2232,6 +2219,7 @@ public partial class SettingsWindow : ChromeWindow
         _settings.Monitoring = MonitoringBox.IsChecked == true;
         _settings.ServerNotice = ServerNoticeBox.IsChecked == true;
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
+        _settings.CloseRobloxOnLeave = CloseRobloxOnLeaveBox.IsChecked == true;
         _settings.ConfirmMultipleInstances = ConfirmMultipleInstancesBox.IsChecked == true;
         _settings.DesktopShortcut = DesktopShortcutBox.IsChecked == true;
         _settings.StartMenuShortcut = StartMenuShortcutBox.IsChecked == true;
@@ -2351,9 +2339,10 @@ public partial class SettingsWindow : ChromeWindow
         bool watching = MonitoringBox.IsChecked == true;
 
         ServerNoticeBox.IsEnabled = watching;
+        CloseRobloxOnLeaveBox.IsEnabled = watching;
         PresenceLocked.Visibility = watching ? Visibility.Collapsed : Visibility.Visible;
 
-        foreach (UIElement child in PagePresence.Children)
+        foreach (UIElement child in IntegrationsDiscord.Children)
         {
             if (!ReferenceEquals(child, PresenceLocked))
             {

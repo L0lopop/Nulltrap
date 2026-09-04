@@ -157,6 +157,27 @@ public sealed class AppServices : IDisposable
         }
     }
 
+    public static void CloseRoblox()
+    {
+        foreach (System.Diagnostics.Process client in System.Diagnostics.Process.GetProcessesByName("RobloxPlayerBeta"))
+        {
+            try
+            {
+                if (!client.CloseMainWindow() || !client.WaitForExit(3000))
+                {
+                    client.Kill();
+                }
+            }
+            catch (Exception failure) when (failure is InvalidOperationException or System.ComponentModel.Win32Exception)
+            {
+            }
+            finally
+            {
+                client.Dispose();
+            }
+        }
+    }
+
     public static bool RobloxIsRunning() =>
         System.Diagnostics.Process.GetProcessesByName("RobloxPlayerBeta").Length > 0
         || System.Diagnostics.Process.GetProcessesByName("RobloxStudioBeta").Length > 0;

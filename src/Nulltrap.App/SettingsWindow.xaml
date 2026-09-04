@@ -48,13 +48,12 @@
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.launcher}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGeneral" Tag="General" Content="{loc:S nav.general}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavMods" Tag="Mods" Content="{loc:S nav.mods}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavPresence" Tag="Presence" Content="{loc:S nav.presence}" Checked="OnNavigate" />
+                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavIntegrations" Tag="Integrations" Content="{loc:S nav.integrations}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavFlags" Tag="Flags" Content="{loc:S nav.flags}" Checked="OnNavigate" />
 
                     <TextBlock Style="{StaticResource NavSection}" Text="{loc:S nav.roblox}" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavGraphics" Tag="Graphics" Content="{loc:S nav.graphics}" Checked="OnNavigate" />
                     <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavVersions" Tag="Versions" Content="{loc:S nav.versions}" Checked="OnNavigate" />
-                    <RadioButton Style="{StaticResource NavItem}" GroupName="Nav" x:Name="NavActivity" Tag="Activity" Content="{loc:S nav.activity}" Checked="OnNavigate" />
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -156,250 +155,360 @@
 
 
                     <StackPanel x:Name="PageGeneral" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.closeAfterLaunch}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S general.closeAfterLaunchHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="CloseAfterLaunchBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S graphics.unlockFpsHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnUnlockFpsChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.autoUpdate}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S general.autoUpdateHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="AutomaticClientUpdatesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,350,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.cache}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.cacheHint}" />
-                                    <TextBlock x:Name="SweepSizeText" Style="{StaticResource RowHint}" Margin="0,7,0,0" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <ComboBox x:Name="CacheSweepBox" Style="{StaticResource Dropdown}" Width="200" />
-                                    <Button x:Name="SweepNowButton" Style="{StaticResource Quiet}"
-                                            Content="{loc:S action.sweepNow}" MinWidth="132" Margin="8,0,0,0"
-                                            Click="OnSweepNow" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.trimMemory}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.trimMemoryHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="TrimMemoryBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.multiInstance}" />
-                                    <TextBlock Style="{StaticResource RowHint}"
-                                               Text="{loc:S general.multiInstanceHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
-                            </Grid>
-                        </Border>
-
-                    </StackPanel>
-
-                    <StackPanel x:Name="PagePresence" Visibility="Collapsed">
-                        <Border x:Name="PresenceLocked" Style="{StaticResource RowCard}"
-                                BorderBrush="{DynamicResource DangerBrush}" Visibility="Collapsed">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.needsMonitoring}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.needsMonitoringHint}" />
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
+                                             x:Name="TabGeneralStart" Tag="GeneralStart"
+                                             Content="{loc:S general.tabStart}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="GeneralTabs"
+                                             x:Name="TabGeneralUpkeep" Tag="GeneralUpkeep"
+                                             Content="{loc:S general.tabUpkeep}" Checked="OnSubTab" />
                             </StackPanel>
                         </Border>
 
-                            <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.richPresence}" />
-                            <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,14"
-                                       Text="{loc:S presence.richPresenceHint}" />
-
+                        <StackPanel x:Name="GeneralStart">
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.enable}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.enableHint}" />
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.closeAfterLaunch}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S general.closeAfterLaunchHint}" />
                                     </StackPanel>
-                                    <CheckBox x:Name="PresenceEnabledBox" Style="{StaticResource Switch}"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top"
-                                              Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="CloseAfterLaunchBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
                                 </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.account}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.accountHint}" />
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.closeRoblox}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S general.closeRobloxHint}" />
                                     </StackPanel>
-                                    <CheckBox x:Name="PresenceAccountBox" Style="{StaticResource Switch}"
-                                              HorizontalAlignment="Right" VerticalAlignment="Top"
-                                              Click="OnPresenceChanged" />
+                                    <CheckBox x:Name="CloseRobloxOnLeaveBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
                                 </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,60,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.join}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.joinHint}" />
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.multiInstance}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S general.multiInstanceHint}" />
                                     </StackPanel>
-                                    <CheckBox x:Name="PresenceJoinBox" Style="{StaticResource Switch}"
+                                    <CheckBox x:Name="ConfirmMultipleInstancesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S graphics.unlockFps}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S graphics.unlockFpsHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="UnlockFpsBox" Style="{StaticResource Switch}"
                                               HorizontalAlignment="Right" VerticalAlignment="Top"
-                                              Click="OnPresenceChanged" />
+                                              Click="OnUnlockFpsChanged" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+
+                        <StackPanel x:Name="GeneralUpkeep" Visibility="Collapsed">
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.autoUpdate}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S general.autoUpdateHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="AutomaticClientUpdatesBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,350,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.cache}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.cacheHint}" />
+                                        <TextBlock x:Name="SweepSizeText" Style="{StaticResource RowHint}" Margin="0,7,0,0" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <ComboBox x:Name="CacheSweepBox" Style="{StaticResource Dropdown}" Width="200" />
+                                        <Button x:Name="SweepNowButton" Style="{StaticResource Quiet}"
+                                                Content="{loc:S action.sweepNow}" MinWidth="132" Margin="8,0,0,0"
+                                                Click="OnSweepNow" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.trimMemory}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.trimMemoryHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="TrimMemoryBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+
+
+                    <StackPanel x:Name="PageIntegrations" Visibility="Collapsed">
+                        <Border Style="{StaticResource SubTabStrip}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="IntegrationTabs"
+                                             x:Name="TabIntegrationsActivity" Tag="IntegrationsActivity"
+                                             Content="{loc:S nav.activity}" IsChecked="True" Checked="OnSubTab" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="IntegrationTabs"
+                                             x:Name="TabIntegrationsDiscord" Tag="IntegrationsDiscord"
+                                             Content="{loc:S nav.presence}" Checked="OnSubTab" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel x:Name="IntegrationsActivity">
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.monitoring}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.monitoringHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="MonitoringBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top"
+                                              Click="OnMonitoringChanged" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.serverNotice}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.serverNoticeHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="ServerNoticeBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock x:Name="PlayedWeekText" FontSize="22" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource PurpleBrightBrush}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.week}" Margin="0,4,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock x:Name="SessionCountText" FontSize="22" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextBrush}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.sessions}" Margin="0,4,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock x:Name="AverageSessionText" FontSize="22" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextBrush}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.average}" Margin="0,4,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3">
+                                        <TextBlock x:Name="LongestSessionText" FontSize="22" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextBrush}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.longest}" Margin="0,4,0,0" />
+                                    </StackPanel>
                                 </Grid>
                             </Border>
 
                             <Border Style="{StaticResource RowCard}">
                                 <StackPanel>
-                                    <ToggleButton x:Name="CustomRpcHeader" Style="{StaticResource Row}"
-                                                  Checked="OnToggleCustomRpc"
-                                                  Unchecked="OnToggleCustomRpc">
-                                        <Grid>
-                                        <StackPanel Margin="0,0,40,0">
-                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.custom}" />
-                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.customHint}" />
-                                        </StackPanel>
-                                        <TextBlock x:Name="CustomRpcChevron" Text="&#xE70D;"
-                                                   FontFamily="Segoe MDL2 Assets" FontSize="12"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   Foreground="{DynamicResource TextSoftBrush}"
-                                                   RenderTransformOrigin="0.5,0.5">
-                                            <TextBlock.RenderTransform>
-                                                <RotateTransform x:Name="CustomRpcTurn" Angle="0" />
-                                            </TextBlock.RenderTransform>
-                                            </TextBlock>
-                                        </Grid>
-                                    </ToggleButton>
-
-                                    <StackPanel x:Name="CustomRpcBody" Visibility="Collapsed" Margin="0,16,0,0">
-                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.headline}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.headlineHint}" />
-                                        <StackPanel Margin="0,10,0,0">
-                                    <CheckBox x:Name="HeadGameNameBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.headlineGame}" Click="OnPresenceChanged" />
-                                    <CheckBox x:Name="HeadPlayingBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.headlinePlaying}" Click="OnPresenceChanged" />
-                                        </StackPanel>
-
-                                        <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.subline}" />
-                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.sublineHint}" />
-                                        <StackPanel Margin="0,10,0,0">
-                                    <CheckBox x:Name="SubCreatorBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.sublineCreator}" Click="OnPresenceChanged" />
-                                    <CheckBox x:Name="SubPlayersBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.sublinePlayers}" Click="OnPresenceChanged" />
-                                    <CheckBox x:Name="SubServerBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.sublineServer}" Click="OnPresenceChanged" />
-                                        </StackPanel>
-
-                                        <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.alsoShow}" />
-                                        <StackPanel Margin="0,10,0,0">
-                                    <CheckBox x:Name="PresenceElapsedBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.elapsed}" Click="OnPresenceChanged" />
-                                    <CheckBox x:Name="PresenceIconBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.icon}" Click="OnPresenceChanged" />
-                                    <CheckBox x:Name="PresenceButtonBox" Style="{StaticResource Tick}"
-                                              Content="{loc:S presence.button}" Click="OnPresenceChanged" />
-                                        </StackPanel>
-                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.favourites}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.favouritesHint}" />
+                                    <StackPanel x:Name="FavouritesPanel" Margin="0,12,0,0" />
                                 </StackPanel>
                             </Border>
 
-
-                            <Border x:Name="PresencePreview" Style="{StaticResource RowCard}" Padding="18,16">
+                            <Border Style="{StaticResource RowCard}">
                                 <StackPanel>
-                                    <Grid Margin="0,0,0,12">
-                                        <TextBlock Text="{loc:S presence.playing}" FontSize="12" FontWeight="Bold"
-                                                   Foreground="{DynamicResource TextBrush}" />
-                                        <Border HorizontalAlignment="Right" CornerRadius="4" Padding="8,3"
-                                                Background="{DynamicResource SurfaceHoverBrush}">
-                                            <TextBlock Text="{loc:S presence.previewTag}" FontSize="11"
-                                                       Foreground="{DynamicResource TextSoftBrush}" />
-                                        </Border>
-                                    </Grid>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.recent}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.recentHint}" />
+                                    <StackPanel x:Name="RecentPanel" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal">
-                                        <Grid Width="64" Height="64" VerticalAlignment="Top">
-                                            <Border x:Name="PreviewIcon" CornerRadius="8"
-                                                    Background="{DynamicResource AccentBrush}" />
-                                            <TextBlock x:Name="PreviewIconGlyph" Text="R" FontSize="26" FontWeight="Bold"
-                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <StackPanel x:Name="IntegrationsDiscord" Visibility="Collapsed">
+                            <Border x:Name="PresenceLocked" Style="{StaticResource RowCard}"
+                                    BorderBrush="{DynamicResource DangerBrush}" Visibility="Collapsed">
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.needsMonitoring}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.needsMonitoringHint}" />
+                                </StackPanel>
+                            </Border>
+
+                                <TextBlock Style="{StaticResource GroupHeading}" Text="{loc:S presence.richPresence}" />
+                                <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,14"
+                                           Text="{loc:S presence.richPresenceHint}" />
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <Grid>
+                                        <StackPanel Margin="0,0,60,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.enable}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.enableHint}" />
+                                        </StackPanel>
+                                        <CheckBox x:Name="PresenceEnabledBox" Style="{StaticResource Switch}"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                  Click="OnPresenceChanged" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <Grid>
+                                        <StackPanel Margin="0,0,60,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.account}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.accountHint}" />
+                                        </StackPanel>
+                                        <CheckBox x:Name="PresenceAccountBox" Style="{StaticResource Switch}"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                  Click="OnPresenceChanged" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <Grid>
+                                        <StackPanel Margin="0,0,60,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.join}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.joinHint}" />
+                                        </StackPanel>
+                                        <CheckBox x:Name="PresenceJoinBox" Style="{StaticResource Switch}"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                  Click="OnPresenceChanged" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Style="{StaticResource RowCard}">
+                                    <StackPanel>
+                                        <ToggleButton x:Name="CustomRpcHeader" Style="{StaticResource Row}"
+                                                      Checked="OnToggleCustomRpc"
+                                                      Unchecked="OnToggleCustomRpc">
+                                            <Grid>
+                                            <StackPanel Margin="0,0,40,0">
+                                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.custom}" />
+                                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.customHint}" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="CustomRpcChevron" Text="&#xE70D;"
+                                                       FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                                       HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextSoftBrush}"
+                                                       RenderTransformOrigin="0.5,0.5">
+                                                <TextBlock.RenderTransform>
+                                                    <RotateTransform x:Name="CustomRpcTurn" Angle="0" />
+                                                </TextBlock.RenderTransform>
+                                                </TextBlock>
+                                            </Grid>
+                                        </ToggleButton>
+
+                                        <StackPanel x:Name="CustomRpcBody" Visibility="Collapsed" Margin="0,16,0,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.headline}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.headlineHint}" />
+                                            <StackPanel Margin="0,10,0,0">
+                                        <CheckBox x:Name="HeadGameNameBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.headlineGame}" Click="OnPresenceChanged" />
+                                        <CheckBox x:Name="HeadPlayingBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.headlinePlaying}" Click="OnPresenceChanged" />
+                                            </StackPanel>
+
+                                            <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.subline}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S presence.sublineHint}" />
+                                            <StackPanel Margin="0,10,0,0">
+                                        <CheckBox x:Name="SubCreatorBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.sublineCreator}" Click="OnPresenceChanged" />
+                                        <CheckBox x:Name="SubPlayersBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.sublinePlayers}" Click="OnPresenceChanged" />
+                                        <CheckBox x:Name="SubServerBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.sublineServer}" Click="OnPresenceChanged" />
+                                            </StackPanel>
+
+                                            <TextBlock Style="{StaticResource RowTitle}" Margin="0,18,0,0" Text="{loc:S presence.alsoShow}" />
+                                            <StackPanel Margin="0,10,0,0">
+                                        <CheckBox x:Name="PresenceElapsedBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.elapsed}" Click="OnPresenceChanged" />
+                                        <CheckBox x:Name="PresenceIconBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.icon}" Click="OnPresenceChanged" />
+                                        <CheckBox x:Name="PresenceButtonBox" Style="{StaticResource Tick}"
+                                                  Content="{loc:S presence.button}" Click="OnPresenceChanged" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+
+                                <Border x:Name="PresencePreview" Style="{StaticResource RowCard}" Padding="18,16">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,12">
+                                            <TextBlock Text="{loc:S presence.playing}" FontSize="12" FontWeight="Bold"
                                                        Foreground="{DynamicResource TextBrush}" />
-                                            <Border x:Name="PreviewAccount" Width="24" Height="24" CornerRadius="12"
-                                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                                    Margin="0,0,-6,-6"
-                                                    Background="{DynamicResource PurpleBrush}"
-                                                    BorderBrush="{DynamicResource SurfaceBrush}" BorderThickness="2">
-                                                <TextBlock x:Name="PreviewAccountGlyph" FontSize="11" FontWeight="Bold"
-                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                           Foreground="{DynamicResource TextBrush}" />
+                                            <Border HorizontalAlignment="Right" CornerRadius="4" Padding="8,3"
+                                                    Background="{DynamicResource SurfaceHoverBrush}">
+                                                <TextBlock Text="{loc:S presence.previewTag}" FontSize="11"
+                                                           Foreground="{DynamicResource TextSoftBrush}" />
                                             </Border>
                                         </Grid>
 
-                                        <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
-                                            <TextBlock Text="Roblox" FontSize="13" FontWeight="Bold"
-                                                       Foreground="{DynamicResource TextBrush}" />
-                                            <TextBlock x:Name="PreviewDetails" FontSize="13" Margin="0,3,0,0"
-                                                       Foreground="{DynamicResource TextBrush}" />
-                                            <TextBlock x:Name="PreviewState" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="{DynamicResource TextSoftBrush}" />
-                                            <TextBlock x:Name="PreviewElapsed" FontSize="12" Margin="0,2,0,0"
-                                                       Foreground="#FF67D68A" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <Grid Width="64" Height="64" VerticalAlignment="Top">
+                                                <Border x:Name="PreviewIcon" CornerRadius="8"
+                                                        Background="{DynamicResource AccentBrush}" />
+                                                <TextBlock x:Name="PreviewIconGlyph" Text="R" FontSize="26" FontWeight="Bold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           Foreground="{DynamicResource TextBrush}" />
+                                                <Border x:Name="PreviewAccount" Width="24" Height="24" CornerRadius="12"
+                                                        HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                        Margin="0,0,-6,-6"
+                                                        Background="{DynamicResource PurpleBrush}"
+                                                        BorderBrush="{DynamicResource SurfaceBrush}" BorderThickness="2">
+                                                    <TextBlock x:Name="PreviewAccountGlyph" FontSize="11" FontWeight="Bold"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                               Foreground="{DynamicResource TextBrush}" />
+                                                </Border>
+                                            </Grid>
+
+                                            <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="Roblox" FontSize="13" FontWeight="Bold"
+                                                           Foreground="{DynamicResource TextBrush}" />
+                                                <TextBlock x:Name="PreviewDetails" FontSize="13" Margin="0,3,0,0"
+                                                           Foreground="{DynamicResource TextBrush}" />
+                                                <TextBlock x:Name="PreviewState" FontSize="12" Margin="0,2,0,0"
+                                                           Foreground="{DynamicResource TextSoftBrush}" />
+                                                <TextBlock x:Name="PreviewElapsed" FontSize="12" Margin="0,2,0,0"
+                                                           Foreground="#FF67D68A" />
+                                            </StackPanel>
                                         </StackPanel>
+
+                                        <Border x:Name="PreviewJoin" Margin="0,14,0,0" Padding="0,9"
+                                                CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
+                                            <TextBlock x:Name="PreviewJoinText" FontSize="12" HorizontalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                        </Border>
+
+                                        <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="0,9"
+                                                CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
+                                            <TextBlock x:Name="PreviewButtonText" FontSize="12" HorizontalAlignment="Center"
+                                                       Foreground="{DynamicResource TextBrush}" />
+                                        </Border>
                                     </StackPanel>
+                                </Border>
 
-                                    <Border x:Name="PreviewJoin" Margin="0,14,0,0" Padding="0,9"
-                                            CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
-                                        <TextBlock x:Name="PreviewJoinText" FontSize="12" HorizontalAlignment="Center"
-                                                   Foreground="{DynamicResource TextBrush}" />
-                                    </Border>
 
-                                    <Border x:Name="PreviewButton" Margin="0,8,0,0" Padding="0,9"
-                                            CornerRadius="4" Background="{DynamicResource SurfaceHoverBrush}">
-                                        <TextBlock x:Name="PreviewButtonText" FontSize="12" HorizontalAlignment="Center"
-                                                   Foreground="{DynamicResource TextBrush}" />
-                                    </Border>
-                                </StackPanel>
-                            </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S presence.status}" />
-                                <TextBlock x:Name="PresenceStatusText" Style="{StaticResource RowHint}" />
-                            </StackPanel>
-                        </Border>
-
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="PageLauncher" Visibility="Collapsed">
@@ -1245,81 +1354,6 @@
                         </Border>
                     </StackPanel>
 
-                    <StackPanel x:Name="PageActivity" Visibility="Collapsed">
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.monitoring}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.monitoringHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="MonitoringBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top"
-                                          Click="OnMonitoringChanged" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <StackPanel Margin="0,0,60,0">
-                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.serverNotice}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.serverNoticeHint}" />
-                                </StackPanel>
-                                <CheckBox x:Name="ServerNoticeBox" Style="{StaticResource Switch}"
-                                          HorizontalAlignment="Right" VerticalAlignment="Top" />
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock x:Name="PlayedWeekText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource PurpleBrightBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.week}" Margin="0,4,0,0" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock x:Name="SessionCountText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.sessions}" Margin="0,4,0,0" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock x:Name="AverageSessionText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.average}" Margin="0,4,0,0" />
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="3">
-                                    <TextBlock x:Name="LongestSessionText" FontSize="22" FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}" />
-                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.longest}" Margin="0,4,0,0" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.favourites}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.favouritesHint}" />
-                                <StackPanel x:Name="FavouritesPanel" Margin="0,12,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource RowCard}">
-                            <StackPanel>
-                                <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S activity.recent}" />
-                                <TextBlock Style="{StaticResource RowHint}" Text="{loc:S activity.recentHint}" />
-                                <StackPanel x:Name="RecentPanel" Margin="0,12,0,0" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
 
 
                     <StackPanel x:Name="PageNews" Visibility="Collapsed">

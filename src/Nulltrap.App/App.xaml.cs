@@ -45,6 +45,16 @@ public partial class App : Application
         });
     }
 
+    private void OnLeftServer(object? sender, Core.Sessions.RobloxSession session)
+    {
+        if (_services is null || !session.IsIdentified || !_services.Settings.Load().CloseRobloxOnLeave)
+        {
+            return;
+        }
+
+        AppServices.CloseRoblox();
+    }
+
     private void OnMemoryRelief(object? sender, EventArgs e)
     {
         if (_services?.Settings.Load().TrimMemory == true)
@@ -67,6 +77,7 @@ public partial class App : Application
         _services.StartClientUpdates();
         _services.StartPresence();
         _services.Sessions.Joined += OnJoinedServer;
+        _services.Sessions.Left += OnLeftServer;
 
         _ = Task.Run(() => _services.SweepCache());
 
