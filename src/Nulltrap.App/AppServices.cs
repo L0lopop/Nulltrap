@@ -40,6 +40,8 @@ public sealed class AppServices : IDisposable
         UninstallEntry = new WindowsUninstallEntry();
         ProcessLauncher = new WindowsProcessLauncher();
         Remover = new WindowsDeferredRemover();
+        Startup = new WindowsStartupEntry();
+        Instances = new WindowsInstanceLockFactory();
         Memory = new WindowsMemoryTrimmer();
         Cache = new CacheSweeper();
 
@@ -91,6 +93,23 @@ public sealed class AppServices : IDisposable
     public IProcessLauncher ProcessLauncher { get; }
 
     public IDeferredRemover Remover { get; }
+
+    public IStartupEntry Startup { get; }
+
+    public IInstanceLockFactory Instances { get; }
+
+    public void ApplyStartup()
+    {
+        string exe = Installer.IsInstalled ? Installer.InstalledExecutablePath : CurrentExecutablePath;
+
+        if (Settings.Load().RunAtStartup)
+        {
+            Startup.Register(exe, "-background");
+            return;
+        }
+
+        Startup.Remove();
+    }
 
     public IMemoryTrimmer Memory { get; }
 

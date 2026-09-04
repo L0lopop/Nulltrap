@@ -61,6 +61,31 @@ public partial class MainWindow : ChromeWindow
 
     public void LaunchPlayer() => _ = LaunchAsync(BinaryType.WindowsPlayer);
 
+    private void Retire()
+    {
+        if (Application.Current is App app && app.Linger())
+        {
+            Hide();
+            app.WhisperOnce();
+            return;
+        }
+
+        Close();
+    }
+
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        if (Application.Current is App { Watching: true } watching)
+        {
+            e.Cancel = true;
+            Hide();
+            watching.WhisperOnce();
+            return;
+        }
+
+        base.OnClosing(e);
+    }
+
     public void LaunchGame(long placeId) => _ = LaunchAsync(BinaryType.WindowsPlayer, placeId);
 
     public void OpenSettings() => OpenSettings("Home");
@@ -148,7 +173,7 @@ public partial class MainWindow : ChromeWindow
 
             if (settings.CloseAfterLaunch)
             {
-                Close();
+                Retire();
                 return;
             }
 

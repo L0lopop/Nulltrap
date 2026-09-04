@@ -1,4 +1,4 @@
-using Nulltrap.Core.Deployment;
+﻿using Nulltrap.Core.Deployment;
 
 namespace Nulltrap.Core.Launching;
 
@@ -10,6 +10,7 @@ public enum LaunchAction
     LaunchPlayer,
     LaunchStudio,
     Uninstall,
+    Background,
 }
 
 public sealed record LaunchArguments
@@ -90,6 +91,9 @@ public sealed record LaunchArguments
                     break;
                 case "uninstall":
                     action = LaunchAction.Uninstall;
+                    break;
+                case "background":
+                    action = LaunchAction.Background;
                     break;
                 case "quiet":
                 case "silent":

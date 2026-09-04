@@ -193,6 +193,28 @@
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.stayInTray}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.stayInTrayHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="StayInTrayBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.runAtStartup}" />
+                                        <TextBlock Style="{StaticResource RowHint}" Text="{loc:S general.runAtStartupHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="RunAtStartupBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.multiInstance}" />
                                         <TextBlock Style="{StaticResource RowHint}"
                                                    Text="{loc:S general.multiInstanceHint}" />

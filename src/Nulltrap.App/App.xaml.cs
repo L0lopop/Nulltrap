@@ -16,7 +16,15 @@ public partial class App : Application
 
     private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
 
+    private const string WatchLock = "Nulltrap.Background";
+
     private AppServices? _services;
+
+    private TrayIcon? _tray;
+
+    private IInstanceLock? _watch;
+
+    private bool _whispered;
 
     public static AppServices Services =>
         (Current as App)?._services
@@ -52,14 +60,19 @@ public partial class App : Application
                 _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
             }
 
+            Core.Roblox.ServerFacts? facts = notice || _tray is not null
+                ? await _services.Servers.FindAsync(session.PlaceId, session.JobId).ConfigureAwait(true)
+                : null;
+
+            _tray?.Playing(
+                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
+                place,
+                facts);
+
             if (!notice)
             {
                 return;
             }
-
-            Core.Roblox.ServerFacts? facts = await _services.Servers
-                .FindAsync(session.PlaceId, session.JobId)
-                .ConfigureAwait(true);
 
             NoticeWindow.Announce(
                 game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
@@ -78,6 +91,8 @@ public partial class App : Application
         {
             return;
         }
+
+        _tray?.Idle();
 
         _services.Plugins.Tell(Told(session, null, null), joined: false);
 
@@ -154,6 +169,8 @@ public partial class App : Application
         _services = new AppServices();
         Core.Settings.NulltrapSettings chosen = _services.Settings.Load();
 
+        _services.ApplyStartup();
+
         Strings.Use(chosen.Language);
         Themes.Apply(chosen.Theme);
         _services.KeepHandlersRegistered();
@@ -173,6 +190,11 @@ public partial class App : Application
 
         LaunchArguments arguments = LaunchArguments.Parse(e.Args);
 
+        if (arguments.Action is not (LaunchAction.Setup or LaunchAction.Install or LaunchAction.Uninstall))
+        {
+            Linger();
+        }
+
         switch (arguments.Action)
         {
             case LaunchAction.Setup:
@@ -187,6 +209,14 @@ public partial class App : Application
                 RunUninstall(arguments);
                 break;
 
+            case LaunchAction.Background:
+                if (!Watching)
+                {
+                    Shutdown();
+                }
+
+                break;
+
             case LaunchAction.LaunchPlayer:
             case LaunchAction.LaunchStudio:
                 _ = RunLaunchAsync(arguments);
@@ -196,6 +226,71 @@ public partial class App : Application
                 ShowHome();
                 break;
         }
+    }
+
+    public bool Linger()
+    {
+        if (_services is null || !_services.Settings.Load().StayInTray)
+        {
+            return false;
+        }
+
+        if (_tray is not null)
+        {
+            return true;
+        }
+
+        if (!_services.Instances.TryAcquire(WatchLock, out IInstanceLock held))
+        {
+            return false;
+        }
+
+        _watch = held;
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+        _tray = new TrayIcon();
+        _tray.Opened += (_, _) => Surface();
+        _tray.Played += (_, _) => Surface()?.LaunchPlayer();
+        _tray.Quit += (_, _) => Shutdown();
+
+        return true;
+    }
+
+    public bool Watching => _tray is not null;
+
+    public void WhisperOnce()
+    {
+        if (_whispered || _tray is null)
+        {
+            return;
+        }
+
+        _whispered = true;
+        _tray.Whisper(Strings.Get("tray.hidden"), Strings.Get("tray.hiddenHint"));
+    }
+
+    private MainWindow? Surface()
+    {
+        if (Windows.OfType<MainWindow>().FirstOrDefault() is { } standing)
+        {
+            standing.Show();
+            standing.WindowState = WindowState.Normal;
+            standing.Activate();
+
+            return standing;
+        }
+
+        if (!Services.Settings.Load().SetupCompleted && !Services.Installer.IsInstalled)
+        {
+            ShowSetup();
+            return null;
+        }
+
+        var fresh = new MainWindow();
+        fresh.Show();
+        fresh.Activate();
+
+        return fresh;
     }
 
     private void ShowHome()
@@ -359,7 +454,11 @@ public partial class App : Application
             }
 
             window.Close();
-            Shutdown();
+
+            if (!Linger())
+            {
+                Shutdown();
+            }
         }
         catch (OperationCanceledException)
         {
@@ -373,6 +472,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _tray?.Dispose();
+        _watch?.Dispose();
         _services?.Dispose();
         base.OnExit(e);
     }

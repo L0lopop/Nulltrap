@@ -35,6 +35,12 @@ public sealed record NulltrapSettings
     [JsonPropertyName("closeAfterLaunch")]
     public bool CloseAfterLaunch { get; set; } = true;
 
+    [JsonPropertyName("stayInTray")]
+    public bool StayInTray { get; set; } = true;
+
+    [JsonPropertyName("runAtStartup")]
+    public bool RunAtStartup { get; set; }
+
     [JsonPropertyName("closeRobloxOnLeave")]
     public bool CloseRobloxOnLeave { get; set; }
 

@@ -204,6 +204,8 @@ public partial class SettingsWindow : ChromeWindow
 
 
         TrimMemoryBox.IsChecked = _settings.TrimMemory;
+        StayInTrayBox.IsChecked = _settings.StayInTray;
+        RunAtStartupBox.IsChecked = _settings.RunAtStartup;
         CloseRobloxOnLeaveBox.IsChecked = _settings.CloseRobloxOnLeave;
         FillSweepPlans();
         ShowCacheSize();
@@ -2288,6 +2290,8 @@ public partial class SettingsWindow : ChromeWindow
         _settings.ServerNotice = ServerNoticeBox.IsChecked == true;
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
         _settings.CloseRobloxOnLeave = CloseRobloxOnLeaveBox.IsChecked == true;
+        _settings.StayInTray = StayInTrayBox.IsChecked == true;
+        _settings.RunAtStartup = RunAtStartupBox.IsChecked == true;
         _settings.ConfirmMultipleInstances = ConfirmMultipleInstancesBox.IsChecked == true;
         _settings.DesktopShortcut = DesktopShortcutBox.IsChecked == true;
         _settings.StartMenuShortcut = StartMenuShortcutBox.IsChecked == true;
@@ -2334,6 +2338,7 @@ public partial class SettingsWindow : ChromeWindow
         SaveRobloxSettings();
         App.Services.Mods.Enabled = _settings.Mods;
         App.Services.ApplyMonitoring();
+        App.Services.ApplyStartup();
         App.Services.StartPlugins();
         BuildPlugins();
         App.Services.StartPresence();
