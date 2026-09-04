@@ -1,9 +1,15 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
 namespace Nulltrap.Core.Updating;
 
-public sealed record LauncherRelease(string Version, string Url, DateTimeOffset PublishedAt, bool Newer);
+public sealed record LauncherRelease(
+    string Version,
+    string Url,
+    DateTimeOffset PublishedAt,
+    bool Newer,
+    string? Download = null,
+    long Size = 0);
 
 public sealed class LauncherUpdateClient
 {
@@ -49,6 +55,25 @@ public sealed class LauncherUpdateClient
         return Version.TryParse(trimmed, out version);
     }
 
+    internal static AssetRecord? Executable(ReleaseRecord record) =>
+        record.Assets?.FirstOrDefault(asset =>
+            asset.Url is not null
+            && asset.Name is not null
+            && asset.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
+
+    public async Task<Stream> FetchAsync(string url, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(url);
+
+        HttpResponseMessage answer = await _http
+            .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
+
+        answer.EnsureSuccessStatusCode();
+
+        return await answer.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public async Task<LauncherRelease?> LatestAsync(string running, CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, LatestUrl);
@@ -72,11 +97,15 @@ public sealed class LauncherUpdateClient
                 return null;
             }
 
+            AssetRecord? exe = Executable(record);
+
             return new LauncherRelease(
                 record.TagName.TrimStart('v', 'V'),
                 record.HtmlUrl ?? "https://github.com/" + Repository + "/releases",
                 record.PublishedAt ?? DateTimeOffset.UtcNow,
-                IsNewer(record.TagName, running));
+                IsNewer(record.TagName, running),
+                exe?.Url,
+                exe?.Size ?? 0);
         }
         catch (Exception failure) when (failure is HttpRequestException or TaskCanceledException)
         {
@@ -85,8 +114,23 @@ public sealed class LauncherUpdateClient
     }
 }
 
+internal sealed record AssetRecord
+{
+    [JsonPropertyName("name")]
+    public string? Name { get; init; }
+
+    [JsonPropertyName("browser_download_url")]
+    public string? Url { get; init; }
+
+    [JsonPropertyName("size")]
+    public long Size { get; init; }
+}
+
 internal sealed record ReleaseRecord
 {
+    [JsonPropertyName("assets")]
+    public List<AssetRecord>? Assets { get; init; }
+
     [JsonPropertyName("tag_name")]
     public string? TagName { get; init; }
 

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -892,6 +893,8 @@ public partial class SettingsWindow : ChromeWindow
         UpdateBannerTitle.Text = Strings.Get("news.newVersion", release.Version);
         UpdateBannerHint.Text = Strings.Get("news.newVersionHint", release.PublishedAt.ToLocalTime().ToString("d"));
         UpdateBanner.Visibility = release.Newer ? Visibility.Visible : Visibility.Collapsed;
+        InstallReleaseButton.IsEnabled = release.Download is not null;
+        InstallReleaseButton.Visibility = release.Download is null ? Visibility.Collapsed : Visibility.Visible;
 
         if (release.Newer)
         {
@@ -906,6 +909,58 @@ public partial class SettingsWindow : ChromeWindow
         if (_release is not null)
         {
             Open(_release.Url);
+        }
+    }
+
+    private async void OnInstallRelease(object sender, RoutedEventArgs e)
+    {
+        if (_release?.Download is null)
+        {
+            UpdateBannerHint.Text = Strings.Get("news.noFile");
+            return;
+        }
+
+        InstallReleaseButton.IsEnabled = false;
+        UpdateBannerHint.Text = Strings.Get("news.fetching");
+
+        string fresh = Path.Combine(Path.GetTempPath(), $"Nulltrap-{_release.Version}.exe");
+
+        try
+        {
+            await using (Stream coming = await App.Services.LauncherUpdates
+                .FetchAsync(_release.Download)
+                .ConfigureAwait(true))
+            await using (FileStream landing = File.Create(fresh))
+            {
+                await coming.CopyToAsync(landing).ConfigureAwait(true);
+            }
+
+            if (new FileInfo(fresh).Length < 1024)
+            {
+                throw new IOException(Strings.Get("news.tooSmall"));
+            }
+
+            App.Services.Installer.Replace(fresh);
+
+            Process.Start(new ProcessStartInfo(App.Services.Installer.InstalledExecutablePath)
+            {
+                UseShellExecute = true,
+            })?.Dispose();
+
+            Application.Current.Shutdown();
+        }
+        catch (Exception failure) when (failure is IOException or HttpRequestException or UnauthorizedAccessException or TaskCanceledException)
+        {
+            UpdateBannerHint.Text = Strings.Get("news.updateFailed", failure.Message);
+            InstallReleaseButton.IsEnabled = true;
+
+            try
+            {
+                File.Delete(fresh);
+            }
+            catch (IOException)
+            {
+            }
         }
     }
 

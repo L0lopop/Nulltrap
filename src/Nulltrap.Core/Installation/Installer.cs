@@ -1,4 +1,4 @@
-using Nulltrap.Platform.Abstractions;
+﻿using Nulltrap.Platform.Abstractions;
 
 namespace Nulltrap.Core.Installation;
 
@@ -56,6 +56,53 @@ public sealed class Installer
     public bool IsInstalled =>
         File.Exists(InstalledExecutablePath)
         && _protocols.IsRegistered(LaunchTarget.Player, InstalledExecutablePath);
+
+    public string RetiredExecutablePath => InstalledExecutablePath + ".old";
+
+    public void ForgetRetired()
+    {
+        try
+        {
+            if (File.Exists(RetiredExecutablePath))
+            {
+                File.Delete(RetiredExecutablePath);
+            }
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    public void Replace(string freshExecutable)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(freshExecutable);
+
+        if (!File.Exists(freshExecutable))
+        {
+            throw new FileNotFoundException(freshExecutable);
+        }
+
+        ForgetRetired();
+
+        if (File.Exists(InstalledExecutablePath))
+        {
+            File.Move(InstalledExecutablePath, RetiredExecutablePath);
+        }
+
+        try
+        {
+            File.Move(freshExecutable, InstalledExecutablePath);
+        }
+        catch (IOException)
+        {
+            if (File.Exists(RetiredExecutablePath) && !File.Exists(InstalledExecutablePath))
+            {
+                File.Move(RetiredExecutablePath, InstalledExecutablePath);
+            }
+
+            throw;
+        }
+    }
 
     public bool IsRunningFromInstall(string currentExecutablePath) =>
         string.Equals(

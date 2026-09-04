@@ -1491,16 +1491,20 @@
                         <Border x:Name="UpdateBanner" Style="{StaticResource RowCard}" Visibility="Collapsed"
                                 Background="{DynamicResource AccentBrush}">
                             <Grid>
-                                <StackPanel Margin="0,0,150,0">
+                                <StackPanel Margin="0,0,300,0">
                                     <TextBlock x:Name="UpdateBannerTitle" Style="{StaticResource RowTitle}"
                                                Foreground="{DynamicResource OnAccentBrush}" />
                                     <TextBlock x:Name="UpdateBannerHint" Style="{StaticResource RowHint}"
                                                Foreground="{DynamicResource OnAccentBrush}" />
                                 </StackPanel>
-                                <Button x:Name="OpenReleaseButton" Style="{StaticResource Quiet}"
-                                        Content="{loc:S news.open}" MinWidth="130"
-                                        HorizontalAlignment="Right" VerticalAlignment="Center"
-                                        Click="OnOpenRelease" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button x:Name="OpenReleaseButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S news.open}" MinWidth="130"
+                                            Click="OnOpenRelease" />
+                                    <Button x:Name="InstallReleaseButton" Style="{StaticResource Quiet}"
+                                            Content="{loc:S news.install}" MinWidth="150" Margin="8,0,0,0"
+                                            Click="OnInstallRelease" />
+                                </StackPanel>
                             </Grid>
                         </Border>
 

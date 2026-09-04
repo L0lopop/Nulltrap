@@ -104,6 +104,7 @@ public partial class App : Application
         Strings.Use(chosen.Language);
         Themes.Apply(chosen.Theme);
         _services.KeepHandlersRegistered();
+        _services.Installer.ForgetRetired();
         _services.StartPlugins();
         _services.StartTracking();
         _services.StartClientUpdates();
