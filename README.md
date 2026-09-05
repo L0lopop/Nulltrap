@@ -24,13 +24,6 @@ and run it. Nothing has to be installed first — the .NET runtime is inside the
 file — and it never asks for administrator rights: it puts itself in your user
 profile and takes over the Roblox launches from there.
 
-Every release lists the SHA-256 of its file, and `SHA256SUMS.txt` next to it
-holds the same hashes. Check yours before running it:
-
-```powershell
-Get-FileHash Nulltrap.exe -Algorithm SHA256
-```
-
 To remove it: the **Remove Nulltrap** button in the launcher's settings, or the
 Windows list of installed programs. It asks whether to keep your settings and
 your downloads.
@@ -47,9 +40,9 @@ process. It does not need a machine-learning runtime or an embedded browser.
 The dependency list is short on purpose and the download size is a number CI
 checks, not a number that drifts.
 
-**Be verifiable.** Signed releases, reproducible builds, published hashes. The
-single largest unsolved problem in this niche is that users cannot tell a real
-download from a malicious one, and no existing project solves it technically.
+**Be verifiable.** Signed releases and reproducible builds. The single largest
+unsolved problem in this niche is that users cannot tell a real download from a
+malicious one, and no existing project solves it technically.
 
 **Take mods seriously.** Since Roblox introduced the [FastFlag allowlist] in
 September 2025, arbitrary FastFlags no longer apply — the client ignores

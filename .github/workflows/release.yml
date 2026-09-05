@@ -63,18 +63,6 @@ jobs:
       - name: Publish
         run: dotnet publish src/Nulltrap.App -c Release -o publish
 
-      - name: Hash the artifacts
-        shell: pwsh
-        run: |
-          $built = @(Get-ChildItem publish -File | Sort-Object Name)
-
-          foreach ($file in $built) {
-            $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower()
-            "$hash  $($file.Name)" | Out-File publish/SHA256SUMS.txt -Append -Encoding utf8
-          }
-
-          Get-Content publish/SHA256SUMS.txt
-
       - name: Write the release notes
         shell: pwsh
         run: |
@@ -85,7 +73,6 @@ jobs:
             throw "changelog.json has no entry for ${{ steps.tag.outputs.version }}"
           }
 
-          $sums = (Get-Content publish/SHA256SUMS.txt) -join "`n"
           $lines = @()
           $lines += '## What it does'
           $lines += ''
@@ -114,12 +101,6 @@ jobs:
           $lines += 'Скачайте `Nulltrap.exe` и запустите. Ставить заранее ничего не нужно, прав администратора он не просит.'
           $lines += ''
           $lines += '</details>'
-          $lines += ''
-          $lines += '## SHA-256'
-          $lines += ''
-          $lines += '```'
-          $lines += $sums
-          $lines += '```'
 
           $lines -join "`n" | Out-File notes.md -Encoding utf8
 
