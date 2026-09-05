@@ -23,6 +23,16 @@ public partial class MainWindow : ChromeWindow
     {
         InitializeComponent();
         Refresh();
+
+        IsVisibleChanged += OnShown;
+    }
+
+    private void OnShown(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (IsVisible && Application.Current is App running)
+        {
+            running.NudgeUpdateCheck();
+        }
     }
 
     private void Refresh()
@@ -48,15 +58,9 @@ public partial class MainWindow : ChromeWindow
             ? string.Empty
             : Strings.Get("home.channel", settings.Channel);
 
+        ClientText.Visibility = ClientText.Text.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
 
-        if (installed)
-        {
-            InstallLink.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            InstallLink.Visibility = Visibility.Visible;
-        }
+        InstallLink.Visibility = installed ? Visibility.Collapsed : Visibility.Visible;
     }
 
     public void LaunchPlayer() => _ = LaunchAsync(BinaryType.WindowsPlayer);

@@ -20,40 +20,45 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <Image Width="72" Height="72" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality">
-                <Image.Source>
-                    <BitmapImage UriSource="Nulltrap.png" />
-                </Image.Source>
-            </Image>
+        <DockPanel Grid.Column="0" LastChildFill="False">
+            <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Left">
+                <Button Style="{StaticResource Link}"
+                        Content="{loc:S home.github}"
+                        Click="OnOpenRepository" />
 
-            <TextBlock Text="Nulltrap"
-                       Margin="0,14,0,0"
-                       Foreground="{DynamicResource TextBrush}"
-                       FontSize="26"
-                       FontWeight="SemiBold" />
+                <Button x:Name="InstallLink"
+                        Style="{StaticResource Link}"
+                        Visibility="Collapsed"
+                        Content="{loc:S home.install}"
+                        Click="OnInstall" />
+            </StackPanel>
 
-            <TextBlock x:Name="VersionText"
-                       Foreground="{DynamicResource TextSoftBrush}"
-                       FontSize="12" />
+            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left">
+                <Image Width="72" Height="72" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality">
+                    <Image.Source>
+                        <BitmapImage UriSource="Nulltrap.png" />
+                    </Image.Source>
+                </Image>
 
-            <TextBlock x:Name="ClientText"
-                       Margin="0,10,0,0"
-                       Foreground="{DynamicResource TextSoftBrush}"
-                       FontSize="12"
-                       TextWrapping="Wrap" />
+                <TextBlock Text="Nulltrap"
+                           Margin="0,14,0,0"
+                           Foreground="{DynamicResource TextBrush}"
+                           FontSize="26"
+                           FontWeight="SemiBold" />
 
-            <Button Style="{StaticResource Link}"
-                    Margin="0,14,0,0"
-                    Content="{loc:S home.github}"
-                    Click="OnOpenRepository" />
+                <TextBlock x:Name="VersionText"
+                           Margin="0,2,0,0"
+                           Foreground="{DynamicResource TextSoftBrush}"
+                           FontSize="12" />
 
-            <Button x:Name="InstallLink"
-                    Style="{StaticResource Link}"
-                    Visibility="Collapsed"
-                    Content="{loc:S home.install}"
-                    Click="OnInstall" />
-        </StackPanel>
+                <TextBlock x:Name="ClientText"
+                           Margin="0,6,0,0"
+                           Visibility="Collapsed"
+                           Foreground="{DynamicResource TextSoftBrush}"
+                           FontSize="12"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+        </DockPanel>
 
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>

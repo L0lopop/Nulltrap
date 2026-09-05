@@ -28,6 +28,8 @@ public partial class App : Application
 
     private IInstanceLock? _watch;
 
+    private bool _asking;
+
     public static AppServices Services =>
         (Current as App)?._services
         ?? throw new InvalidOperationException("Services are not available yet.");
@@ -157,9 +159,13 @@ public partial class App : Application
             session.ServerAddress,
             country);
 
+    public void NudgeUpdateCheck() => _ = TellAboutUpdateAsync();
+
+    private bool Standing => Windows.OfType<MainWindow>().Any(window => window.IsVisible);
+
     private async Task TellAboutUpdateAsync()
     {
-        if (_services is null)
+        if (_services is null || _asking || !Standing)
         {
             return;
         }
@@ -172,13 +178,19 @@ public partial class App : Application
             return;
         }
 
-        Core.Updating.LauncherRelease? release = await _services.LauncherUpdates
-            .LatestAsync(AppServices.Version)
-            .ConfigureAwait(true);
+        _asking = true;
 
-        if (_services is null)
+        Core.Updating.LauncherRelease? release;
+
+        try
         {
-            return;
+            release = await _services.LauncherUpdates
+                .LatestAsync(AppServices.Version)
+                .ConfigureAwait(true);
+        }
+        finally
+        {
+            _asking = false;
         }
 
         Core.Settings.NulltrapSettings fresh = _services.Settings.Load();
@@ -186,7 +198,7 @@ public partial class App : Application
         fresh.LastUpdateCheck = DateTimeOffset.UtcNow;
         _services.Settings.Save(fresh);
 
-        if (release is not { Newer: true })
+        if (release is not { Newer: true } || !Standing)
         {
             return;
         }
@@ -194,7 +206,19 @@ public partial class App : Application
         NoticeWindow.Announce(
             Strings.Get("news.newVersion", release.Version),
             Strings.Get("news.noticeBody"),
-            chosen: () => Surface()?.OpenSettings("News"));
+            chosen: ShowNews);
+    }
+
+    private void ShowNews()
+    {
+        if (Windows.OfType<SettingsWindow>().FirstOrDefault() is { } standing)
+        {
+            standing.GoTo("News");
+            standing.Activate();
+            return;
+        }
+
+        Surface()?.OpenSettings("News");
     }
 
     private void OnPulse(object? sender, EventArgs e)
@@ -251,7 +275,6 @@ public partial class App : Application
         if (arguments.Action is not (LaunchAction.Setup or LaunchAction.Install or LaunchAction.Uninstall))
         {
             Linger();
-            _ = TellAboutUpdateAsync();
         }
 
         switch (arguments.Action)
