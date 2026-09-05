@@ -11,18 +11,29 @@ Small, auditable, and honest about what it can and cannot do.
 
 </div>
 
-> [!WARNING]
-> **Nulltrap works, but there has been no release yet.**
-> It installs itself, downloads Roblox and Studio, and launches them from the
-> Play button on the Roblox website. Mods, session tracking and Discord
-> presence are not built yet. Build it from source until the first release
-> appears. See [Status](#status).
-
 > [!IMPORTANT]
-> When releases exist, this repository will be the only place to download them.
-> Sites offering "Nulltrap" downloads elsewhere are not us. This warning is here
-> from day one because every project in this space has had to add it after the
-> fake download sites showed up.
+> This repository is the only place to download Nulltrap. Sites offering
+> "Nulltrap" downloads elsewhere are not us. This warning has been here from day
+> one because every project in this space has had to add it after the fake
+> download sites showed up.
+
+## Install
+
+Download `Nulltrap.exe` from [Releases](https://github.com/L0lopop/Nulltrap/releases)
+and run it. Nothing has to be installed first — the .NET runtime is inside the
+file — and it never asks for administrator rights: it puts itself in your user
+profile and takes over the Roblox launches from there.
+
+Every release lists the SHA-256 of its file, and `SHA256SUMS.txt` next to it
+holds the same hashes. Check yours before running it:
+
+```powershell
+Get-FileHash Nulltrap.exe -Algorithm SHA256
+```
+
+To remove it: the **Remove Nulltrap** button in the launcher's settings, or the
+Windows list of installed programs. It asks whether to keep your settings and
+your downloads.
 
 ## Why another one
 

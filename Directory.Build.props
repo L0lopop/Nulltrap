@@ -14,7 +14,7 @@
     <Company>Nulltrap</Company>
     <Authors>L0lopop</Authors>
     <Copyright>Copyright (c) 2026 L0lopop</Copyright>
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>0.1.0</VersionPrefix>
     <RepositoryType>git</RepositoryType>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>

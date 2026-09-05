@@ -130,6 +130,11 @@ public partial class MainWindow : ChromeWindow
 
     private async Task LaunchAsync(BinaryType binaryType, long placeId = 0)
     {
+        if (binaryType == BinaryType.WindowsPlayer && !SecondClientDialog.Allowed(this))
+        {
+            return;
+        }
+
         PlayButton.IsEnabled = false;
         StudioButton.IsEnabled = false;
 

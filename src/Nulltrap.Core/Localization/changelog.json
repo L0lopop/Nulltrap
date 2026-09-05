@@ -1,44 +1,50 @@
 [
   {
-    "version": "0.0.1",
-    "date": "2026-08-29",
+    "version": "0.1.0",
+    "date": "2026-09-05",
     "en": [
-      "Installs itself into your user profile without administrator rights",
+      "Installs itself into your user profile without administrator rights, and needs nothing else installed first",
       "Takes over the Roblox and Studio launches on its own, and puts them back if something else takes them",
       "Downloads Roblox and Studio from the Versions page before you need them, with the traffic and the speed shown",
       "Keeps the client current on its own: it checks the channel every four hours and downloads a new build",
+      "Updates itself from the releases page, without sending you there",
+      "Profiles: a named set of FastFlags, Roblox settings and mods per game, applied whichever way the game is started",
+      "Plugins, on the SDK that ships with the launcher, each in its own load context",
       "Mods: your own files laid over the client, kept there across updates, with the originals put back when you remove yours",
       "FastFlags in three parts - the frame rate cap, ready made switches Roblox still honours, and an editor for your own",
       "Frame rate unlock, up to 9999 instead of the 240 Roblox stops at",
       "Graphics settings Roblox still allows, with the ignored ones marked",
+      "Lives in the tray and can start with Windows, so it watches without a window open",
+      "A notice on joining a server: where it is, its ping and how many are on it, on every teleport too",
       "Discord status: the experience, its icon, your Roblox account, and a button that opens the exact server",
       "Activity: what you played, for how long and on which server, read from Roblox's own log",
+      "Four themes, and cache sweeping on a schedule",
       "English and Russian throughout, numbers included"
     ],
     "ru": [
-      "Устанавливается в профиль пользователя без прав администратора",
+      "Устанавливается в профиль пользователя без прав администратора и ничего не требует поставить заранее",
       "Сам забирает запуски Roblox и Studio и возвращает их себе, если что-то перехватило",
       "Скачивает Roblox и Studio со страницы «Версии» заранее, показывая трафик и скорость",
       "Сам держит клиент в актуальной версии: проверяет канал каждые четыре часа и качает новую сборку",
+      "Обновляет сам себя со страницы релизов, не отправляя вас туда",
+      "Профили: именованный набор фаст-флагов, настроек Roblox и модов под каждую игру, срабатывает с любого пути запуска",
+      "Плагины на SDK, который идёт вместе с лаунчером, каждый в своём контексте загрузки",
       "Моды: ваши файлы поверх клиента, переживают обновления, оригиналы возвращаются, когда ваш файл убран",
       "FastFlags в трёх частях — снятие лимита кадров, готовые переключатели из белого списка и редактор для своих",
       "Снятие ограничения кадров, до 9999 вместо 240, на которых останавливает Roblox",
       "Настройки графики из тех, что Roblox ещё разрешает, с пометкой игнорируемых",
+      "Живёт в трее и умеет стартовать с Windows, так что следит и без открытого окна",
+      "Уведомление о заходе на сервер: где он, какой пинг и сколько на нём людей — и на каждом телепорте тоже",
       "Статус в Discord: игра, её обложка, ваш аккаунт Roblox и кнопка, открывающая именно тот сервер",
       "Активность: во что играли, сколько и на каком сервере — по логу самого Roblox",
+      "Четыре темы и уборка кэша по расписанию",
       "Русский и английский везде, включая запись чисел"
     ],
     "nextEn": [
-      "Updating Nulltrap itself, instead of sending you to the releases page",
-      "Profiles: a named set of flags, graphics and mods, switched in one click",
-      "Plugins, on the SDK that is already in the solution",
       "Several Roblox clients at once",
       "A second platform - the core has been kept portable for it from the first commit"
     ],
     "nextRu": [
-      "Обновление самого Nulltrap вместо отправки на страницу релизов",
-      "Профили: именованный набор флагов, графики и модов, переключаемый одной кнопкой",
-      "Плагины на SDK, который уже лежит в решении",
       "Несколько клиентов Roblox одновременно",
       "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
     ]

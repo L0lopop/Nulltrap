@@ -46,12 +46,14 @@ jobs:
           "| File | Size | SHA-256 |"              | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           "| --- | ---: | --- |"                   | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
 
-          Get-ChildItem publish -File | ForEach-Object {
-            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
-            $size = "{0:N0} KB" -f [math]::Ceiling($_.Length / 1KB)
-            "| ``$($_.Name)`` | $size | ``$hash`` |" |
+          $built = @(Get-ChildItem publish -File | Sort-Object Name)
+
+          foreach ($file in $built) {
+            $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower()
+            $size = "{0:N0} KB" -f [math]::Ceiling($file.Length / 1KB)
+            "| ``$($file.Name)`` | $size | ``$hash`` |" |
               Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
-            "$hash  $($_.Name)" | Out-File -FilePath publish/SHA256SUMS.txt -Append -Encoding utf8
+            "$hash  $($file.Name)" | Out-File -FilePath publish/SHA256SUMS.txt -Append -Encoding utf8
           }
 
       - name: Upload artifact

@@ -465,6 +465,17 @@ public partial class App : Application
 
     private async Task RunLaunchAsync(LaunchArguments arguments)
     {
+        if (arguments.BinaryType == Core.Deployment.BinaryType.WindowsPlayer
+            && !SecondClientDialog.Allowed(null))
+        {
+            if (!Linger())
+            {
+                Shutdown();
+            }
+
+            return;
+        }
+
         var window = new ProgressWindow();
         window.Show();
 
