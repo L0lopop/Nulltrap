@@ -96,7 +96,7 @@ public partial class MainWindow : ChromeWindow
 
     private void OnAbout(object sender, RoutedEventArgs e) => OpenSettings("About");
 
-    private void OpenSettings(string page)
+    public void OpenSettings(string page)
     {
         var settings = new SettingsWindow { Owner = this };
         settings.GoTo(page);

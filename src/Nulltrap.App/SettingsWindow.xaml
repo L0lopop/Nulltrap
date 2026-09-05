@@ -1568,6 +1568,16 @@
                             </Grid>
                         </Border>
 
+                        <Border Style="{StaticResource RowCard}">
+                            <Grid>
+                                <StackPanel Margin="0,0,60,0">
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S news.notice}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S news.noticeHint}" />
+                                </StackPanel>
+                                <CheckBox x:Name="UpdateNoticeBox" Style="{StaticResource Switch}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Border>
+
                         <Border x:Name="UpdateBanner" Style="{StaticResource RowCard}" Visibility="Collapsed"
                                 Background="{DynamicResource AccentBrush}">
                             <Grid>

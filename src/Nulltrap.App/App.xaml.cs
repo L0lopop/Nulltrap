@@ -14,6 +14,8 @@ public partial class App : Application
 
     private static readonly TimeSpan MemoryRelief = TimeSpan.FromMinutes(2);
 
+    private static readonly TimeSpan UpdateCheckEvery = TimeSpan.FromHours(6);
+
     private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
 
     private readonly System.Windows.Threading.DispatcherTimer _pulse = new() { Interval = TimeSpan.FromSeconds(5) };
@@ -155,6 +157,46 @@ public partial class App : Application
             session.ServerAddress,
             country);
 
+    private async Task TellAboutUpdateAsync()
+    {
+        if (_services is null)
+        {
+            return;
+        }
+
+        Core.Settings.NulltrapSettings asked = _services.Settings.Load();
+
+        if (!asked.UpdateNotice
+            || (asked.LastUpdateCheck is { } last && DateTimeOffset.UtcNow - last < UpdateCheckEvery))
+        {
+            return;
+        }
+
+        Core.Updating.LauncherRelease? release = await _services.LauncherUpdates
+            .LatestAsync(AppServices.Version)
+            .ConfigureAwait(true);
+
+        if (_services is null)
+        {
+            return;
+        }
+
+        Core.Settings.NulltrapSettings fresh = _services.Settings.Load();
+
+        fresh.LastUpdateCheck = DateTimeOffset.UtcNow;
+        _services.Settings.Save(fresh);
+
+        if (release is not { Newer: true })
+        {
+            return;
+        }
+
+        NoticeWindow.Announce(
+            Strings.Get("news.newVersion", release.Version),
+            Strings.Get("news.noticeBody"),
+            chosen: () => Surface()?.OpenSettings("News"));
+    }
+
     private void OnPulse(object? sender, EventArgs e)
     {
         if (_services is null
@@ -209,6 +251,7 @@ public partial class App : Application
         if (arguments.Action is not (LaunchAction.Setup or LaunchAction.Install or LaunchAction.Uninstall))
         {
             Linger();
+            _ = TellAboutUpdateAsync();
         }
 
         switch (arguments.Action)

@@ -98,6 +98,12 @@ public sealed record NulltrapSettings
     [JsonPropertyName("automaticClientUpdates")]
     public bool AutomaticClientUpdates { get; set; } = true;
 
+    [JsonPropertyName("updateNotice")]
+    public bool UpdateNotice { get; set; } = true;
+
+    [JsonPropertyName("lastUpdateCheck")]
+    public DateTimeOffset? LastUpdateCheck { get; set; }
+
     [JsonIgnore]
     public PresenceOptions PresenceOptions => new()
     {

@@ -17,6 +17,8 @@ public partial class NoticeWindow : Window
 
     private readonly DispatcherTimer _clock = new() { Interval = OnScreen };
 
+    private Action? _chosen;
+
     public NoticeWindow()
     {
         InitializeComponent();
@@ -26,11 +28,19 @@ public partial class NoticeWindow : Window
         Closed += (_, _) => _clock.Stop();
     }
 
-    public static void Announce(string title, string body, string? tail = null, string? iconUrl = null)
+    public static void Announce(
+        string title,
+        string body,
+        string? tail = null,
+        string? iconUrl = null,
+        Action? chosen = null)
     {
         _showing?.Close();
 
         var notice = new NoticeWindow();
+
+        notice._chosen = chosen;
+        notice.Cursor = chosen is null ? null : System.Windows.Input.Cursors.Hand;
 
         notice.NoticeTitle.Text = title;
         notice.NoticeBody.Text = body;
@@ -121,7 +131,15 @@ public partial class NoticeWindow : Window
         Top = Math.Max(free.Top, Math.Min(top, free.Bottom - ActualHeight));
     }
 
-    private void OnClicked(object sender, MouseButtonEventArgs e) => Fade();
+    private void OnClicked(object sender, MouseButtonEventArgs e)
+    {
+        Action? chosen = _chosen;
+
+        _chosen = null;
+        Fade();
+
+        chosen?.Invoke();
+    }
 
     private void Fade()
     {
