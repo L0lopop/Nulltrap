@@ -1,5 +1,31 @@
 [
   {
+    "version": "0.1.1",
+    "date": "2026-09-05",
+    "en": [
+      "Says in the corner when a new version is out, and opens the update page when you click it",
+      "The notice waits for a Nulltrap window instead of appearing over whatever else is on screen",
+      "There is a switch for it beside the update check",
+      "The update banner no longer claims updating is done by hand; the button next to it does the work",
+      "The home screen lines up: the icon level with the top of the cards, the GitHub link with their bottom"
+    ],
+    "ru": [
+      "Говорит в углу, когда вышла новая версия, и по нажатию открывает страницу обновления",
+      "Уведомление ждёт открытого окна Nulltrap, а не вылезает поверх чужих окон",
+      "Рядом с проверкой обновлений есть тумблер для него",
+      "В баннере обновления больше не написано, что обновляться нужно руками — кнопка рядом всё делает сама",
+      "Главный экран выровнен: иконка вровень с верхом карточек, ссылка на GitHub — с их низом"
+    ],
+    "nextEn": [
+      "Several Roblox clients at once",
+      "A second platform - the core has been kept portable for it from the first commit"
+    ],
+    "nextRu": [
+      "Несколько клиентов Roblox одновременно",
+      "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
+    ]
+  },
+  {
     "version": "0.1.0",
     "date": "2026-09-05",
     "en": [
@@ -40,13 +66,7 @@
       "Четыре темы и уборка кэша по расписанию",
       "Русский и английский везде, включая запись чисел"
     ],
-    "nextEn": [
-      "Several Roblox clients at once",
-      "A second platform - the core has been kept portable for it from the first commit"
-    ],
-    "nextRu": [
-      "Несколько клиентов Roblox одновременно",
-      "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
-    ]
+    "nextEn": [],
+    "nextRu": []
   }
 ]
