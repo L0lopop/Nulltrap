@@ -1391,6 +1391,26 @@
 
                             <Border Style="{StaticResource RowCard}">
                                 <StackPanel>
+                                    <Grid>
+                                        <StackPanel Margin="0,0,290,0">
+                                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.share}" />
+                                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.shareHint}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Button x:Name="PackModButton" Style="{StaticResource Quiet}"
+                                                    Content="{loc:S mods.pack}" MinWidth="128" Click="OnPackMod" />
+                                            <Button x:Name="InstallModButton" Style="{StaticResource Quiet}"
+                                                    Content="{loc:S mods.install}"
+                                                    MinWidth="150" Margin="10,0,0,0" Click="OnInstallMod" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock x:Name="ModsShareText" Style="{StaticResource RowHint}" Margin="0,12,0,0"
+                                               TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.files}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.filesHint}" />
                                     <StackPanel x:Name="ModsPanel" Margin="0,12,0,0" />

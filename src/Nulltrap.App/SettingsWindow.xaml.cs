@@ -1353,12 +1353,12 @@ public partial class SettingsWindow : ChromeWindow
                 _ = CheckAsync(_target);
             }
 
-            if (page == "Activity")
+            if (page == "Integrations")
             {
                 BuildActivity();
             }
 
-            if (page == "Mods")
+            if (page == "Modifications")
             {
                 BuildMods();
             }
@@ -1815,6 +1815,105 @@ public partial class SettingsWindow : ChromeWindow
         Directory.CreateDirectory(App.Services.Mods.SourceDirectory);
         Open(App.Services.Mods.SourceDirectory);
     }
+
+    private void OnPackMod(object sender, RoutedEventArgs e)
+    {
+        string folder = App.Services.Mods.SourceDirectory;
+        IReadOnlyList<string> packable = ModPackage.Packable(folder);
+
+        if (packable.Count == 0)
+        {
+            ModsShareText.Text = Strings.Get("mods.packEmpty");
+            return;
+        }
+
+        var asking = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = Strings.Get("mods.pack"),
+            FileName = "Nulltrap" + ModPackage.Extension,
+            DefaultExt = ModPackage.Extension,
+            Filter = $"Nulltrap mod (*{ModPackage.Extension})|*{ModPackage.Extension}",
+            OverwritePrompt = true,
+        };
+
+        if (asking.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        var card = new ModCard
+        {
+            Name = Path.GetFileNameWithoutExtension(asking.FileName),
+            MadeWith = AppServices.Version,
+            MadeAt = DateTimeOffset.UtcNow,
+        };
+
+        try
+        {
+            using (FileStream into = File.Create(asking.FileName))
+            {
+                ModPackage.Pack(folder, card, into);
+            }
+
+            ModsShareText.Text = Strings.Get("mods.packed", packable.Count, asking.FileName);
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException)
+        {
+            ModsShareText.Text = Strings.Get("mods.trouble", failure.Message);
+        }
+    }
+
+    private void OnInstallMod(object sender, RoutedEventArgs e)
+    {
+        var asking = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = Strings.Get("mods.install"),
+            DefaultExt = ModPackage.Extension,
+            Filter = $"Nulltrap mod (*{ModPackage.Extension})|*{ModPackage.Extension}|Zip (*.zip)|*.zip",
+            CheckFileExists = true,
+        };
+
+        if (asking.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        ModReading reading;
+
+        try
+        {
+            reading = ModPackage.Install(asking.FileName, App.Services.Mods.SourceDirectory);
+        }
+        catch (Exception failure) when (failure is IOException or UnauthorizedAccessException or InvalidDataException)
+        {
+            ModsShareText.Text = Strings.Get("mods.trouble", failure.Message);
+            return;
+        }
+
+        if (!reading.Sound)
+        {
+            ModsShareText.Text = Strings.Get("mods.trouble", Explain(reading));
+            return;
+        }
+
+        string named = string.IsNullOrWhiteSpace(reading.Contents!.Card.Name)
+            ? Path.GetFileNameWithoutExtension(asking.FileName)
+            : reading.Contents.Card.Name;
+
+        ModsShareText.Text = Strings.Get("mods.installed", named, reading.Contents.Files.Count);
+        BuildMods();
+    }
+
+    private static string Explain(ModReading reading) => reading.Trouble switch
+    {
+        ModTrouble.NotAPackage => Strings.Get("mods.badPackage"),
+        ModTrouble.Empty => Strings.Get("mods.badEmpty"),
+        ModTrouble.Escapes => Strings.Get("mods.badEscapes", reading.Offender ?? string.Empty),
+        ModTrouble.Runnable => Strings.Get("mods.badRunnable", reading.Offender ?? string.Empty),
+        ModTrouble.OutsideAssets => Strings.Get("mods.badOutside", reading.Offender ?? string.Empty),
+        ModTrouble.TooBig => Strings.Get("mods.badTooBig"),
+        _ => string.Empty,
+    };
 
     private void OnApplyMods(object sender, RoutedEventArgs e)
     {
