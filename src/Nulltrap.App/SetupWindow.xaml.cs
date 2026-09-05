@@ -148,6 +148,18 @@ public partial class SetupWindow : ChromeWindow
 
     private void OfferMods()
     {
+        if (BuiltInMods.All.Count == 0)
+        {
+            ModsOffered.Children.Add(new System.Windows.Controls.TextBlock
+            {
+                Style = (Style)FindResource("RowHint"),
+                Margin = new Thickness(4, 0, 0, 0),
+                Text = Strings.Get("builtin.none"),
+            });
+
+            return;
+        }
+
         foreach (BuiltInMod mod in BuiltInMods.All)
         {
             var title = new System.Windows.Controls.TextBlock

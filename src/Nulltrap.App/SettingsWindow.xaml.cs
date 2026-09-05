@@ -1778,6 +1778,12 @@ public partial class SettingsWindow : ChromeWindow
 
         BuiltInPanel.Children.Clear();
 
+        if (BuiltInMods.All.Count == 0)
+        {
+            BuiltInPanel.Children.Add(Faint(Strings.Get("builtin.none")));
+            return;
+        }
+
         foreach (BuiltInMod mod in BuiltInMods.All)
         {
             var words = new StackPanel { Margin = new Thickness(0, 0, 60, 0) };

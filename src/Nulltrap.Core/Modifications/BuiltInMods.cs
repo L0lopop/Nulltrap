@@ -8,37 +8,9 @@ public sealed record BuiltInMod(string Id, string NameKey, string HintKey, IRead
 
 public static class BuiltInMods
 {
-    private const string Silence = "Nulltrap.Core.Modifications.Assets.silence";
-
     private static readonly Assembly Owner = typeof(BuiltInMods).Assembly;
 
-    public static IReadOnlyList<BuiltInMod> All { get; } =
-    [
-        new(
-            "quiet-death",
-            "builtin.quietDeath",
-            "builtin.quietDeathHint",
-            [
-                new("content/sounds/ouch.ogg", Silence + ".ogg"),
-                new("content/sounds/oof.ogg", Silence + ".ogg"),
-            ]),
-        new(
-            "quiet-steps",
-            "builtin.quietSteps",
-            "builtin.quietStepsHint",
-            [
-                new("content/sounds/action_footsteps_plastic.mp3", Silence + ".mp3"),
-            ]),
-        new(
-            "quiet-jumps",
-            "builtin.quietJumps",
-            "builtin.quietJumpsHint",
-            [
-                new("content/sounds/action_jump.mp3", Silence + ".mp3"),
-                new("content/sounds/action_jump_land.mp3", Silence + ".mp3"),
-                new("content/sounds/action_get_up.mp3", Silence + ".mp3"),
-            ]),
-    ];
+    public static IReadOnlyList<BuiltInMod> All { get; } = [];
 
     public static BuiltInMod? Find(string id) =>
         All.FirstOrDefault(mod => string.Equals(mod.Id, id, StringComparison.OrdinalIgnoreCase));
