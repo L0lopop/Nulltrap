@@ -447,7 +447,7 @@
   "news.behind": "You are on {0}. {1} is out.",
   "news.noReleases": "You are on {0}. Nothing has been released yet, so there is nothing to compare against.",
   "news.newVersion": "Nulltrap {0} is out",
-  "news.newVersionHint": "Published {0}. Updating is still done by hand; that changes soon.",
+  "news.newVersionHint": "Published {0}. Press Update and the launcher replaces itself.",
   "news.install": "Update",
   "news.fetching": "Fetching the new version...",
   "news.noFile": "This release has no launcher file.",
