@@ -116,6 +116,17 @@
                     </Border>
                 </StackPanel>
 
+                <StackPanel x:Name="StepMods" Visibility="Collapsed">
+                    <Border Style="{StaticResource RowCard}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.mods}" />
+                            <TextBlock Style="{StaticResource RowHint}" Text="{loc:S setup.modsHint}" />
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel x:Name="ModsOffered" />
+                </StackPanel>
+
                 <StackPanel x:Name="StepDownload" Visibility="Collapsed">
                     <Border Style="{StaticResource RowCard}">
                         <Grid>

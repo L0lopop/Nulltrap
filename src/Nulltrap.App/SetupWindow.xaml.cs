@@ -1,9 +1,11 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Deployment;
 using Nulltrap.Core.Installation;
+using Nulltrap.Core.Localization;
+using Nulltrap.Core.Modifications;
 using Nulltrap.Core.Settings;
 using Nulltrap.Platform.Abstractions;
 
@@ -15,6 +17,7 @@ public partial class SetupWindow : ChromeWindow
     {
         Welcome,
         Options,
+        Mods,
         Download,
         Progress,
         Done,
@@ -31,8 +34,12 @@ public partial class SetupWindow : ChromeWindow
 
         LocationText.Text = App.Services.Installer.InstalledExecutablePath;
 
+        OfferMods();
         Render();
     }
+
+    private readonly Dictionary<string, System.Windows.Controls.CheckBox> _offered =
+        new(StringComparer.OrdinalIgnoreCase);
 
     public bool LaunchRequested { get; private set; }
 
@@ -42,22 +49,26 @@ public partial class SetupWindow : ChromeWindow
     {
         StepWelcome.Visibility = Visible(Step.Welcome);
         StepOptions.Visibility = Visible(Step.Options);
+        StepMods.Visibility = Visible(Step.Mods);
         StepDownload.Visibility = Visible(Step.Download);
         StepProgress.Visibility = Visible(Step.Progress);
         StepDone.Visibility = Visible(Step.Done);
 
         (StepTitle.Text, StepSubtitle.Text) = _step switch
         {
-            Step.Welcome => ("Welcome to Nulltrap", "Read this before installing."),
-            Step.Options => ("How it should behave", "All of this can be changed later."),
-            Step.Download => ("What to download now", "Roblox is downloaded from Roblox's own servers."),
-            Step.Progress => ("Setting up", "This takes a few minutes on a first install."),
-            _ => ("All done", "Nulltrap is installed and registered."),
+            Step.Welcome => (Strings.Get("setup.welcomeTitle"), Strings.Get("setup.welcomeSub")),
+            Step.Options => (Strings.Get("setup.optionsTitle"), Strings.Get("setup.optionsSub")),
+            Step.Mods => (Strings.Get("setup.modsTitle"), Strings.Get("setup.modsSub")),
+            Step.Download => (Strings.Get("setup.downloadTitle"), Strings.Get("setup.downloadSub")),
+            Step.Progress => (Strings.Get("setup.progressTitle"), Strings.Get("setup.progressSub")),
+            _ => (Strings.Get("setup.doneTitle"), Strings.Get("setup.doneSub")),
         };
 
-        StepCounter.Text = _step == Step.Done ? string.Empty : $"Step {(int)_step + 1} of 4";
+        StepCounter.Text = _step == Step.Done
+            ? string.Empty
+            : Strings.Get("setup.step", (int)_step + 1, (int)Step.Progress + 1);
 
-        BackButton.Visibility = _step is Step.Options or Step.Download
+        BackButton.Visibility = _step is Step.Options or Step.Mods or Step.Download
             ? Visibility.Visible
             : Visibility.Hidden;
 
@@ -65,10 +76,10 @@ public partial class SetupWindow : ChromeWindow
 
         NextButton.Content = _step switch
         {
-            Step.Download => "Install",
-            Step.Progress => "Working",
-            Step.Done => "Launch Roblox",
-            _ => "Continue",
+            Step.Download => Strings.Get("setup.install"),
+            Step.Progress => Strings.Get("setup.working"),
+            Step.Done => Strings.Get("setup.launch"),
+            _ => Strings.Get("action.continue"),
         };
 
         NextButton.IsEnabled = _step switch
@@ -85,7 +96,13 @@ public partial class SetupWindow : ChromeWindow
 
     private void OnBack(object sender, RoutedEventArgs e)
     {
-        _step = _step == Step.Download ? Step.Options : Step.Welcome;
+        _step = _step switch
+        {
+            Step.Download => Step.Mods,
+            Step.Mods => Step.Options,
+            _ => Step.Welcome,
+        };
+
         Render();
     }
 
@@ -99,6 +116,11 @@ public partial class SetupWindow : ChromeWindow
                 break;
 
             case Step.Options:
+                _step = Step.Mods;
+                Render();
+                break;
+
+            case Step.Mods:
                 _step = Step.Download;
                 Render();
                 break;
@@ -124,6 +146,66 @@ public partial class SetupWindow : ChromeWindow
         Close();
     }
 
+    private void OfferMods()
+    {
+        foreach (BuiltInMod mod in BuiltInMods.All)
+        {
+            var title = new System.Windows.Controls.TextBlock
+            {
+                Style = (Style)FindResource("RowTitle"),
+                Text = Strings.Get(mod.NameKey),
+            };
+
+            var hint = new System.Windows.Controls.TextBlock
+            {
+                Style = (Style)FindResource("RowHint"),
+                Text = Strings.Get(mod.HintKey),
+            };
+
+            var words = new System.Windows.Controls.StackPanel { Margin = new Thickness(0, 0, 60, 0) };
+
+            words.Children.Add(title);
+            words.Children.Add(hint);
+
+            var box = new System.Windows.Controls.CheckBox
+            {
+                Style = (Style)FindResource("Switch"),
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+
+            var row = new System.Windows.Controls.Grid();
+
+            row.Children.Add(words);
+            row.Children.Add(box);
+
+            ModsOffered.Children.Add(new System.Windows.Controls.Border
+            {
+                Style = (Style)FindResource("RowCard"),
+                Child = row,
+            });
+
+            System.Windows.Automation.AutomationProperties.SetAutomationId(box, "Offer_" + mod.Id);
+
+            _offered[mod.Id] = box;
+        }
+    }
+
+    private int TakeMods()
+    {
+        string folder = App.Services.Mods.SourceDirectory;
+        int taken = 0;
+
+        foreach ((string id, System.Windows.Controls.CheckBox box) in _offered)
+        {
+            if (box.IsChecked == true && BuiltInMods.Apply(id, folder))
+            {
+                taken++;
+            }
+        }
+
+        return taken;
+    }
+
     private async Task RunAsync()
     {
         var summary = new List<string>();
@@ -145,6 +227,13 @@ public partial class SetupWindow : ChromeWindow
                     settings.RegisterStudio));
 
             summary.Add($"Installed to {App.Services.Paths.Root}");
+
+            int picked = TakeMods();
+
+            if (picked > 0)
+            {
+                summary.Add(Strings.Get("setup.modsPicked", picked));
+            }
 
             if (report.ReplacedAnotherLauncher && report.PreviousPlayerHandler is not null)
             {

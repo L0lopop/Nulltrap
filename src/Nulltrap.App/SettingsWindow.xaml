@@ -1411,6 +1411,14 @@
 
                             <Border Style="{StaticResource RowCard}">
                                 <StackPanel>
+                                    <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S setup.mods}" />
+                                    <TextBlock Style="{StaticResource RowHint}" Text="{loc:S builtin.hint}" />
+                                    <StackPanel x:Name="BuiltInPanel" Margin="0,12,0,0" />
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <StackPanel>
                                     <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S mods.files}" />
                                     <TextBlock Style="{StaticResource RowHint}" Text="{loc:S mods.filesHint}" />
                                     <StackPanel x:Name="ModsPanel" Margin="0,12,0,0" />

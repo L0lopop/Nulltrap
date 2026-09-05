@@ -15,5 +15,7 @@
 *.jpg binary
 *.ttf binary
 *.otf binary
+*.ogg binary
+*.mp3 binary
 *.dll binary
 *.exe binary

@@ -1772,7 +1772,82 @@ public partial class SettingsWindow : ChromeWindow
         Foreground = (System.Windows.Media.Brush)FindResource("TextSoftBrush"),
     };
 
+    private void BuildBuiltIn()
+    {
+        string folder = App.Services.Mods.SourceDirectory;
+
+        BuiltInPanel.Children.Clear();
+
+        foreach (BuiltInMod mod in BuiltInMods.All)
+        {
+            var words = new StackPanel { Margin = new Thickness(0, 0, 60, 0) };
+
+            words.Children.Add(new TextBlock
+            {
+                Style = (Style)FindResource("RowTitle"),
+                Text = Strings.Get(mod.NameKey),
+            });
+
+            words.Children.Add(new TextBlock
+            {
+                Style = (Style)FindResource("RowHint"),
+                Text = Strings.Get(mod.HintKey),
+            });
+
+            var box = new CheckBox
+            {
+                Style = (Style)FindResource("Switch"),
+                HorizontalAlignment = HorizontalAlignment.Right,
+                IsChecked = BuiltInMods.IsOn(mod.Id, folder),
+                Tag = mod.Id,
+            };
+
+            System.Windows.Automation.AutomationProperties.SetAutomationId(box, "BuiltIn_" + mod.Id);
+            box.Click += OnBuiltInToggled;
+
+            var row = new Grid();
+
+            row.Children.Add(words);
+            row.Children.Add(box);
+
+            BuiltInPanel.Children.Add(new Border
+            {
+                Style = (Style)FindResource("RowCard"),
+                Margin = new Thickness(0, 0, 0, 8),
+                Child = row,
+            });
+        }
+    }
+
+    private void OnBuiltInToggled(object sender, RoutedEventArgs e)
+    {
+        if (sender is not CheckBox { Tag: string id } box)
+        {
+            return;
+        }
+
+        string folder = App.Services.Mods.SourceDirectory;
+
+        if (box.IsChecked == true)
+        {
+            BuiltInMods.Apply(id, folder);
+        }
+        else
+        {
+            BuiltInMods.Remove(id, folder);
+        }
+
+        ListMods();
+        ShowSaved();
+    }
+
     private void BuildMods()
+    {
+        BuildBuiltIn();
+        ListMods();
+    }
+
+    private void ListMods()
     {
         ModsFolderText.Text = App.Services.Mods.SourceDirectory;
 
