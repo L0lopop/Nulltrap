@@ -1775,7 +1775,6 @@ public partial class SettingsWindow : ChromeWindow
     private void BuildMods()
     {
         ModsFolderText.Text = App.Services.Mods.SourceDirectory;
-        ModsEnabledBox.IsChecked = _settings.Mods;
 
         IReadOnlyList<ModFile> files = App.Services.Mods.List();
 
