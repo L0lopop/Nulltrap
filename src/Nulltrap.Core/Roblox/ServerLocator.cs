@@ -6,9 +6,26 @@ using System.Text.Json;
 
 namespace Nulltrap.Core.Roblox;
 
-public sealed record ServerPlace(string Country, string? City)
+public sealed record ServerPlace(string Country, string? City, string? Zone = null)
 {
     public string Describe => string.IsNullOrWhiteSpace(City) ? Country : $"{Country} · {City}";
+
+    public DateTimeOffset? Clock(DateTimeOffset now)
+    {
+        if (string.IsNullOrWhiteSpace(Zone))
+        {
+            return null;
+        }
+
+        try
+        {
+            return TimeZoneInfo.ConvertTime(now, TimeZoneInfo.FindSystemTimeZoneById(Zone));
+        }
+        catch (Exception failure) when (failure is TimeZoneNotFoundException or InvalidTimeZoneException)
+        {
+            return null;
+        }
+    }
 }
 
 public sealed class ServerLocator
@@ -95,8 +112,12 @@ public sealed class ServerLocator
             }
 
             string? city = Text(root, "city");
+            string? zone = Text(root, "timezone");
 
-            return new ServerPlace(country, string.IsNullOrWhiteSpace(city) ? null : city);
+            return new ServerPlace(
+                country,
+                string.IsNullOrWhiteSpace(city) ? null : city,
+                string.IsNullOrWhiteSpace(zone) ? null : zone);
         }
         catch (JsonException)
         {

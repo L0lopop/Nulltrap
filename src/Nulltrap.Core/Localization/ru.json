@@ -37,6 +37,8 @@
   "tray.quit": "Выйти",
   "tray.idle": "Roblox не запущен",
   "tray.playing": "Играет: {0}",
+  "tray.clock": "На сервере сейчас {0}",
+  "tray.spent": "В игре {0}",
   "general.multiInstance": "Спрашивать перед вторым клиентом Roblox",
   "general.multiInstanceHint": "Спрашивать, если Roblox уже запущен.",
   "multi.title": "Roblox уже запущен",

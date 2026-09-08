@@ -30,6 +30,8 @@ public partial class App : Application
 
     private bool _asking;
 
+    private bool _borrowed;
+
     public static AppServices Services =>
         (Current as App)?._services
         ?? throw new InvalidOperationException("Services are not available yet.");
@@ -41,14 +43,10 @@ public partial class App : Application
             return;
         }
 
-        bool notice = _services.Settings.Load().ServerNotice;
-        bool listening = _services.Plugins.Found.Any(plugin => plugin.Running);
-        bool showing = _tray is not null;
+        Core.Settings.NulltrapSettings asked = _services.Settings.Load();
 
-        if (!notice && !listening && !showing)
-        {
-            return;
-        }
+        bool notice = asked.ServerNotice;
+        bool listening = _services.Plugins.Found.Any(plugin => plugin.Running);
 
         _ = Dispatcher.InvokeAsync(async () =>
         {
@@ -65,14 +63,17 @@ public partial class App : Application
                 _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
             }
 
-            Core.Roblox.ServerFacts? facts = notice || showing
-                ? await _services.Servers.FindAsync(session.PlaceId, session.JobId).ConfigureAwait(true)
-                : null;
+            Core.Roblox.ServerFacts? facts = await _services.Servers
+                .FindAsync(session.PlaceId, session.JobId)
+                .ConfigureAwait(true);
+
+            Watch(borrowed: !asked.StayInTray);
 
             _tray?.Playing(
                 game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
                 place,
-                facts);
+                facts,
+                session.StartedAt);
 
             if (!notice)
             {
@@ -97,7 +98,15 @@ public partial class App : Application
             return;
         }
 
-        _tray?.Idle();
+        _ = Dispatcher.InvokeAsync(() =>
+        {
+            _tray?.Idle();
+
+            if (_borrowed && !AppServices.RobloxIsRunning())
+            {
+                LetGo();
+            }
+        });
 
         _services.Plugins.Tell(Told(session, null, null), joined: false);
 
@@ -244,14 +253,20 @@ public partial class App : Application
 
     private void OnPulse(object? sender, EventArgs e)
     {
-        if (_services is null
-            || _services.Sessions.State == Core.Sessions.SessionState.Idle
-            || AppServices.RobloxIsRunning())
+        if (_services is null || AppServices.RobloxIsRunning())
         {
             return;
         }
 
-        _services.Sessions.GiveUp();
+        if (_services.Sessions.State != Core.Sessions.SessionState.Idle)
+        {
+            _services.Sessions.GiveUp();
+        }
+
+        if (_borrowed)
+        {
+            LetGo();
+        }
     }
 
     private void OnMemoryRelief(object? sender, EventArgs e)
@@ -333,13 +348,29 @@ public partial class App : Application
 
     public bool Linger()
     {
-        if (_services is null || !_services.Settings.Load().StayInTray)
+        if (_services is null)
+        {
+            return false;
+        }
+
+        if (_services.Settings.Load().StayInTray)
+        {
+            return Watch(borrowed: false);
+        }
+
+        return AppServices.RobloxIsRunning() && Watch(borrowed: true);
+    }
+
+    private bool Watch(bool borrowed)
+    {
+        if (_services is null)
         {
             return false;
         }
 
         if (_tray is not null)
         {
+            _borrowed = _borrowed && borrowed;
             return true;
         }
 
@@ -349,6 +380,7 @@ public partial class App : Application
         }
 
         _watch = held;
+        _borrowed = borrowed;
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         _tray = new TrayIcon();
@@ -358,6 +390,28 @@ public partial class App : Application
         _tray.Quit += (_, _) => Shutdown();
 
         return true;
+    }
+
+    private void LetGo()
+    {
+        if (_tray is null)
+        {
+            return;
+        }
+
+        _tray.Dispose();
+        _tray = null;
+        _borrowed = false;
+
+        _watch?.Dispose();
+        _watch = null;
+
+        ShutdownMode = ShutdownMode.OnLastWindowClose;
+
+        if (!Windows.OfType<MainWindow>().Any())
+        {
+            Shutdown();
+        }
     }
 
     public bool Watching => _tray is not null;
@@ -375,18 +429,13 @@ public partial class App : Application
             return;
         }
 
-        if (_tray is null)
+        if (_tray is null || AppServices.RobloxIsRunning())
         {
+            _borrowed = _tray is not null;
             return;
         }
 
-        _tray.Dispose();
-        _tray = null;
-
-        _watch?.Dispose();
-        _watch = null;
-
-        ShutdownMode = ShutdownMode.OnLastWindowClose;
+        LetGo();
     }
 
     private void Flip()

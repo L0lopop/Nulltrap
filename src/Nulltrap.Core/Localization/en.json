@@ -37,6 +37,8 @@
   "tray.quit": "Quit",
   "tray.idle": "Roblox is not running",
   "tray.playing": "Playing: {0}",
+  "tray.clock": "It is {0} at the server",
+  "tray.spent": "Playing for {0}",
   "general.multiInstance": "Ask before a second Roblox client",
   "general.multiInstanceHint": "Ask when Roblox is already running.",
   "multi.title": "Roblox is already running",
