@@ -132,7 +132,12 @@ public sealed class TrayIcon : IDisposable
         Tip("Nulltrap");
     });
 
-    public void Playing(string game, ServerPlace? place, ServerFacts? facts, DateTimeOffset? since = null) => On(() =>
+    public void Playing(
+        string game,
+        ServerPlace? place,
+        ServerFacts? facts,
+        DateTimeOffset? since = null,
+        int online = 0) => On(() =>
     {
         _game = game;
         _place = place;
@@ -141,7 +146,7 @@ public sealed class TrayIcon : IDisposable
         _play.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Visible;
 
-        string? about = About(place, facts);
+        string? about = About(place, facts, online);
 
         _server.Header = about;
         _server.Visibility = about is null ? Visibility.Collapsed : Visibility.Visible;
@@ -193,7 +198,7 @@ public sealed class TrayIcon : IDisposable
         _host.Close();
     }
 
-    private static string? About(ServerPlace? place, ServerFacts? facts)
+    private static string? About(ServerPlace? place, ServerFacts? facts, int online)
     {
         var parts = new List<string>();
 
@@ -206,13 +211,22 @@ public sealed class TrayIcon : IDisposable
         {
             parts.Add(Strings.Get("notice.seats", facts.Playing, facts.MaxPlayers));
         }
+        else if (online > 0)
+        {
+            parts.Add(Strings.Get("notice.online", online.ToString("N0")));
+        }
 
         if (facts is { Ping: > 0 })
         {
             parts.Add(Strings.Get("notice.ping", facts.Ping));
         }
 
-        return parts.Count == 0 ? null : string.Join(" · ", parts);
+        if (parts.Count == 0)
+        {
+            parts.Add(Strings.Get("tray.noServer"));
+        }
+
+        return string.Join(" · ", parts);
     }
 
     private static System.Drawing.Icon Ours()

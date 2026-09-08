@@ -6,7 +6,9 @@ public sealed record ServerFacts(int Playing, int MaxPlayers, int Ping, int Fps)
 
 public sealed class ServerListClient
 {
-    public const int PagesToWalk = 2;
+    public const int PagesToWalk = 3;
+
+    public const int Attempts = 3;
 
     private static readonly TimeSpan Breath = TimeSpan.FromMilliseconds(900);
 
@@ -91,7 +93,7 @@ public sealed class ServerListClient
             }
 
             string wanted = cursor is null ? address : $"{address}&cursor={Uri.EscapeDataString(cursor)}";
-            string? payload = await AskAsync(wanted, retry: page == 0, cancellationToken).ConfigureAwait(false);
+            string? payload = await AskAsync(wanted, cancellationToken).ConfigureAwait(false);
 
             if (payload is null)
             {
@@ -114,13 +116,13 @@ public sealed class ServerListClient
         return null;
     }
 
-    private async Task<string?> AskAsync(string address, bool retry, CancellationToken cancellationToken)
+    private async Task<string?> AskAsync(string address, CancellationToken cancellationToken)
     {
-        for (int attempt = 0; attempt < (retry ? 2 : 1); attempt++)
+        for (int attempt = 0; attempt < Attempts; attempt++)
         {
             if (attempt > 0)
             {
-                await Task.Delay(Breath, cancellationToken).ConfigureAwait(false);
+                await Task.Delay(Breath * attempt, cancellationToken).ConfigureAwait(false);
             }
 
             try

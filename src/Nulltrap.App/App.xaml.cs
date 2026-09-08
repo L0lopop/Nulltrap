@@ -73,7 +73,8 @@ public partial class App : Application
                 game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
                 place,
                 facts,
-                session.StartedAt);
+                session.StartedAt,
+                game?.Playing ?? 0);
 
             if (!notice)
             {
