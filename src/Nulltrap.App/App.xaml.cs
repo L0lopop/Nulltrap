@@ -209,6 +209,27 @@ public partial class App : Application
             chosen: ShowNews);
     }
 
+    public void Relanguage(MainWindow old)
+    {
+        ArgumentNullException.ThrowIfNull(old);
+
+        _tray?.Relabel();
+
+        var fresh = new MainWindow
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual,
+            Left = old.Left,
+            Top = old.Top,
+            Width = old.Width,
+            Height = old.Height,
+        };
+
+        fresh.Show();
+        fresh.WindowState = old.WindowState;
+
+        old.CloseForGood();
+    }
+
     private void ShowNews()
     {
         if (Windows.OfType<SettingsWindow>().FirstOrDefault() is { } standing)

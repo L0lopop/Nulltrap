@@ -24,6 +24,8 @@ public sealed class TrayIcon : IDisposable
 
     private bool _gone;
 
+    private string? _game;
+
     public TrayIcon()
     {
         _host = new Window
@@ -91,8 +93,21 @@ public sealed class TrayIcon : IDisposable
 
     public event EventHandler? Quit;
 
+    public void Relabel() => On(() =>
+    {
+        _open.Header = Strings.Get("tray.open");
+        _play.Header = Strings.Get("tray.play");
+        _close.Header = Strings.Get("tray.closeRoblox");
+        _quit.Header = Strings.Get("tray.quit");
+
+        _standing.Header = _game is null
+            ? Strings.Get("tray.idle")
+            : Strings.Get("tray.playing", _game);
+    });
+
     public void Idle() => On(() =>
     {
+        _game = null;
         _standing.Header = Strings.Get("tray.idle");
         _server.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Collapsed;
@@ -102,6 +117,7 @@ public sealed class TrayIcon : IDisposable
 
     public void Playing(string game, ServerPlace? place, ServerFacts? facts) => On(() =>
     {
+        _game = game;
         _standing.Header = Strings.Get("tray.playing", game);
         _play.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Visible;

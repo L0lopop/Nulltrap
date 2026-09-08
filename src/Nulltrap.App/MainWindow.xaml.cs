@@ -19,6 +19,8 @@ public partial class MainWindow : ChromeWindow
 
     private static readonly TimeSpan ClientWindowTimeout = TimeSpan.FromMinutes(3);
 
+    private bool _leaving;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -76,9 +78,15 @@ public partial class MainWindow : ChromeWindow
         Close();
     }
 
+    public void CloseForGood()
+    {
+        _leaving = true;
+        Close();
+    }
+
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        if (Application.Current is App { Watching: true })
+        if (!_leaving && Application.Current is App { Watching: true })
         {
             e.Cancel = true;
             Hide();
@@ -102,9 +110,19 @@ public partial class MainWindow : ChromeWindow
 
     public void OpenSettings(string page)
     {
+        string spoke = Strings.Current;
+
         var settings = new SettingsWindow { Owner = this };
         settings.GoTo(page);
         settings.ShowDialog();
+
+        if (!string.Equals(spoke, Strings.Current, StringComparison.Ordinal)
+            && Application.Current is App turning)
+        {
+            turning.Relanguage(this);
+            return;
+        }
+
         Refresh();
     }
 
