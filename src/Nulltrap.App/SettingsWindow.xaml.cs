@@ -762,6 +762,11 @@ public partial class SettingsWindow : ChromeWindow
 
     private void ShowRecommended()
     {
+        if (_pickedAt >= _picked.Count)
+        {
+            _pickedAt = 0;
+        }
+
         RecommendedEmpty.Visibility = _picked.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         RecommendedPanel.Children.Clear();
 
