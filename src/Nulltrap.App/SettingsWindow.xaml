@@ -129,12 +129,26 @@
                         <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                    Text="{loc:S home.recommendedHint}" />
 
-                        <Border Style="{StaticResource RowCard}" Padding="18,18,18,20">
+                        <Border Style="{StaticResource RowCard}" Padding="8,18,8,20">
                             <Grid>
-                                <TextBlock x:Name="RecommendedEmpty" FontSize="12"
-                                           Foreground="{DynamicResource TextSoftBrush}"
-                                           Text="{loc:S home.recommendedEmpty}" />
-                                <UniformGrid x:Name="RecommendedPanel" Columns="5" Margin="0,0,-12,0" />
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="RecommendedBack" Grid.Column="0" Style="{StaticResource Arrow}"
+                                        Content="&#xE76B;" Click="OnRecommendedBack" />
+
+                                <Grid Grid.Column="1" Margin="8,0,8,0">
+                                    <TextBlock x:Name="RecommendedEmpty" FontSize="12"
+                                               Foreground="{DynamicResource TextSoftBrush}"
+                                               Text="{loc:S home.recommendedEmpty}" />
+                                    <UniformGrid x:Name="RecommendedPanel" Columns="5" Margin="0,0,-12,0" />
+                                </Grid>
+
+                                <Button x:Name="RecommendedNext" Grid.Column="2" Style="{StaticResource Arrow}"
+                                        Content="&#xE76C;" Click="OnRecommendedNext" />
                             </Grid>
                         </Border>
 
@@ -142,14 +156,41 @@
                         <TextBlock Style="{StaticResource RowHint}" Margin="2,-6,0,12"
                                    Text="{loc:S home.beforeHint}" />
 
-                        <Border Style="{StaticResource RowCard}" Padding="18,18,18,20">
+                        <Border Style="{StaticResource SubTabStrip}" HorizontalAlignment="Left" Margin="2,0,0,12">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="PlayedSort"
+                                             x:Name="SortByTime" IsChecked="True"
+                                             Content="{loc:S home.sortByTime}" Checked="OnPlayedSort" />
+                                <RadioButton Style="{StaticResource SubTab}" GroupName="PlayedSort"
+                                             x:Name="SortByLast"
+                                             Content="{loc:S home.sortByLast}" Checked="OnPlayedSort" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource RowCard}" Padding="8,18,8,20">
                             <Grid>
-                                <TextBlock x:Name="RecentEmpty" FontSize="12"
-                                           Foreground="{DynamicResource TextSoftBrush}"
-                                           Text="{loc:S activity.nothingYet}" />
-                                <UniformGrid x:Name="RecentGamesPanel" Columns="5" Margin="0,0,-12,0" />
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="RecentBack" Grid.Column="0" Style="{StaticResource Arrow}"
+                                        Content="&#xE76B;" Click="OnRecentBack" />
+
+                                <Grid Grid.Column="1" Margin="8,0,8,0">
+                                    <TextBlock x:Name="RecentEmpty" FontSize="12"
+                                               Foreground="{DynamicResource TextSoftBrush}"
+                                               Text="{loc:S activity.nothingYet}" />
+                                    <UniformGrid x:Name="RecentGamesPanel" Columns="5" Margin="0,0,-12,0" />
+                                </Grid>
+
+                                <Button x:Name="RecentNext" Grid.Column="2" Style="{StaticResource Arrow}"
+                                        Content="&#xE76C;" Click="OnRecentNext" />
                             </Grid>
                         </Border>
+
+                        <TextBlock x:Name="RecentCountText" Style="{StaticResource RowHint}" Margin="2,8,0,0" />
 
                     </StackPanel>
 

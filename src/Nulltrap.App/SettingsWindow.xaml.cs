@@ -138,6 +138,18 @@ public partial class SettingsWindow : ChromeWindow
     private double _transfer;
     private LauncherRelease? _release;
     private const int TilesInARow = 5;
+
+    private const int TilesToKeep = 40;
+
+    private IReadOnlyList<PlayedGame> _played = [];
+
+    private IReadOnlyList<DiscoveredGame> _picked = [];
+
+    private IReadOnlyDictionary<long, GameInfo> _art = new Dictionary<long, GameInfo>();
+
+    private int _playedAt;
+
+    private int _pickedAt;
     private const int GenreSample = 12;
     private const int TilePixels = 360;
     private const int AvatarPixels = 132;
@@ -713,52 +725,122 @@ public partial class SettingsWindow : ChromeWindow
             .Distinct()
             .ToArray();
 
-        IReadOnlyList<PlayedGame> recent = history.ByGame(TilesInARow);
+        _played = history.ByGame(int.MaxValue);
+        _playedAt = 0;
+
         Task<IReadOnlyList<DiscoveredGame>> charts = App.Services.Discover.PopularAsync();
 
-        IReadOnlyDictionary<long, GameInfo> known = await App.Services.Games
-            .DescribeManyAsync([.. played.Take(GenreSample), .. recent.Select(game => game.UniverseId)]);
+        _art = await App.Services.Games
+            .DescribeManyAsync([.. played.Take(GenreSample), .. _played.Select(game => game.UniverseId)]);
 
-        BuildRecentGames(recent, known);
+        ShowPlayed();
 
         string[] genres = played
             .Take(GenreSample)
-            .Select(known.GetValueOrDefault)
+            .Select(_art.GetValueOrDefault)
             .Select(game => game?.Genre)
             .OfType<string>()
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
         IReadOnlyList<DiscoveredGame> pool = await charts;
-        IReadOnlyList<DiscoveredGame> picked = Recommendations.Pick(pool, played, genres, TilesInARow);
 
-        RecommendedEmpty.Visibility = picked.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        RecommendedPanel.Children.Clear();
+        _picked = Recommendations.Pick(pool, played, genres, TilesToKeep);
+        _pickedAt = 0;
 
-        if (picked.Count == 0)
+        if (_picked.Count > 0)
         {
-            return;
+            IReadOnlyDictionary<long, GameInfo> more = await App.Services.Games
+                .DescribeManyAsync([.. _picked.Select(game => game.UniverseId)]);
+
+            _art = _art.Concat(more.Where(pair => !_art.ContainsKey(pair.Key)))
+                .ToDictionary(pair => pair.Key, pair => pair.Value);
         }
 
-        IReadOnlyDictionary<long, GameInfo> art = await App.Services.Games
-            .DescribeManyAsync([.. picked.Select(game => game.UniverseId)]);
+        ShowRecommended();
+    }
 
-        foreach (DiscoveredGame game in picked)
+    private void ShowRecommended()
+    {
+        RecommendedEmpty.Visibility = _picked.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        RecommendedPanel.Children.Clear();
+
+        RecommendedBack.IsEnabled = _pickedAt > 0;
+        RecommendedNext.IsEnabled = _pickedAt + TilesInARow < _picked.Count;
+
+        foreach (DiscoveredGame game in _picked.Skip(_pickedAt).Take(TilesInARow))
         {
             RecommendedPanel.Children.Add(Tile(
                 game.Name,
                 Strings.Get("home.playingNow", game.Playing.ToString("N0", CultureInfo.CurrentCulture)),
-                art.GetValueOrDefault(game.UniverseId)?.IconUrl,
+                _art.GetValueOrDefault(game.UniverseId)?.IconUrl,
                 game.RootPlaceId));
         }
 
         Arrive(RecommendedPanel);
     }
 
+    private void ShowPlayed()
+    {
+        IReadOnlyList<PlayedGame> order = SortByLast.IsChecked == true
+            ? [.. _played.OrderByDescending(game => game.LastPlayed)]
+            : _played;
+
+        if (_playedAt >= order.Count)
+        {
+            _playedAt = 0;
+        }
+
+        RecentBack.IsEnabled = _playedAt > 0;
+        RecentNext.IsEnabled = _playedAt + TilesInARow < order.Count;
+
+        RecentCountText.Text = order.Count == 0
+            ? string.Empty
+            : Strings.Get(
+                "home.showing",
+                Math.Min(_playedAt + TilesInARow, order.Count),
+                order.Count);
+
+        BuildRecentGames([.. order.Skip(_playedAt).Take(TilesInARow)], _art);
+    }
+
+    private void OnPlayedSort(object sender, RoutedEventArgs e)
+    {
+        if (_loaded)
+        {
+            _playedAt = 0;
+            ShowPlayed();
+        }
+    }
+
+    private void OnRecentBack(object sender, RoutedEventArgs e)
+    {
+        _playedAt = Math.Max(0, _playedAt - TilesInARow);
+        ShowPlayed();
+    }
+
+    private void OnRecentNext(object sender, RoutedEventArgs e)
+    {
+        _playedAt += TilesInARow;
+        ShowPlayed();
+    }
+
+    private void OnRecommendedBack(object sender, RoutedEventArgs e)
+    {
+        _pickedAt = Math.Max(0, _pickedAt - TilesInARow);
+        ShowRecommended();
+    }
+
+    private void OnRecommendedNext(object sender, RoutedEventArgs e)
+    {
+        _pickedAt += TilesInARow;
+        ShowRecommended();
+    }
+
     private void BuildRecentGames(IReadOnlyList<PlayedGame> recent, IReadOnlyDictionary<long, GameInfo> known)
     {
         RecentGamesPanel.Children.Clear();
-        RecentEmpty.Visibility = recent.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        RecentEmpty.Visibility = _played.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
         foreach (PlayedGame game in recent)
         {
