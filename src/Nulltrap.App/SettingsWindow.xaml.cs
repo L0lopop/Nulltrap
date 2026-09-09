@@ -208,6 +208,7 @@ public partial class SettingsWindow : ChromeWindow
         RunAtStartupBox.IsChecked = _settings.RunAtStartup;
         CloseRobloxOnLeaveBox.IsChecked = _settings.CloseRobloxOnLeave;
         UpdateNoticeBox.IsChecked = _settings.UpdateNotice;
+        AutoUpdateBox.IsChecked = _settings.AutoUpdate;
         FillSweepPlans();
         ShowCacheSize();
 
@@ -2481,6 +2482,7 @@ public partial class SettingsWindow : ChromeWindow
             : ChannelBox.Text.Trim();
         _settings.AutomaticClientUpdates = AutomaticClientUpdatesBox.IsChecked == true;
         _settings.UpdateNotice = UpdateNoticeBox.IsChecked == true;
+        _settings.AutoUpdate = AutoUpdateBox.IsChecked == true;
         PresenceOptions shape = PresenceShape();
         _settings.Mods = ModsEnabledBox.IsChecked == true;
         _settings.DiscordPresence = PresenceEnabledBox.IsChecked == true;

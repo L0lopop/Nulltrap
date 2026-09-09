@@ -101,6 +101,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("updateNotice")]
     public bool UpdateNotice { get; set; } = true;
 
+    [JsonPropertyName("autoUpdate")]
+    public bool AutoUpdate { get; set; } = true;
+
     [JsonPropertyName("lastUpdateCheck")]
     public DateTimeOffset? LastUpdateCheck { get; set; }
 

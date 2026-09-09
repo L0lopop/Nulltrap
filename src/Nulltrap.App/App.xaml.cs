@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 
+using System.Net.Http;
+
 using Nulltrap.Core.Bootstrapping;
 using Nulltrap.Core.Installation;
 using Nulltrap.Core.Launching;
@@ -101,7 +103,8 @@ public partial class App : Application
         Core.Roblox.ServerPlace? place,
         int online)
     {
-        string? cursor = null;
+        string?[] cursors = [null, null];
+        bool[] ended = [false, false];
 
         for (int round = 0; round < HuntRounds; round++)
         {
@@ -114,8 +117,20 @@ public partial class App : Application
                 return;
             }
 
+            int side = round % 2;
+
+            if (ended[side])
+            {
+                side = 1 - side;
+            }
+
+            if (ended[side])
+            {
+                return;
+            }
+
             Core.Roblox.ServerStep step = await _services.Servers
-                .StepAsync(session.PlaceId, session.JobId, cursor)
+                .StepAsync(session.PlaceId, session.JobId, cursors[side], side == 0)
                 .ConfigureAwait(true);
 
             if (step.Found)
@@ -124,12 +139,8 @@ public partial class App : Application
                 return;
             }
 
-            if (step.Ended)
-            {
-                return;
-            }
-
-            cursor = step.Cursor;
+            ended[side] = step.Ended;
+            cursors[side] = step.Cursor;
         }
     }
 
@@ -257,7 +268,17 @@ public partial class App : Application
         fresh.LastUpdateCheck = DateTimeOffset.UtcNow;
         _services.Settings.Save(fresh);
 
-        if (release is not { Newer: true } || !Standing)
+        if (release is not { Newer: true })
+        {
+            return;
+        }
+
+        if (asked.AutoUpdate && await SwallowAsync(release).ConfigureAwait(true))
+        {
+            return;
+        }
+
+        if (!Standing)
         {
             return;
         }
@@ -266,6 +287,64 @@ public partial class App : Application
             Strings.Get("news.newVersion", release.Version),
             Strings.Get("news.noticeBody"),
             chosen: ShowNews);
+    }
+
+    private async Task<bool> SwallowAsync(Core.Updating.LauncherRelease release)
+    {
+        if (_services is null
+            || release.Download is null
+            || AppServices.RobloxIsRunning()
+            || Windows.OfType<SettingsWindow>().Any()
+            || Windows.OfType<SetupWindow>().Any()
+            || Windows.OfType<ProgressWindow>().Any())
+        {
+            return false;
+        }
+
+        string fresh = System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(),
+            $"Nulltrap-{release.Version}.exe");
+
+        try
+        {
+            await using (System.IO.Stream coming = await _services.LauncherUpdates
+                .FetchAsync(release.Download)
+                .ConfigureAwait(true))
+            await using (System.IO.FileStream landing = System.IO.File.Create(fresh))
+            {
+                await coming.CopyToAsync(landing).ConfigureAwait(true);
+            }
+
+            if (new System.IO.FileInfo(fresh).Length < 1024)
+            {
+                return false;
+            }
+
+            if (AppServices.RobloxIsRunning())
+            {
+                return false;
+            }
+
+            _services.Installer.Replace(fresh);
+        }
+        catch (Exception failure) when (failure is System.IO.IOException
+            or HttpRequestException
+            or UnauthorizedAccessException
+            or TaskCanceledException)
+        {
+            return false;
+        }
+
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+            _services.Installer.InstalledExecutablePath,
+            Standing ? string.Empty : "-background")
+        {
+            UseShellExecute = true,
+        })?.Dispose();
+
+        Shutdown();
+
+        return true;
     }
 
     public void Relanguage(MainWindow old)

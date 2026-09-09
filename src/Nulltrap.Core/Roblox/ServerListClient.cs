@@ -17,7 +17,7 @@ public sealed class ServerListClient
 
     private static readonly TimeSpan Breath = TimeSpan.FromMilliseconds(900);
 
-    private const string Endpoint = "https://games.roblox.com/v1/games/{0}/servers/Public?limit=100";
+    private const string Endpoint = "https://games.roblox.com/v1/games/{0}/servers/Public?limit=100&sortOrder={1}";
 
     private readonly HttpClient _http;
 
@@ -82,15 +82,23 @@ public sealed class ServerListClient
 
     public async Task<ServerFacts?> FindAsync(long placeId, string? jobId, CancellationToken cancellationToken = default)
     {
-        ServerStep step = await StepAsync(placeId, jobId, null, cancellationToken).ConfigureAwait(false);
+        ServerStep step = await StepAsync(placeId, jobId, null, true, cancellationToken).ConfigureAwait(false);
 
-        return step.Facts;
+        if (step.Found)
+        {
+            return step.Facts;
+        }
+
+        ServerStep other = await StepAsync(placeId, jobId, null, false, cancellationToken).ConfigureAwait(false);
+
+        return other.Facts;
     }
 
     public async Task<ServerStep> StepAsync(
         long placeId,
         string? jobId,
         string? from,
+        bool fullestFirst = true,
         CancellationToken cancellationToken = default)
     {
         if (placeId <= 0 || string.IsNullOrWhiteSpace(jobId))
@@ -98,7 +106,12 @@ public sealed class ServerListClient
             return new ServerStep(null, null, Ended: true);
         }
 
-        string address = string.Format(System.Globalization.CultureInfo.InvariantCulture, Endpoint, placeId);
+        string address = string.Format(
+            System.Globalization.CultureInfo.InvariantCulture,
+            Endpoint,
+            placeId,
+            fullestFirst ? "Desc" : "Asc");
+
         string? cursor = from;
 
         for (int page = 0; page < PagesToWalk; page++)

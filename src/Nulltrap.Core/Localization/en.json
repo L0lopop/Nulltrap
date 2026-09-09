@@ -488,6 +488,8 @@
   "news.noticeBody": "Click to open the update.",
   "news.notice": "Tell me about new versions",
   "news.noticeHint": "A notice in the corner of the screen when a new Nulltrap is out.",
+  "news.auto": "Update on its own",
+  "news.autoHint": "Fetches and installs a new version by itself when you are not in a game and nothing is open. Otherwise it only tells you.",
   "news.install": "Update",
   "news.fetching": "Fetching the new version...",
   "news.noFile": "This release has no launcher file.",
