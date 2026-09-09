@@ -76,8 +76,16 @@ public partial class App : Application
             Watch(borrowed: !asked.StayInTray);
 
             string named = game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame");
+            string? region = place?.Describe;
 
-            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0);
+            if (facts is { Ping: > 0 })
+            {
+                _services.Regions.Record(region, facts.Ping);
+            }
+
+            int nearby = facts is { Ping: > 0 } ? 0 : _services.Regions.Typical(region);
+
+            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0, nearby);
 
             if (facts is null)
             {
@@ -92,7 +100,7 @@ public partial class App : Application
             NoticeWindow.Announce(
                 named,
                 Where(place, game),
-                Numbers(facts, place),
+                Numbers(facts, nearby),
                 game?.IconUrl);
         });
     }
@@ -135,6 +143,7 @@ public partial class App : Application
 
             if (step.Found)
             {
+                _services.Regions.Record(place?.Describe, step.Facts!.Ping);
                 _tray?.Playing(named, place, step.Facts, session.StartedAt, online);
                 return;
             }
@@ -187,33 +196,27 @@ public partial class App : Application
         return string.Join(" · ", parts);
     }
 
-    private static string? Numbers(Core.Roblox.ServerFacts? facts, Core.Roblox.ServerPlace? place)
+    private static string? Numbers(Core.Roblox.ServerFacts? facts, int nearby)
     {
         var parts = new List<string>();
 
-        if (place?.Clock(DateTimeOffset.Now) is { } there)
-        {
-            parts.Add(Core.Localization.Strings.Get("tray.clock", there.ToString("HH:mm")));
-        }
-
-        if (facts is null)
-        {
-            return parts.Count == 0 ? null : string.Join(" · ", parts);
-        }
-
-        if (facts.MaxPlayers > 0)
+        if (facts is { MaxPlayers: > 0 })
         {
             parts.Add(Core.Localization.Strings.Get("notice.seats", facts.Playing, facts.MaxPlayers));
         }
 
-        if (facts.Fps > 0)
+        if (facts is { Fps: > 0 })
         {
             parts.Add(Core.Localization.Strings.Get("notice.tick", facts.Fps));
         }
 
-        if (facts.Ping > 0)
+        if (facts is { Ping: > 0 })
         {
             parts.Add(Core.Localization.Strings.Get("notice.ping", facts.Ping));
+        }
+        else if (nearby > 0)
+        {
+            parts.Add(Core.Localization.Strings.Get("notice.nearbyPing", nearby));
         }
 
         return parts.Count == 0 ? null : string.Join(" · ", parts);

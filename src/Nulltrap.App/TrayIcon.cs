@@ -17,7 +17,6 @@ public sealed class TrayIcon : IDisposable
     private readonly ContextMenu _menu;
     private readonly MenuItem _standing;
     private readonly MenuItem _server;
-    private readonly MenuItem _clock;
     private readonly MenuItem _spent;
     private readonly MenuItem _open;
     private readonly MenuItem _play;
@@ -52,7 +51,6 @@ public sealed class TrayIcon : IDisposable
 
         _standing = new MenuItem { IsEnabled = false };
         _server = new MenuItem { IsEnabled = false, Visibility = Visibility.Collapsed };
-        _clock = new MenuItem { IsEnabled = false, Visibility = Visibility.Collapsed };
         _spent = new MenuItem { IsEnabled = false, Visibility = Visibility.Collapsed };
         _open = new MenuItem { Header = Strings.Get("tray.open") };
         _play = new MenuItem { Header = Strings.Get("tray.play") };
@@ -71,7 +69,6 @@ public sealed class TrayIcon : IDisposable
 
         _menu.Items.Add(_standing);
         _menu.Items.Add(_server);
-        _menu.Items.Add(_clock);
         _menu.Items.Add(_spent);
         _menu.Items.Add(new Separator());
         _menu.Items.Add(_open);
@@ -123,7 +120,6 @@ public sealed class TrayIcon : IDisposable
         _game = null;
         _place = null;
         _since = null;
-        _clock.Visibility = Visibility.Collapsed;
         _spent.Visibility = Visibility.Collapsed;
         _standing.Header = Strings.Get("tray.idle");
         _server.Visibility = Visibility.Collapsed;
@@ -137,7 +133,8 @@ public sealed class TrayIcon : IDisposable
         ServerPlace? place,
         ServerFacts? facts,
         DateTimeOffset? since = null,
-        int online = 0) => On(() =>
+        int online = 0,
+        int nearby = 0) => On(() =>
     {
         _game = game;
         _place = place;
@@ -146,7 +143,7 @@ public sealed class TrayIcon : IDisposable
         _play.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Visible;
 
-        string? about = About(place, facts, online);
+        string? about = About(place, facts, online, nearby);
 
         _server.Header = about;
         _server.Visibility = about is null ? Visibility.Collapsed : Visibility.Visible;
@@ -157,11 +154,6 @@ public sealed class TrayIcon : IDisposable
 
     private void Tick()
     {
-        DateTimeOffset? there = _place?.Clock(DateTimeOffset.Now);
-
-        _clock.Header = there is null ? null : Strings.Get("tray.clock", there.Value.ToString("HH:mm"));
-        _clock.Visibility = there is null ? Visibility.Collapsed : Visibility.Visible;
-
         _spent.Header = _since is null
             ? null
             : Strings.Get("tray.spent", Clocks.Short(DateTimeOffset.UtcNow - _since.Value));
@@ -198,7 +190,7 @@ public sealed class TrayIcon : IDisposable
         _host.Close();
     }
 
-    private static string? About(ServerPlace? place, ServerFacts? facts, int online)
+    private static string? About(ServerPlace? place, ServerFacts? facts, int online, int nearby)
     {
         var parts = new List<string>();
 
@@ -219,6 +211,10 @@ public sealed class TrayIcon : IDisposable
         if (facts is { Ping: > 0 })
         {
             parts.Add(Strings.Get("notice.ping", facts.Ping));
+        }
+        else if (nearby > 0)
+        {
+            parts.Add(Strings.Get("notice.nearbyPing", nearby));
         }
 
         if (parts.Count == 0)
