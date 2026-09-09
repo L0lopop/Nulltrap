@@ -131,7 +131,6 @@ public sealed class TrayIcon : IDisposable
     public void Playing(
         string game,
         ServerPlace? place,
-        ServerFacts? facts,
         DateTimeOffset? since = null,
         int online = 0) => On(() =>
     {
@@ -142,7 +141,7 @@ public sealed class TrayIcon : IDisposable
         _play.Visibility = Visibility.Collapsed;
         _close.Visibility = Visibility.Visible;
 
-        string? about = About(place, facts, online);
+        string? about = About(place, online);
 
         _server.Header = about;
         _server.Visibility = about is null ? Visibility.Collapsed : Visibility.Visible;
@@ -189,7 +188,7 @@ public sealed class TrayIcon : IDisposable
         _host.Close();
     }
 
-    private static string? About(ServerPlace? place, ServerFacts? facts, int online)
+    private static string? About(ServerPlace? place, int online)
     {
         var parts = new List<string>();
 
@@ -198,18 +197,9 @@ public sealed class TrayIcon : IDisposable
             parts.Add(place.Describe);
         }
 
-        if (facts is { MaxPlayers: > 0 })
-        {
-            parts.Add(Strings.Get("notice.seats", facts.Playing, facts.MaxPlayers));
-        }
-        else if (online > 0)
+        if (online > 0)
         {
             parts.Add(Strings.Get("notice.online", online.ToString("N0")));
-        }
-
-        if (facts is { Ping: > 0 })
-        {
-            parts.Add(Strings.Get("notice.ping", facts.Ping));
         }
 
         if (parts.Count == 0)

@@ -14,7 +14,7 @@
         Opacity="0"
         MouseLeftButtonDown="OnClicked">
 
-    <Border Background="{DynamicResource SurfaceBrush}"
+    <Border Background="{DynamicResource NoticeBrush}"
             BorderBrush="{DynamicResource PurpleBrush}"
             BorderThickness="1"
             CornerRadius="10"

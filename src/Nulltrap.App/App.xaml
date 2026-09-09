@@ -27,6 +27,7 @@
         <SolidColorBrush x:Key="CaptionBrush" Color="{StaticResource CaptionColor}" />
         <SolidColorBrush x:Key="CaptionVeilBrush" Color="{StaticResource CaptionColor}" Opacity="0.55" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="NoticeBrush" Color="{StaticResource SurfaceColor}" Opacity="0.82" />
         <SolidColorBrush x:Key="SurfaceHoverBrush" Color="{StaticResource SurfaceHoverColor}" />
         <SolidColorBrush x:Key="RuleBrush" Color="{StaticResource RuleColor}" />
         <SolidColorBrush x:Key="PurpleBrush" Color="{StaticResource PurpleColor}" />

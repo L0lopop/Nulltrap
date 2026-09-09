@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 
 using Nulltrap.Core.Settings;
@@ -98,6 +98,7 @@ public static class Themes
         Lay(shelf, "CaptionBrush", skin.Caption);
         Lay(shelf, "CaptionVeilBrush", skin.Caption, 0.55);
         Lay(shelf, "SurfaceBrush", skin.Surface);
+        Lay(shelf, "NoticeBrush", skin.Surface, 0.82);
         Lay(shelf, "SurfaceHoverBrush", skin.SurfaceHover);
         Lay(shelf, "RuleBrush", skin.Rule);
         Lay(shelf, "PurpleBrush", skin.Purple);

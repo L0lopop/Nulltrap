@@ -18,10 +18,6 @@ public partial class App : Application
 
     private static readonly TimeSpan UpdateCheckEvery = TimeSpan.FromHours(6);
 
-    private static readonly TimeSpan HuntBreath = TimeSpan.FromSeconds(50);
-
-    private const int HuntRounds = 12;
-
     private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
 
     private readonly System.Windows.Threading.DispatcherTimer _pulse = new() { Interval = TimeSpan.FromSeconds(5) };
@@ -69,79 +65,19 @@ public partial class App : Application
                 _services.Plugins.Tell(Told(session, game?.Name, place?.Country), joined: true);
             }
 
-            Core.Roblox.ServerFacts? facts = await _services.Servers
-                .FindAsync(session.PlaceId, session.JobId)
-                .ConfigureAwait(true);
-
             Watch(borrowed: !asked.StayInTray);
 
             string named = game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame");
 
-            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0);
-
-            if (facts is null)
-            {
-                _ = HuntServerAsync(session, named, place, game?.Playing ?? 0);
-            }
+            _tray?.Playing(named, place, session.StartedAt, game?.Playing ?? 0);
 
             if (!notice)
             {
                 return;
             }
 
-            NoticeWindow.Announce(
-                named,
-                Where(place, game),
-                Numbers(facts),
-                game?.IconUrl);
+            NoticeWindow.Announce(named, Where(place, game), iconUrl: game?.IconUrl);
         });
-    }
-
-    private async Task HuntServerAsync(
-        Core.Sessions.RobloxSession session,
-        string named,
-        Core.Roblox.ServerPlace? place,
-        int online)
-    {
-        string?[] cursors = [null, null];
-        bool[] ended = [false, false];
-
-        for (int round = 0; round < HuntRounds; round++)
-        {
-            await Task.Delay(HuntBreath).ConfigureAwait(true);
-
-            if (_services is null
-                || _tray is null
-                || !string.Equals(_services.Sessions.Current?.JobId, session.JobId, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            int side = round % 2;
-
-            if (ended[side])
-            {
-                side = 1 - side;
-            }
-
-            if (ended[side])
-            {
-                return;
-            }
-
-            Core.Roblox.ServerStep step = await _services.Servers
-                .StepAsync(session.PlaceId, session.JobId, cursors[side], side == 0)
-                .ConfigureAwait(true);
-
-            if (step.Found)
-            {
-                _tray?.Playing(named, place, step.Facts, session.StartedAt, online);
-                return;
-            }
-
-            ended[side] = step.Ended;
-            cursors[side] = step.Cursor;
-        }
     }
 
     private void OnMovedServer(object? sender, Core.Sessions.RobloxSession session) =>
@@ -185,28 +121,6 @@ public partial class App : Application
         }
 
         return string.Join(" · ", parts);
-    }
-
-    private static string? Numbers(Core.Roblox.ServerFacts? facts)
-    {
-        var parts = new List<string>();
-
-        if (facts is { MaxPlayers: > 0 })
-        {
-            parts.Add(Core.Localization.Strings.Get("notice.seats", facts.Playing, facts.MaxPlayers));
-        }
-
-        if (facts is { Fps: > 0 })
-        {
-            parts.Add(Core.Localization.Strings.Get("notice.tick", facts.Fps));
-        }
-
-        if (facts is { Ping: > 0 })
-        {
-            parts.Add(Core.Localization.Strings.Get("notice.ping", facts.Ping));
-        }
-
-        return parts.Count == 0 ? null : string.Join(" · ", parts);
     }
 
     private static Plugins.PluginSession Told(

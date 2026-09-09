@@ -61,7 +61,6 @@ public sealed class AppServices : IDisposable
 
         Games = new GameInfoClient(_http);
         Locator = new ServerLocator(_http);
-        Servers = new ServerListClient(_http);
         Discover = new DiscoverClient(_http);
         Accounts = new AccountInfoClient(_http);
         LauncherUpdates = new LauncherUpdateClient(_http);
@@ -156,8 +155,6 @@ public sealed class AppServices : IDisposable
     public RobloxLogWatcher LogWatcher { get; private set; }
 
     public ServerLocator Locator { get; }
-
-    public ServerListClient Servers { get; }
 
     public IPresenceTransportFactory PresenceTransports { get; }
 
