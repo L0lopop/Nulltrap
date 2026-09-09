@@ -62,7 +62,6 @@ public sealed class AppServices : IDisposable
         Games = new GameInfoClient(_http);
         Locator = new ServerLocator(_http);
         Servers = new ServerListClient(_http);
-        Regions = new RegionPings(Paths);
         Discover = new DiscoverClient(_http);
         Accounts = new AccountInfoClient(_http);
         LauncherUpdates = new LauncherUpdateClient(_http);
@@ -159,8 +158,6 @@ public sealed class AppServices : IDisposable
     public ServerLocator Locator { get; }
 
     public ServerListClient Servers { get; }
-
-    public RegionPings Regions { get; }
 
     public IPresenceTransportFactory PresenceTransports { get; }
 

@@ -328,7 +328,6 @@
   "notice.seats": "{0} из {1} на сервере",
   "notice.tick": "{0} к/с у сервера",
   "notice.ping": "{0} мс",
-  "notice.nearbyPing": "в этом регионе обычно ≈{0} мс",
   "notice.unknownPlace": "Страну сервера определить не удалось",
   "activity.week": "за неделю",
   "activity.total": "за всё время",

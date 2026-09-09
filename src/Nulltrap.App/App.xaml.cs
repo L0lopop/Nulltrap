@@ -76,16 +76,8 @@ public partial class App : Application
             Watch(borrowed: !asked.StayInTray);
 
             string named = game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame");
-            string? region = place?.Describe;
 
-            if (facts is { Ping: > 0 })
-            {
-                _services.Regions.Record(region, facts.Ping);
-            }
-
-            int nearby = facts is { Ping: > 0 } ? 0 : _services.Regions.Typical(region);
-
-            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0, nearby);
+            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0);
 
             if (facts is null)
             {
@@ -100,7 +92,7 @@ public partial class App : Application
             NoticeWindow.Announce(
                 named,
                 Where(place, game),
-                Numbers(facts, nearby),
+                Numbers(facts),
                 game?.IconUrl);
         });
     }
@@ -143,7 +135,6 @@ public partial class App : Application
 
             if (step.Found)
             {
-                _services.Regions.Record(place?.Describe, step.Facts!.Ping);
                 _tray?.Playing(named, place, step.Facts, session.StartedAt, online);
                 return;
             }
@@ -196,7 +187,7 @@ public partial class App : Application
         return string.Join(" · ", parts);
     }
 
-    private static string? Numbers(Core.Roblox.ServerFacts? facts, int nearby)
+    private static string? Numbers(Core.Roblox.ServerFacts? facts)
     {
         var parts = new List<string>();
 
@@ -213,10 +204,6 @@ public partial class App : Application
         if (facts is { Ping: > 0 })
         {
             parts.Add(Core.Localization.Strings.Get("notice.ping", facts.Ping));
-        }
-        else if (nearby > 0)
-        {
-            parts.Add(Core.Localization.Strings.Get("notice.nearbyPing", nearby));
         }
 
         return parts.Count == 0 ? null : string.Join(" · ", parts);

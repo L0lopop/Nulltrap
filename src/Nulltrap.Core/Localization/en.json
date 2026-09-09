@@ -328,7 +328,6 @@
   "notice.seats": "{0} of {1} on this server",
   "notice.tick": "server at {0} fps",
   "notice.ping": "{0} ms",
-  "notice.nearbyPing": "usually ≈{0} ms in this region",
   "notice.unknownPlace": "The server's country could not be worked out",
   "activity.week": "this week",
   "activity.total": "all time",
