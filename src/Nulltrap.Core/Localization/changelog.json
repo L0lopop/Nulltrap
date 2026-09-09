@@ -1,5 +1,43 @@
 [
   {
+    "version": "0.1.2",
+    "date": "2026-09-09",
+    "en": [
+      "The mods switch works: clicking it used to undo itself, so mods could never be turned off",
+      "Two settings pages were never filled in - the mods folder showed blank and the activity figures stayed empty",
+      "A mod can be packed into one file and handed over; installing one refuses anything runnable or reaching outside content",
+      "The tray icon is there for as long as Roblox is, whatever the stay-in-tray setting says, and goes when the game does",
+      "The tray menu says where the server is, how many are in the game and how long this session has run",
+      "The join notice is translucent, arrives sooner and no longer waits on an endpoint Roblox throttles",
+      "Ping is gone from both. Roblox only reports it for servers it feels like listing, and the number was never yours anyway",
+      "Nulltrap updates itself when nothing is in the way; there is a switch for it beside the update notice",
+      "The home screen pages through every game you have played and forty picks, ordered by time spent or by last visit",
+      "Changing the language now redraws the whole launcher instead of half of it",
+      "Setup is translated end to end and asks about the mods that come with the launcher"
+    ],
+    "ru": [
+      "Тумблер модов работает: раньше нажатие отменяло само себя, и выключить моды было нельзя",
+      "Две страницы настроек вообще не наполнялись — путь к папке модов был пуст, а в активности не считалось время",
+      "Мод можно собрать в один файл и передать; при установке отказ всему запускаемому и путям за пределы content",
+      "Значок в трее держится столько же, сколько Roblox, независимо от настройки, и уходит вместе с игрой",
+      "В меню трея — где сервер, сколько людей в игре и сколько идёт эта сессия",
+      "Уведомление о заходе полупрозрачное, появляется быстрее и больше не ждёт адрес, который Roblox душит",
+      "Пинг убран отовсюду. Roblox отдаёт его не для всех серверов, да и был он не вашим, а средним по серверу",
+      "Nulltrap обновляется сам, когда ничего не мешает; рядом с уведомлением о версиях есть тумблер",
+      "На главной листаются все сыгранные игры и сорок рекомендаций — по времени в игре или по последнему заходу",
+      "Смена языка перерисовывает весь лаунчер, а не половину",
+      "Мастер установки переведён целиком и спрашивает про моды, которые идут с лаунчером"
+    ],
+    "nextEn": [
+      "Several Roblox clients at once",
+      "A second platform - the core has been kept portable for it from the first commit"
+    ],
+    "nextRu": [
+      "Несколько клиентов Roblox одновременно",
+      "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
+    ]
+  },
+  {
     "version": "0.1.1",
     "date": "2026-09-05",
     "en": [
@@ -16,14 +54,8 @@
       "В баннере обновления больше не написано, что обновляться нужно руками — кнопка рядом всё делает сама",
       "Главный экран выровнен: иконка вровень с верхом карточек, ссылка на GitHub — с их низом"
     ],
-    "nextEn": [
-      "Several Roblox clients at once",
-      "A second platform - the core has been kept portable for it from the first commit"
-    ],
-    "nextRu": [
-      "Несколько клиентов Roblox одновременно",
-      "Вторая платформа — ядро держат переносимым ради неё с первого коммита"
-    ]
+    "nextEn": [],
+    "nextRu": []
   },
   {
     "version": "0.1.0",
