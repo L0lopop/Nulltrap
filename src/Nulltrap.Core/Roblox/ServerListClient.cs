@@ -4,6 +4,11 @@ namespace Nulltrap.Core.Roblox;
 
 public sealed record ServerFacts(int Playing, int MaxPlayers, int Ping, int Fps);
 
+public sealed record ServerStep(ServerFacts? Facts, string? Cursor, bool Ended)
+{
+    public bool Found => Facts is not null;
+}
+
 public sealed class ServerListClient
 {
     public const int PagesToWalk = 3;
@@ -77,13 +82,24 @@ public sealed class ServerListClient
 
     public async Task<ServerFacts?> FindAsync(long placeId, string? jobId, CancellationToken cancellationToken = default)
     {
+        ServerStep step = await StepAsync(placeId, jobId, null, cancellationToken).ConfigureAwait(false);
+
+        return step.Facts;
+    }
+
+    public async Task<ServerStep> StepAsync(
+        long placeId,
+        string? jobId,
+        string? from,
+        CancellationToken cancellationToken = default)
+    {
         if (placeId <= 0 || string.IsNullOrWhiteSpace(jobId))
         {
-            return null;
+            return new ServerStep(null, null, Ended: true);
         }
 
         string address = string.Format(System.Globalization.CultureInfo.InvariantCulture, Endpoint, placeId);
-        string? cursor = null;
+        string? cursor = from;
 
         for (int page = 0; page < PagesToWalk; page++)
         {
@@ -92,28 +108,31 @@ public sealed class ServerListClient
                 await Task.Delay(Breath, cancellationToken).ConfigureAwait(false);
             }
 
-            string wanted = cursor is null ? address : $"{address}&cursor={Uri.EscapeDataString(cursor)}";
+            string wanted = string.IsNullOrWhiteSpace(cursor)
+                ? address
+                : $"{address}&cursor={Uri.EscapeDataString(cursor)}";
+
             string? payload = await AskAsync(wanted, cancellationToken).ConfigureAwait(false);
 
             if (payload is null)
             {
-                return null;
+                return new ServerStep(null, cursor, Ended: false);
             }
 
             ServerFacts? found = Read(payload, jobId, out cursor);
 
             if (found is not null)
             {
-                return found;
+                return new ServerStep(found, cursor, Ended: false);
             }
 
             if (string.IsNullOrWhiteSpace(cursor))
             {
-                return null;
+                return new ServerStep(null, null, Ended: true);
             }
         }
 
-        return null;
+        return new ServerStep(null, cursor, Ended: false);
     }
 
     private async Task<string?> AskAsync(string address, CancellationToken cancellationToken)

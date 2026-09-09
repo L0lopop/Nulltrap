@@ -16,6 +16,10 @@ public partial class App : Application
 
     private static readonly TimeSpan UpdateCheckEvery = TimeSpan.FromHours(6);
 
+    private static readonly TimeSpan HuntBreath = TimeSpan.FromSeconds(50);
+
+    private const int HuntRounds = 12;
+
     private readonly System.Windows.Threading.DispatcherTimer _relief = new() { Interval = MemoryRelief };
 
     private readonly System.Windows.Threading.DispatcherTimer _pulse = new() { Interval = TimeSpan.FromSeconds(5) };
@@ -69,12 +73,14 @@ public partial class App : Application
 
             Watch(borrowed: !asked.StayInTray);
 
-            _tray?.Playing(
-                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
-                place,
-                facts,
-                session.StartedAt,
-                game?.Playing ?? 0);
+            string named = game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame");
+
+            _tray?.Playing(named, place, facts, session.StartedAt, game?.Playing ?? 0);
+
+            if (facts is null)
+            {
+                _ = HuntServerAsync(session, named, place, game?.Playing ?? 0);
+            }
 
             if (!notice)
             {
@@ -82,11 +88,49 @@ public partial class App : Application
             }
 
             NoticeWindow.Announce(
-                game?.Name ?? Core.Localization.Strings.Get("activity.unknownGame"),
+                named,
                 Where(place, game),
-                Numbers(facts),
+                Numbers(facts, place),
                 game?.IconUrl);
         });
+    }
+
+    private async Task HuntServerAsync(
+        Core.Sessions.RobloxSession session,
+        string named,
+        Core.Roblox.ServerPlace? place,
+        int online)
+    {
+        string? cursor = null;
+
+        for (int round = 0; round < HuntRounds; round++)
+        {
+            await Task.Delay(HuntBreath).ConfigureAwait(true);
+
+            if (_services is null
+                || _tray is null
+                || !string.Equals(_services.Sessions.Current?.JobId, session.JobId, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Core.Roblox.ServerStep step = await _services.Servers
+                .StepAsync(session.PlaceId, session.JobId, cursor)
+                .ConfigureAwait(true);
+
+            if (step.Found)
+            {
+                _tray?.Playing(named, place, step.Facts, session.StartedAt, online);
+                return;
+            }
+
+            if (step.Ended)
+            {
+                return;
+            }
+
+            cursor = step.Cursor;
+        }
     }
 
     private void OnMovedServer(object? sender, Core.Sessions.RobloxSession session) =>
@@ -132,14 +176,19 @@ public partial class App : Application
         return string.Join(" · ", parts);
     }
 
-    private static string? Numbers(Core.Roblox.ServerFacts? facts)
+    private static string? Numbers(Core.Roblox.ServerFacts? facts, Core.Roblox.ServerPlace? place)
     {
-        if (facts is null)
+        var parts = new List<string>();
+
+        if (place?.Clock(DateTimeOffset.Now) is { } there)
         {
-            return null;
+            parts.Add(Core.Localization.Strings.Get("tray.clock", there.ToString("HH:mm")));
         }
 
-        var parts = new List<string>();
+        if (facts is null)
+        {
+            return parts.Count == 0 ? null : string.Join(" · ", parts);
+        }
 
         if (facts.MaxPlayers > 0)
         {
