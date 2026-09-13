@@ -9,6 +9,12 @@
 
 [English](README.md) · **Русский**
 
+[![Release](https://img.shields.io/github/v/release/L0lopop/Nulltrap?style=flat-square&color=7B2FC7&label=%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F)](https://github.com/L0lopop/Nulltrap/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/L0lopop/Nulltrap/total?style=flat-square&color=7B2FC7&label=%D1%81%D0%BA%D0%B0%D1%87%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9)](https://github.com/L0lopop/Nulltrap/releases)
+[![Stars](https://img.shields.io/github/stars/L0lopop/Nulltrap?style=flat-square&color=7B2FC7&label=%D0%B7%D0%B2%D1%91%D0%B7%D0%B4)](https://github.com/L0lopop/Nulltrap/stargazers)
+[![CI](https://img.shields.io/github/actions/workflow/status/L0lopop/Nulltrap/ci.yml?branch=main&style=flat-square&color=7B2FC7&label=%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B0)](https://github.com/L0lopop/Nulltrap/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/%D0%BB%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F-MIT-7B2FC7?style=flat-square)](LICENSE)
+
 </div>
 
 > [!IMPORTANT]
@@ -109,6 +115,25 @@ Windows-предположения уже повсюду.
 Правило соблюдает сборка, а не дисциплина: CI компилирует `Core` и всё, что под
 ним, на Linux, где зависимость от Windows просто не разрешается. Потянешься за
 реестром из портируемой половины — сборка краснеет на том же пуше.
+
+## Звезда
+
+Если Nulltrap пригодился — нажмите ★ вверху страницы. Это не мелочь: в теме
+`roblox` на GitHub сотни проектов, и находят обычно те, у кого звёзд больше.
+Одно нажатие — и следующий человек, которому нужен бутстраппер, доберётся сюда
+быстрее.
+
+<div align="center">
+
+<a href="https://star-history.com/#L0lopop/Nulltrap&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date" />
+    <img alt="Звёзды со временем" src="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date" width="620" />
+  </picture>
+</a>
+
+</div>
 
 ## Лицензия
 

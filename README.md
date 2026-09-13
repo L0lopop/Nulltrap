@@ -9,6 +9,12 @@ Small, auditable, and honest about what it can and cannot do.
 
 **English** · [Русский](README.ru.md)
 
+[![Release](https://img.shields.io/github/v/release/L0lopop/Nulltrap?style=flat-square&color=7B2FC7&label=release)](https://github.com/L0lopop/Nulltrap/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/L0lopop/Nulltrap/total?style=flat-square&color=7B2FC7&label=downloads)](https://github.com/L0lopop/Nulltrap/releases)
+[![Stars](https://img.shields.io/github/stars/L0lopop/Nulltrap?style=flat-square&color=7B2FC7&label=stars)](https://github.com/L0lopop/Nulltrap/stargazers)
+[![CI](https://img.shields.io/github/actions/workflow/status/L0lopop/Nulltrap/ci.yml?branch=main&style=flat-square&color=7B2FC7&label=build)](https://github.com/L0lopop/Nulltrap/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-7B2FC7?style=flat-square)](LICENSE)
+
 </div>
 
 > [!IMPORTANT]
@@ -109,6 +115,25 @@ The rule is enforced by the build, not by discipline: CI compiles `Core` and
 everything under it on Linux, where a Windows dependency cannot resolve at all.
 Reach for the registry from the portable half and the build goes red on the
 same push.
+
+## A star
+
+If Nulltrap turned out to be useful, press ★ at the top of this page. It is not
+a small thing: the `roblox` topic on GitHub holds hundreds of projects, and the
+ones people find are the ones with stars. One click, and whoever goes looking
+for a bootstrapper next gets here sooner.
+
+<div align="center">
+
+<a href="https://star-history.com/#L0lopop/Nulltrap&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date" />
+    <img alt="Stars over time" src="https://api.star-history.com/svg?repos=L0lopop/Nulltrap&type=Date" width="620" />
+  </picture>
+</a>
+
+</div>
 
 ## License
 
