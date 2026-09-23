@@ -222,6 +222,18 @@
                             <Border Style="{StaticResource RowCard}">
                                 <Grid>
                                     <StackPanel Margin="0,0,60,0">
+                                        <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.chooseServer}" />
+                                        <TextBlock Style="{StaticResource RowHint}"
+                                                   Text="{loc:S general.chooseServerHint}" />
+                                    </StackPanel>
+                                    <CheckBox x:Name="ChooseServerBox" Style="{StaticResource Switch}"
+                                              HorizontalAlignment="Right" VerticalAlignment="Top" />
+                                </Grid>
+                            </Border>
+
+                            <Border Style="{StaticResource RowCard}">
+                                <Grid>
+                                    <StackPanel Margin="0,0,60,0">
                                         <TextBlock Style="{StaticResource RowTitle}" Text="{loc:S general.closeRoblox}" />
                                         <TextBlock Style="{StaticResource RowHint}"
                                                    Text="{loc:S general.closeRobloxHint}" />

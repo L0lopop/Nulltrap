@@ -96,7 +96,8 @@ public partial class MainWindow : ChromeWindow
         base.OnClosing(e);
     }
 
-    public void LaunchGame(long placeId) => _ = LaunchAsync(BinaryType.WindowsPlayer, placeId);
+    public void LaunchGame(long placeId, string? title = null) =>
+        _ = LaunchAsync(BinaryType.WindowsPlayer, placeId, title);
 
     public void OpenSettings() => OpenSettings("Home");
 
@@ -150,9 +151,19 @@ public partial class MainWindow : ChromeWindow
         }
     }
 
-    private async Task LaunchAsync(BinaryType binaryType, long placeId = 0)
+    private async Task LaunchAsync(BinaryType binaryType, long placeId = 0, string? title = null)
     {
         if (binaryType == BinaryType.WindowsPlayer && !SecondClientDialog.Allowed(this))
+        {
+            return;
+        }
+
+        string? server = null;
+
+        if (binaryType == BinaryType.WindowsPlayer
+            && placeId > 0
+            && App.Services.Settings.Load().ChooseServer
+            && !ServerDialog.Ask(this, placeId, title, out server))
         {
             return;
         }
@@ -177,7 +188,7 @@ public partial class MainWindow : ChromeWindow
 
             int client = App.Services.ProcessLauncher.Start(
                 result.ExecutablePath,
-                placeId > 0 ? ClientArguments.ForGame(placeId) : ClientArguments.ForMenu(binaryType),
+                placeId > 0 ? ClientArguments.ForGame(placeId, server) : ClientArguments.ForMenu(binaryType),
                 result.VersionDirectory);
 
             window.ShowWaiting(Strings.Get("progress.waitingForRoblox"));

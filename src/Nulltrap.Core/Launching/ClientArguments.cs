@@ -15,10 +15,22 @@ public static class ClientArguments
     public static string ForMenu(BinaryType binaryType) =>
         binaryType == BinaryType.WindowsStudio64 ? string.Empty : AppFlag;
 
-    public static string ForGame(long placeId) =>
-        placeId <= 0
-            ? AppFlag
-            : $"{AppFlag} {DeepLinkFlag} {Quote(ExperienceLink + placeId.ToString(CultureInfo.InvariantCulture) + "&joinAttemptOrigin=" + JoinOrigin)}";
+    public static string ForGame(long placeId, string? serverId = null)
+    {
+        if (placeId <= 0)
+        {
+            return AppFlag;
+        }
+
+        string link = ExperienceLink + placeId.ToString(CultureInfo.InvariantCulture);
+
+        if (Roblox.ServerBrowser.IsServerId(serverId))
+        {
+            link += "&gameInstanceId=" + Uri.EscapeDataString(serverId!.Trim());
+        }
+
+        return $"{AppFlag} {DeepLinkFlag} {Quote(link + "&joinAttemptOrigin=" + JoinOrigin)}";
+    }
 
     public static string ForUri(BinaryType binaryType, string? uri) =>
         string.IsNullOrWhiteSpace(uri) ? ForMenu(binaryType) : Quote(uri.Trim());

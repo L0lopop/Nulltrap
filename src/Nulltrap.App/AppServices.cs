@@ -62,6 +62,7 @@ public sealed class AppServices : IDisposable
         Games = new GameInfoClient(_http);
         Locator = new ServerLocator(_http);
         Discover = new DiscoverClient(_http);
+        Servers = new ServerBrowser(_http);
         Accounts = new AccountInfoClient(_http);
         LauncherUpdates = new LauncherUpdateClient(_http);
         Sessions = new SessionTracker();
@@ -141,6 +142,8 @@ public sealed class AppServices : IDisposable
     public GameInfoClient Games { get; }
 
     public DiscoverClient Discover { get; }
+
+    public ServerBrowser Servers { get; }
 
     public AccountInfoClient Accounts { get; }
 

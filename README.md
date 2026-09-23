@@ -75,9 +75,9 @@ a flag will be ignored, rather than letting you believe it applied.
 Working today: self-installation without administrator rights, Roblox and
 Studio downloads with a checksum-addressed cache, protocol handlers, the
 graphics settings Roblox still allows, per-game profiles that carry both
-FastFlags and ordinary Roblox settings, a plugin contract with its own SDK,
-a tray icon with a background mode, join notices, and an English and Russian
-interface.
+FastFlags and ordinary Roblox settings, picking the exact server before a game
+starts, a plugin contract with its own SDK, a tray icon with a background mode,
+join notices, and an English and Russian interface.
 
 ## Building
 

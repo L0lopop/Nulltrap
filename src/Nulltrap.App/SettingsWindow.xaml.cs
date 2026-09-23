@@ -194,6 +194,7 @@ public partial class SettingsWindow : ChromeWindow
         _flags = _fastFlags.Load();
 
         CloseAfterLaunchBox.IsChecked = _settings.CloseAfterLaunch;
+        ChooseServerBox.IsChecked = _settings.ChooseServer;
         ConfirmMultipleInstancesBox.IsChecked = _settings.ConfirmMultipleInstances;
         DesktopShortcutBox.IsChecked = _settings.DesktopShortcut;
         StartMenuShortcutBox.IsChecked = _settings.StartMenuShortcut;
@@ -905,7 +906,7 @@ public partial class SettingsWindow : ChromeWindow
             Style = (Style)FindResource("BluePlay"),
             Content = Strings.Get("home.playThis"),
             Margin = new Thickness(0, 10, 0, 0),
-            Tag = placeId,
+            Tag = new Wanted(placeId, title),
         };
 
         play.Click += OnPlayTile;
@@ -919,20 +920,22 @@ public partial class SettingsWindow : ChromeWindow
         return stack;
     }
 
+    private sealed record Wanted(long Place, string Title);
+
     private void OnPlayTile(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: long place } && place > 0)
+        if (sender is Button { Tag: Wanted wanted } && wanted.Place > 0)
         {
-            Play(place);
+            Play(wanted.Place, wanted.Title);
         }
     }
 
-    private void Play(long placeId)
+    private void Play(long placeId, string? title)
     {
         if (Owner is MainWindow home)
         {
             Close();
-            home.LaunchGame(placeId);
+            home.LaunchGame(placeId, title);
             return;
         }
 
@@ -2557,6 +2560,7 @@ public partial class SettingsWindow : ChromeWindow
         _settings.Monitoring = MonitoringBox.IsChecked == true;
         _settings.ServerNotice = ServerNoticeBox.IsChecked == true;
         _settings.CloseAfterLaunch = CloseAfterLaunchBox.IsChecked == true;
+        _settings.ChooseServer = ChooseServerBox.IsChecked == true;
         _settings.CloseRobloxOnLeave = CloseRobloxOnLeaveBox.IsChecked == true;
         _settings.StayInTray = StayInTrayBox.IsChecked == true;
         _settings.RunAtStartup = RunAtStartupBox.IsChecked == true;

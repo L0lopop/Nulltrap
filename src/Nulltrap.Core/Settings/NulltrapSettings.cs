@@ -44,6 +44,9 @@ public sealed record NulltrapSettings
     [JsonPropertyName("closeRobloxOnLeave")]
     public bool CloseRobloxOnLeave { get; set; }
 
+    [JsonPropertyName("chooseServer")]
+    public bool ChooseServer { get; set; }
+
     [JsonPropertyName("confirmMultipleInstances")]
     public bool ConfirmMultipleInstances { get; set; } = true;
 

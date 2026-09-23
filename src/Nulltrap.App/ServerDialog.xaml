@@ -1,0 +1,145 @@
+﻿<local:ChromeWindow x:Class="Nulltrap.App.ServerDialog"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:local="clr-namespace:Nulltrap.App"
+                    xmlns:loc="clr-namespace:Nulltrap.App.Localization"
+                    mc:Ignorable="d"
+                    Style="{StaticResource ChromeWindowStyle}"
+                    Title="{loc:S server.title}"
+                    Height="640" Width="580"
+                    ShowMinimize="False"
+                    ResizeMode="NoResize"
+                    ShowInTaskbar="False"
+                    WindowStartupLocation="CenterOwner">
+
+    <local:ChromeWindow.Resources>
+        <Style x:Key="ServerRow" TargetType="ToggleButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0,0,0,6" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Shell"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource RuleBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="14,10">
+                            <ContentPresenter HorizontalAlignment="Stretch" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Shell" Property="Background"
+                                        Value="{DynamicResource SurfaceHoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Shell" Property="Background"
+                                        Value="{DynamicResource NavPickedBrush}" />
+                                <Setter TargetName="Shell" Property="BorderBrush"
+                                        Value="{DynamicResource PurpleBrightBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </local:ChromeWindow.Resources>
+
+    <Grid Margin="26,18,26,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock x:Name="PlaceText"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource TextBrush}" />
+            <TextBlock Text="{loc:S server.hint}" Style="{StaticResource RowHint}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,14,0,10">
+            <StackPanel Orientation="Horizontal">
+                <ComboBox x:Name="OrderBox"
+                          Style="{StaticResource Dropdown}"
+                          Width="190"
+                          SelectionChanged="OnOrderChanged" />
+                <CheckBox x:Name="HideFullBox"
+                          Style="{StaticResource Tick}"
+                          Margin="14,0,0,0"
+                          VerticalAlignment="Center"
+                          IsChecked="True"
+                          Content="{loc:S server.hideFull}"
+                          Checked="OnHideFullChanged"
+                          Unchecked="OnHideFullChanged" />
+            </StackPanel>
+
+            <TextBlock x:Name="CountText"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Foreground="{DynamicResource TextSoftBrush}" />
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="{DynamicResource VoidBrush}"
+                BorderBrush="{DynamicResource RuleBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12,12,8,12">
+            <Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="ListPanel" Margin="0,0,4,0" />
+                </ScrollViewer>
+
+                <TextBlock x:Name="StatusText"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="20,0"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           FontSize="12"
+                           Foreground="{DynamicResource TextSoftBrush}" />
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="3" Margin="0,14,0,0">
+            <TextBlock Text="{loc:S server.byId}" Style="{StaticResource RowTitle}" />
+            <TextBox x:Name="ServerIdBox"
+                     Style="{StaticResource Field}"
+                     Margin="0,6,0,0"
+                     TextChanged="OnServerIdChanged" />
+            <TextBlock x:Name="IdNoteText" Style="{StaticResource RowHint}" Text="{loc:S server.byIdHint}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,0">
+            <Button x:Name="JoinButton"
+                    Style="{StaticResource Accent}"
+                    MinWidth="150"
+                    IsEnabled="False"
+                    Content="{loc:S server.join}"
+                    Click="OnJoin" />
+            <Button Style="{StaticResource Quiet}"
+                    MinWidth="120"
+                    Margin="8,0,0,0"
+                    Content="{loc:S server.any}"
+                    Click="OnAny" />
+            <Button Style="{StaticResource Quiet}"
+                    MinWidth="100"
+                    Margin="8,0,0,0"
+                    Content="{loc:S action.cancel}"
+                    Click="OnCancel" />
+        </StackPanel>
+    </Grid>
+</local:ChromeWindow>
